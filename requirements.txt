@@ -1,0 +1,35 @@
+# AI in Practice I - Module 1: Applied GenAI
+# Python >=3.11,<3.15   (verified on 3.13 and 3.14)
+#
+# The floor is set by the dependency set, not by our code: current numpy
+# and scipy require 3.12, and pandas/matplotlib/scikit-learn require 3.11.
+# Our own code needs 3.10 (Pydantic evaluates `str | None` at runtime).
+# The ceiling is litellm's: it declares <3.15.
+
+# --- model access -----------------------------------------------------------
+litellm>=1.55.0            # one client for Anthropic / OpenAI / Gemini / Groq / Ollama
+python-dotenv>=1.0.0
+
+# --- contracts and validation -----------------------------------------------
+pydantic>=2.9.0
+
+# --- retrieval ---------------------------------------------------------------
+chromadb>=0.5.20           # embedded vector store, no server
+rank-bm25>=0.2.2           # lexical baseline
+sentence-transformers>=3.3.0   # local embeddings + cross-encoder reranker
+numpy>=1.26.0
+
+# --- serving (Lab 7) ---------------------------------------------------------
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+streamlit>=1.40.0
+sse-starlette>=2.1.0
+pyyaml>=6.0
+
+# --- analysis ----------------------------------------------------------------
+pandas>=2.2.0
+matplotlib>=3.9.0
+
+# --- dev ---------------------------------------------------------------------
+pytest>=8.3.0
+ruff>=0.8.0
