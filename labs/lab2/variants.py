@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from aip.llm import StructuredOutputError, structured  # noqa: E402
 from labs.lab1.extract import (  # noqa: E402
-    SYSTEM_PROMPT, TicketRecord, apply_business_rules, extract_deterministic,
+    SYSTEM_PROMPT, TicketRecordC, apply_business_rules, extract_deterministic,
 )
 
 # ---------------------------------------------------------------------------
@@ -93,8 +93,6 @@ def few_shot_block(ids: list[str], include_reasoning: bool = False) -> str:
         out["sentiment"] = exp["sentiment"]
         out["product"] = exp["product"]
         out["language"] = exp["language"]
-        out["policy_number"] = exp["policy_number"]
-        out["contains_pii"] = exp["contains_pii"]
 
         rendered_output = json.dumps(out, indent=2)
         blocks.append(
@@ -111,7 +109,7 @@ def few_shot_block(ids: list[str], include_reasoning: bool = False) -> str:
 def zero_shot(ticket: str, tier: str = "SMALL") -> dict:
     """TODO B: Lab 1 Part C, no examples. This is your baseline."""
     try:
-        rec = structured(ticket, schema=TicketRecord, system=SYSTEM_PROMPT, tier=tier)
+        rec = structured(ticket, schema=TicketRecordC, system=SYSTEM_PROMPT, tier=tier)
         d = rec.model_dump()
     except StructuredOutputError as exc:
         d = {
@@ -121,8 +119,6 @@ def zero_shot(ticket: str, tier: str = "SMALL") -> dict:
             "product": "unknown",
             "language": "en",
             "evidence": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Structured output failed: {exc}",
         }
@@ -134,8 +130,6 @@ def zero_shot(ticket: str, tier: str = "SMALL") -> dict:
             "product": "unknown",
             "language": "en",
             "evidence": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Unexpected error: {type(exc).__name__}: {exc}",
         }
@@ -155,7 +149,7 @@ def few_shot(ticket: str, tier: str = "SMALL") -> dict:
         f"{ticket}"
     )
     try:
-        rec = structured(prompt, schema=TicketRecord, system=SYSTEM_PROMPT, tier=tier)
+        rec = structured(prompt, schema=TicketRecordC, system=SYSTEM_PROMPT, tier=tier)
         d = rec.model_dump()
     except StructuredOutputError as exc:
         d = {
@@ -165,8 +159,6 @@ def few_shot(ticket: str, tier: str = "SMALL") -> dict:
             "product": "unknown",
             "language": "en",
             "evidence": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Structured output failed: {exc}",
         }
@@ -178,8 +170,6 @@ def few_shot(ticket: str, tier: str = "SMALL") -> dict:
             "product": "unknown",
             "language": "en",
             "evidence": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Unexpected error: {type(exc).__name__}: {exc}",
         }
@@ -189,7 +179,7 @@ def few_shot(ticket: str, tier: str = "SMALL") -> dict:
     return d
 
 
-class TicketRecordReasoned(TicketRecord):
+class TicketRecordReasoned(TicketRecordC):
     """TODO B: add a `reasoning: str` field FIRST (T2 §3.3).
 
     Pydantic keeps declaration order, and field order in the JSON Schema
@@ -234,8 +224,6 @@ def few_shot_reasoned(ticket: str, tier: str = "SMALL") -> dict:
             "language": "en",
             "evidence": "",
             "reasoning": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Structured output failed: {exc}",
         }
@@ -248,8 +236,6 @@ def few_shot_reasoned(ticket: str, tier: str = "SMALL") -> dict:
             "language": "en",
             "evidence": "",
             "reasoning": "",
-            "policy_number": None,
-            "contains_pii": False,
             "needs_human_review": True,
             "review_reason": f"Unexpected error: {type(exc).__name__}: {exc}",
         }
@@ -275,26 +261,23 @@ def cascade(ticket: str) -> dict:
     small_rec = None
 
     try:
-        small_rec = structured(ticket, schema=TicketRecord, system=SYSTEM_PROMPT, tier="SMALL", temperature=0.0)
+        small_rec = structured(ticket, schema=TicketRecordC, system=SYSTEM_PROMPT, tier="SMALL", temperature=0.0)
         evidence = str(small_rec.evidence or "").strip()
         if len(evidence) < 10:
             should_escalate = True
         else:
             # Check self-consistency disagreement trigger: draw a second sample at T=0.7
             # T>0 changes both sampling and the cache key, avoiding identical cache hits
-            sample2 = structured(ticket, schema=TicketRecord, system=SYSTEM_PROMPT, tier="SMALL", temperature=0.7)
-            if (
-                small_rec.category != sample2.category
-                or small_rec.urgency != sample2.urgency
-                or small_rec.sentiment != sample2.sentiment
-            ):
+            sample2 = structured(ticket, schema=TicketRecordC, system=SYSTEM_PROMPT, tier="SMALL", temperature=0.7)
+            disagree_fields = ("category", "urgency", "sentiment", "product", "language")
+            if any(getattr(small_rec, f) != getattr(sample2, f) for f in disagree_fields):
                 should_escalate = True
     except Exception:
         should_escalate = True
 
     if should_escalate:
         try:
-            large_rec = structured(ticket, schema=TicketRecord, system=SYSTEM_PROMPT, tier="MAIN")
+            large_rec = structured(ticket, schema=TicketRecordC, system=SYSTEM_PROMPT, tier="MAIN")
             d = large_rec.model_dump()
         except StructuredOutputError as exc:
             d = {
@@ -304,8 +287,6 @@ def cascade(ticket: str) -> dict:
                 "product": "unknown",
                 "language": "en",
                 "evidence": "",
-                "policy_number": None,
-                "contains_pii": False,
                 "needs_human_review": True,
                 "review_reason": f"Structured output failed on MAIN: {exc}",
             }
@@ -317,8 +298,6 @@ def cascade(ticket: str) -> dict:
                 "product": "unknown",
                 "language": "en",
                 "evidence": "",
-                "policy_number": None,
-                "contains_pii": False,
                 "needs_human_review": True,
                 "review_reason": f"Unexpected error on MAIN: {type(exc).__name__}: {exc}",
             }
