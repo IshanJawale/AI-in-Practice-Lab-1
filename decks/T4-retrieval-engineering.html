@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Subrat Panda">
+<meta name="description" content="Theory 4 of 4 — Retrieval Engineering. Chunking, hybrid retrieval, reranking, and diagnosing which stage of a RAG pipeline failed.">
+<title>T4 · Retrieval Engineering and the Seven Failure Modes of RAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FCFCFD; --surface:#F1F3F6; --sunk:#E7EAEF;
+  --ink:#14161B; --body:#2B303A; --muted:#626A78; --faint:#8A929F;
+  --rule:#DCE0E7; --rule-strong:#BFC5D0;
+  --slate:#16212E; --slate-2:#1E2C3D; --slate-ink:#E9EDF3; --slate-muted:#8FA3BC;
+  --accent:#AE4224; --accent-ink:#8E3520; --accent-soft:#F7E7E1;
+  --teal:#1D5E5C; --teal-soft:#DCEBE8;
+  --gold:#8A6A16; --gold-soft:#F6EEDA;
+  --ok:#1F6B45; --ok-soft:#DFF0E6;
+  --shadow:0 1px 2px rgba(20,22,27,.06), 0 18px 44px -28px rgba(20,22,27,.4);
+  --stage-w:1280px; --stage-h:720px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#0B0F14}
+body{font-family:"Source Serif 4",Georgia,serif;color:var(--body);-webkit-font-smoothing:antialiased}
+.ui{font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- stage ---------- */
+#stage{position:absolute;top:50%;left:50%;width:var(--stage-w);height:var(--stage-h);
+  transform-origin:center center;background:var(--paper);overflow:hidden;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.slide{position:absolute;inset:0;padding:56px 72px;display:none;flex-direction:column;
+  background:var(--paper);animation:in .28s ease both}
+.slide.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}}
+
+/* ---------- typography ---------- */
+h1{font-family:Archivo,sans-serif;font-size:56px;font-weight:700;line-height:1.03;
+  letter-spacing:-.025em;margin:0 0 16px;color:#fff;text-wrap:balance}
+h2{font-family:Archivo,sans-serif;font-size:38px;font-weight:600;letter-spacing:-.018em;
+  margin:0 0 6px;color:var(--ink);line-height:1.12;text-wrap:balance}
+h3{font-family:Archivo,sans-serif;font-size:15px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+p{margin:0 0 15px;font-size:22px;line-height:1.5;max-width:64ch}
+.sub{font-size:19px;color:var(--accent-ink);font-weight:600;font-family:Archivo,sans-serif;
+  margin:-2px 0 20px}
+.rule{height:2px;background:var(--ink);margin:14px 0 26px;flex:none}
+.small{font-size:17px;line-height:1.45;color:var(--muted)}
+.tiny{font-size:14.5px;line-height:1.45;color:var(--faint)}
+b,strong{font-weight:600;color:var(--ink)}
+em{font-style:italic}
+.body-scroll{overflow-y:auto;flex:1;min-height:0;padding-right:6px}
+
+/* ---------- title & section slides ---------- */
+.dark{background:var(--slate);color:var(--slate-ink)}
+.dark h2{color:#fff}.dark p{color:#C3D0E0}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--slate-muted);margin:0 0 26px}
+.tick{width:74px;height:5px;background:var(--accent);margin:0 0 30px;border-radius:2px}
+.byline{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;
+  border-top:1px solid rgba(255,255,255,.14);padding-top:18px;
+  font-family:Archivo,sans-serif;font-size:15px;color:var(--slate-muted)}
+.byline b{color:#fff;font-weight:600;display:block;font-size:17px}
+.secnum{font-family:"IBM Plex Mono",monospace;font-size:80px;font-weight:600;
+  color:rgba(255,255,255,.16);line-height:1;margin-bottom:4px}
+
+/* ---------- statement ---------- */
+.statement{font-family:Archivo,sans-serif;font-size:40px;font-weight:600;line-height:1.24;
+  letter-spacing:-.016em;color:#fff;max-width:24ch;margin:0}
+.attrib{margin-top:26px;font-size:18px;line-height:1.5;color:#A9BBD0;max-width:62ch;
+  font-family:"Source Serif 4",serif}
+
+/* ---------- generic blocks ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:9px;padding:18px 20px}
+.card h4{font-family:Archivo,sans-serif;font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+.card.good h4{color:var(--ok)} .card.bad h4{color:var(--accent-ink)}
+.card ul{margin:0;padding-left:18px} .card li{font-size:17px;line-height:1.42;margin-bottom:8px}
+.card li:last-child{margin-bottom:0}
+
+.pull{border-left:4px solid var(--accent);background:var(--accent-soft);
+  padding:16px 22px;border-radius:0 7px 7px 0;margin:6px 0 18px}
+.pull p{margin:0;font-size:20px;color:var(--ink)}
+
+table{border-collapse:collapse;width:100%;font-size:17px}
+th{font-family:Archivo,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);text-align:left;padding:0 14px 8px 0;
+  border-bottom:2px solid var(--rule-strong)}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.38}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;padding-right:0;font-family:"IBM Plex Mono",monospace}
+
+pre{font-family:"IBM Plex Mono",monospace;font-size:15.5px;line-height:1.5;
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:16px 20px;margin:0;overflow:auto;color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--sunk);
+  padding:1px 5px;border-radius:4px}
+
+/* ---------- fragments ---------- */
+.frag{opacity:.12;filter:blur(.4px);transition:opacity .3s,filter .3s,transform .3s}
+.frag.show{opacity:1;filter:none}
+@media (prefers-reduced-motion:reduce){.frag{transition:none}}
+
+/* ---------- interactive: reveal ---------- */
+.reveal-btn{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;
+  background:var(--ink);color:#fff;border:0;border-radius:6px;padding:9px 16px;
+  cursor:pointer;letter-spacing:.02em}
+.reveal-btn:hover{background:var(--accent)}
+.reveal-body{display:none;margin-top:14px}
+.reveal-body.open{display:block;animation:in .25s ease both}
+
+/* ---------- interactive: clickable rows ---------- */
+.exp{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:7px;
+  background:var(--paper)}
+.exp summary{list-style:none;cursor:pointer;padding:11px 16px;display:flex;gap:14px;
+  align-items:center;font-size:17px;background:var(--surface)}
+.exp summary::-webkit-details-marker{display:none}
+.exp summary:hover{background:var(--sunk)}
+.exp[open] summary{background:var(--ink);color:#fff}
+.exp[open] summary .idx{background:var(--accent);color:#fff}
+.exp .idx{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  background:var(--sunk);color:var(--muted);width:26px;height:26px;border-radius:5px;
+  display:grid;place-items:center;flex:none}
+.exp .ttl{font-family:Archivo,sans-serif;font-weight:600;flex:none;min-width:210px}
+.exp .hint{color:var(--muted);font-size:15.5px}
+.exp[open] summary .hint{color:#B9C4D2}
+.exp .detail{padding:14px 16px 16px 56px;font-size:17px;line-height:1.5}
+.exp .detail .fix{margin-top:9px;padding-left:12px;border-left:3px solid var(--ok);
+  color:var(--ink)}
+
+/* ---------- interactive: boundary chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.chip{font-family:Archivo,sans-serif;font-size:16px;font-weight:600;padding:9px 15px;
+  border-radius:7px;border:1.5px solid var(--rule-strong);background:var(--paper);
+  cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.done{border-color:var(--rule);color:var(--faint)}
+#bslot{min-height:132px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:9px;padding:18px 22px}
+#bslot .who{font-family:Archivo,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:8px}
+#bslot .who.code{color:var(--ok)} #bslot .who.model{color:var(--accent-ink)}
+#bslot .why{font-size:19px;line-height:1.45;margin:0}
+
+/* ---------- interactive: cost calculator ---------- */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+.ctl{margin-bottom:15px}
+.ctl label{display:flex;justify-content:space-between;font-family:Archivo,sans-serif;
+  font-size:14px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.ctl label b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-size:15px}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.readout{background:var(--slate);border-radius:10px;padding:20px 22px;color:var(--slate-ink)}
+.readout .row{display:flex;justify-content:space-between;align-items:baseline;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.11)}
+.readout .row:last-child{border-bottom:none}
+.readout .lbl{font-family:Archivo,sans-serif;font-size:14px;color:var(--slate-muted)}
+.readout .val{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;color:#fff}
+.readout .val.big{font-size:31px}
+.readout .val.accent{color:#F0A18A}
+.verdict{margin-top:12px;font-size:16px;line-height:1.45;color:#C3D0E0;font-family:"Source Serif 4",serif}
+
+/* ---------- interactive: layer stack ---------- */
+.stack{display:flex;flex-direction:column-reverse;gap:5px}
+.layer{display:flex;align-items:center;gap:14px;padding:9px 16px;border-radius:7px;
+  background:var(--surface);border:1px solid var(--rule);cursor:pointer;transition:.15s}
+.layer:hover{border-color:var(--rule-strong);transform:translateX(3px)}
+.layer.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.layer.hl{border-color:var(--accent);border-width:2px}
+.layer .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--faint);width:16px}
+.layer.active .no{color:#8FA3BC}
+.layer .nm{font-family:Archivo,sans-serif;font-weight:600;font-size:16px;min-width:150px}
+.layer .ds{font-size:15.5px;color:var(--muted)}
+.layer.active .ds{color:#B9C4D2}
+#lslot{margin-top:14px;background:var(--accent-soft);border-left:4px solid var(--accent);
+  border-radius:0 7px 7px 0;padding:14px 18px;font-size:17px;line-height:1.45;min-height:74px}
+#lslot .mod{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--accent-ink);
+  font-weight:600;display:block;margin-bottom:5px}
+
+/* ---------- references ---------- */
+.refs{display:grid;gap:9px}
+.ref{display:grid;grid-template-columns:112px 1fr;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--rule);font-size:16.5px;line-height:1.42}
+.ref:last-child{border-bottom:none}
+.ref .tag{font-family:Archivo,sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:#fff;background:var(--muted);border-radius:4px;
+  padding:3px 8px;height:fit-content;text-align:center}
+.ref .tag.paper{background:var(--teal)} .ref .tag.doc{background:var(--gold)}
+.ref .tag.repo{background:var(--accent)} .ref .tag.book{background:var(--slate-2)}
+.ref a{color:var(--accent-ink);word-break:break-word}
+.ref .why{display:block;color:var(--muted);font-size:15px;margin-top:3px}
+
+/* ---------- chrome ---------- */
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--accent);z-index:40;
+  transition:width .25s}
+#hud{position:fixed;right:16px;bottom:14px;z-index:40;font-family:Archivo,sans-serif;
+  font-size:13px;color:#8895A6;display:flex;gap:14px;align-items:center}
+#hud kbd{font-family:"IBM Plex Mono",monospace;background:#1A222C;color:#B9C4D2;
+  border-radius:4px;padding:2px 6px;font-size:11.5px}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;z-index:50;
+  background:#0E141B;color:#C7D2E0;border-top:2px solid var(--accent);padding:18px 26px;
+  display:none;font-size:15.5px;line-height:1.55}
+#notes.on{display:block}
+#notes h5{font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:#7A8899;margin:0 0 8px}
+#notes b{color:#fff}
+#grid{position:fixed;inset:0;z-index:60;background:#0B0F14;overflow:auto;padding:26px;
+  display:none;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px;
+  align-content:start}
+#grid.on{display:grid}
+.thumb{background:var(--paper);border-radius:7px;padding:12px;cursor:pointer;
+  border:2px solid transparent;min-height:104px}
+.thumb:hover,.thumb.cur{border-color:var(--accent)}
+.thumb .tn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint)}
+.thumb .tt{font-family:Archivo,sans-serif;font-size:13.5px;font-weight:600;color:var(--ink);
+  margin-top:5px;line-height:1.28}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* --- per-slide density adjustments -------------------------------------
+   Measured, not guessed: these two slides overflowed the 1280x720 stage by
+   33px and 25px respectively. A slide that overflows is silently cropped on
+   a projector, so the deck self-checks -- see the console helper at the
+   bottom of the script. --------------------------------------------------- */
+.slide.tight p{margin-bottom:10px;font-size:20.5px}
+.slide.tight .rule{margin:9px 0 15px}
+.slide.tight .ctl{margin-bottom:10px}
+.slide.tight .pull{margin:4px 0 0;padding:13px 20px}
+.slide.tight .pull p{font-size:18px}
+.slide.tight table{font-size:16.5px}
+.slide.tight table td{padding:6px 14px 6px 0}
+.slide.tight .sub{margin:-2px 0 12px}
+.slide.tight h2{font-size:34px}
+
+@media print{
+  html,body{overflow:visible;background:#fff;height:auto}
+  #stage{position:static;transform:none!important;width:100%;height:auto;box-shadow:none}
+  .slide{display:flex!important;position:relative;page-break-after:always;
+    height:190mm;animation:none}
+  .frag{opacity:1!important;filter:none!important}
+  .reveal-body{display:block!important}
+  .exp .detail{display:block!important}
+  #bar,#hud,#notes,#grid{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="stage" aria-live="polite"></div>
+<div id="bar"></div>
+<div id="hud">
+  <span id="pos" class="mono">1 / 1</span>
+  <span><kbd>←</kbd><kbd>→</kbd> move</span>
+  <span><kbd>S</kbd> notes</span>
+  <span><kbd>O</kbd> overview</span>
+  <span><kbd>F</kbd> full</span>
+</div>
+<div id="notes"><h5>Speaker notes</h5><div id="notesbody"></div></div>
+<div id="grid"></div>
+
+<script>
+/* =====================================================================
+   AI in Practice I — Module 1: Applied GenAI
+   T4 · Retrieval Engineering and the Seven Failure Modes of RAG
+   Author: Subrat Panda · Plaksha University
+
+   Self-contained. Open in a browser and press F.
+     arrows / space  move      S  speaker notes
+     O  overview grid          F  full screen
+   Run overflowCheck() in the console before presenting.
+
+   Source: decks/src/T4.js  ·  Rebuild: python scripts/build_html_decks.py
+   ===================================================================== */
+
+const AUTHOR = "Subrat Panda";
+
+const SLIDES = [
+
+/* 1 ------------------------------------------------------------------ */
+{ t:"Title", cls:"dark", html:`
+  <p class="eyebrow">AI in Practice I · Module 1: Applied GenAI · Theory 4 of 4</p>
+  <div class="tick"></div>
+  <h1>Retrieval Engineering</h1>
+  <p style="font-size:24px;max-width:60ch;color:#B6C3D4;margin-top:6px">
+    …and the seven failure modes of RAG. Because when the answer is wrong,
+    <em>"RAG is bad"</em> is not a diagnosis — exactly one stage failed, and each one
+    has a different fix.</p>
+  <div class="byline">
+    <div><b>${AUTHOR}</b>Plaksha University · MS in Artificial Intelligence</div>
+    <div style="text-align:right">90 minutes<br>
+      <span style="color:#7E94B4">Prepares you for Labs 3, 4 and 5</span></div>
+  </div>`,
+  notes:`This session carries three labs, so it is dense. Protect the last twenty
+  minutes for the failure modes — that is what Lab 5 runs on.` },
+
+/* 2 ------------------------------------------------------------------ */
+{ t:"Where we are going", html:`
+  <h2>Where we are going</h2>
+  <div class="rule"></div>
+  <div class="body-scroll">
+  <p>The co-requisite course has shown you the RAG pipeline diagram. This session
+     takes it apart, and most of what you learn will be about the parts of that
+     diagram nobody draws.</p>
+  <div class="grid2" style="margin-top:18px">
+    <div class="card"><h4>1 · Ingestion and chunking</h4>
+      <p class="small" style="margin:0">Where most of the quality is decided, and the
+      step almost everyone skips in favour of tuning something more interesting.</p></div>
+    <div class="card"><h4>2 · Indexing and retrieval</h4>
+      <p class="small" style="margin:0">Dense, lexical, hybrid, reranked — and the
+      measured result on our own corpus that contradicts the standard advice.</p></div>
+    <div class="card"><h4>3 · The seven failure modes</h4>
+      <p class="small" style="margin:0">A diagnostic tree that turns "the answer was
+      wrong" into a specific, fixable stage. Lab 5 is built entirely on this.</p></div>
+    <div class="card"><h4>4 · Generation, citation, refusal</h4>
+      <p class="small" style="margin:0">The last stage has its own contract: cite by
+      index, validate in code, and give the system a legal way to say no.</p></div>
+  </div>
+  <p class="tiny" style="margin-top:18px">Full prose:
+     <code>theory/T4-retrieval-engineering.md</code></p>
+  </div>`,
+  notes:`60 seconds.` },
+
+/* 3 ------------------------------------------------------------------ */
+{ t:"The real comparison", html:`
+  <h2>RAG versus what, exactly?</h2>
+  <div class="rule"></div>
+  <p>RAG is usually presented against fine-tuning. For most problems that is the
+     wrong comparison, because they do different things.</p>
+  <table style="margin-top:4px">
+    <tr><th></th><th>RAG</th><th>Fine-tuning</th><th>Long context</th></tr>
+    <tr><td>Adds <b>knowledge</b></td><td>yes</td><td>poorly</td><td>yes</td></tr>
+    <tr><td>Changes <b>behaviour, tone, format</b></td><td>poorly</td><td>yes</td><td>somewhat</td></tr>
+    <tr><td>Update latency</td><td>seconds</td><td>hours–days</td><td>seconds</td></tr>
+    <tr><td><b>Attribution possible</b></td><td><b>yes</b></td><td>no</td><td>partially</td></tr>
+    <tr><td><b>Per-document access control</b></td><td><b>yes</b></td><td>no</td><td>no</td></tr>
+    <tr><td>Corpus size ceiling</td><td>unbounded</td><td>n/a</td><td>context window</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:14px"><p>The two bold rows usually decide
+    it in an enterprise. <b>Attribution</b> is a hard requirement in insurance,
+    finance, medicine and law, and fine-tuning cannot provide it at all. <b>Per-user
+    access control</b> is likewise unachievable once knowledge is baked into weights:
+    everyone who can call the model can reach it.</p></div>`,
+  notes:`The honest 2026 comparison is RAG versus <b>long context</b>, not versus
+  fine-tuning. Use long context when the corpus is small, static, and every query
+  needs all of it — and note there is a monthly invoice attached, because you pay for
+  every input token on every call.` },
+
+/* 4 ------------------------------------------------------------------ */
+{ t:"§1 Chunking", cls:"dark", html:`
+  <p class="secnum mono">01</p>
+  <h2 style="font-size:44px">Ingestion and chunking</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    Where most of the quality is decided — and the step students skip, because
+    swapping the embedding model feels more like engineering.</p>`,
+  notes:`10–25 min.` },
+
+/* 5 ------------------------------------------------------------------ */
+{ t:"The strongest claim", cls:"dark", html:`
+  <div class="tick" style="margin-top:56px"></div>
+  <p class="statement" style="font-size:36px">For a typical corpus, chunking strategy
+    affects end-to-end RAG quality more than the choice of embedding model.<br><br>
+    By a wide margin.</p>
+  <p class="attrib">You will verify this yourself in Lab 3, on this corpus, with
+    numbers. Or you will refute it — which would also be a result.</p>`,
+  notes:`Say the number now if you like: markdown-aware chunking measures nDCG@10
+  0.846 against fixed-size 0.795 on our corpus, and the heading-path prefix alone is
+  worth +0.054.` },
+
+/* 6 ------------------------------------------------------------------ */
+{ t:"Try the chunkers", html:`
+  <h2>Try it: four strategies on the same document</h2>
+  <p class="sub">Pick a strategy and a size. Watch where the boundaries land.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="chips" id="chunkStrat"></div>
+  <div class="ctl" style="max-width:420px"><label>Chunk size
+      <b id="v_cs">400 characters</b></label>
+    <input type="range" id="s_cs" min="150" max="900" step="50" value="400"></div>
+  <div id="chunkOut" style="margin-top:10px"></div>`,
+  notes:`Start with <b>fixed</b> at 150 and let them see a sentence cut mid-word.
+  Then <b>markdown</b> — point at the <code>[Heading &gt; Path]</code> prefix on every
+  chunk, which is the single cheapest trick in this session.
+  <br><br>Ask: which of these would retrieve for "how long do I have to file?" The
+  fixed one splits the answer across two chunks and neither retrieves.` },
+
+/* 7 ------------------------------------------------------------------ */
+{ t:"The trade-off", html:`
+  <h2>The trade-off, including the half nobody mentions</h2>
+  <div class="rule"></div>
+  <div class="grid2">
+    <div class="card"><h4>Small chunks · ~200 tokens</h4><ul>
+      <li>Precise embeddings — the vector means one thing</li>
+      <li>Tight, cheap context</li>
+      <li><b>✕</b> The answer is split across two chunks and neither retrieves alone</li>
+      <li><b>✕</b> No surrounding context for the generator to work with</li>
+    </ul></div>
+    <div class="card"><h4>Large chunks · ~2000 tokens</h4><ul>
+      <li>Context preserved</li>
+      <li>Fewer boundary splits</li>
+      <li><b>✕</b> <b>Diluted embedding</b> — one vector averaging five topics is
+        close to nothing in particular</li>
+      <li><b>✕</b> Expensive, and full of distractors</li>
+    </ul></div>
+  </div>
+  <div class="pull frag" style="margin-top:16px"><p>The dilution point is the
+    non-obvious one. An embedding is a <b>single vector for the whole chunk</b>. Make
+    the chunk bigger and you do not get a richer vector — you get a blurrier one.
+    <b>Larger chunks are not simply "safer".</b></p></div>`,
+  notes:`Everyone's instinct is that bigger is safer. It is not, and the reason is
+  worth a full minute.` },
+
+/* 8 ----------------------------------------------------------------- */
+{ t:"Beats the embedding model", html:`
+  <h2>Things that matter more than the embedding model</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><td style="width:30%"><b>Contextual retrieval</b></td>
+      <td>One LLM-generated sentence per chunk at ingest, situating it in the
+      document. Costs one small-model call per chunk, <em>once</em>. Anthropic report
+      roughly 35% fewer retrieval failures when combined with BM25.</td></tr>
+    <tr><td><b>Metadata</b></td>
+      <td>Store <code>plan</code>, <code>effective_date</code>, <code>status</code>
+      alongside each chunk, and filter <em>before</em> searching. Excluding archived
+      documents solves our whole superseded-document trap at zero query cost.</td></tr>
+    <tr><td><b>Deduplication</b></td>
+      <td>Near-duplicate chunks waste the top-k slots you are paying for.</td></tr>
+    <tr><td><b>Small-to-big</b></td>
+      <td>Embed a small precise chunk; return the larger parent section. Best of both,
+      at the cost of some bookkeeping.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:16px"><p><b>The best retrieval fix is often
+    not retrieval.</b> Two of the four rows above are data-layer changes that never
+    touch the retriever at all.</p></div>`,
+  notes:`The metadata row comes back at the end of Lab 3, where filtering archived
+  documents takes the trap questions from hit_rate@1 0.667 to <b>1.000</b>, free.` },
+
+/* 9 ----------------------------------------------------------------- */
+{ t:"§2 Retrieval", cls:"dark", html:`
+  <p class="secnum mono">02</p>
+  <h2 style="font-size:44px">Indexing and retrieval</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    Dense, lexical, hybrid, reranked. And one measured result from our own corpus
+    that contradicts the advice you will read everywhere else.</p>`,
+  notes:`25–45 min.` },
+
+/* 10 ---------------------------------------------------------------- */
+{ t:"Dense and its blind spot", html:`
+  <h2>Dense retrieval, and its blind spot</h2>
+  <div class="rule"></div>
+  <div class="grid2">
+    <div class="card good"><h4>What it is brilliant at</h4>
+      <p class="small" style="margin:0 0 10px">Semantic matching with no shared
+      vocabulary. The query</p>
+      <p class="small" style="margin:0 0 8px;padding-left:12px;border-left:3px solid var(--ok)">
+        <em>"how long do I have to file?"</em></p>
+      <p class="small" style="margin:0 0 8px">finds the passage</p>
+      <p class="small" style="margin:0;padding-left:12px;border-left:3px solid var(--ok)">
+        <em>"Claims must be submitted within 30 days of discharge."</em></p>
+    </div>
+    <div class="card bad"><h4>Systematically weak on</h4><ul>
+      <li><b>Exact identifiers</b> — <code>AUR-HI-SIL-2026</code>, order numbers,
+        error codes</li>
+      <li><b>Rare proper nouns</b> not well represented in the embedding model's
+        training data</li>
+      <li><b>Numbers and dates</b> — <code>7.5</code> and <code>4.5</code> dioptres
+        embed almost identically</li>
+      <li><b>Negation</b> — "not covered" and "covered" are near-neighbours in
+        embedding space</li>
+    </ul></div>
+  </div>
+  <div class="pull frag" style="margin-top:16px"><p>These are not corner cases. They
+    are <b>a large fraction of what people actually type into an enterprise search
+    box.</b></p></div>`,
+  notes:`The negation point genuinely alarms people, and it should.` },
+
+/* 11 ---------------------------------------------------------------- */
+{ t:"The retrieval race", html:`
+  <h2>Try it: two queries, three retrievers</h2>
+  <p class="sub">Real measured results from our Lab 3 corpus. Click a query.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="chips" id="raceQ"></div>
+  <div id="raceOut" style="min-height:200px"></div>`,
+  notes:`Run <b>Q44</b> first — the exact identifier. BM25 ranks it first, dense ranks
+  it second. Then <b>Q41</b> — no lexical overlap at all with "grace period" — where
+  dense is perfect and BM25 scores zero.
+  <br><br><b>Then the twist:</b> hybrid rescues Q44 and <em>halves</em> Q41. Ask
+  whether that trade is worth taking before you show the last query.` },
+
+/* 12 ---------------------------------------------------------------- */
+{ t:"RRF", html:`
+  <h2>Combining them: Reciprocal Rank Fusion</h2>
+  <div class="rule"></div>
+  <p>BM25 scores are unbounded and corpus-dependent; cosine similarities run −1 to 1.
+     They are <b>not on a comparable scale</b>, and every attempt to min-max normalise
+     them is fragile across queries.</p>
+  <pre>score(d) = Σ_r  1 / (k + rank_r(d))            k ≈ 60</pre>
+  <p style="margin-top:14px">RRF sidesteps the problem by fusing <b>ranks</b>, which
+     are comparable by construction:</p>
+  <table style="margin-top:4px">
+    <tr><td style="width:44%">Ranked 1st by BM25, 40th by dense</td>
+      <td class="mono">1/61 + 1/100 = 0.0264</td></tr>
+    <tr><td>Ranked 3rd by both</td><td class="mono">2/63 = 0.0317</td></tr>
+  </table>
+  <p class="small frag" style="margin-top:14px">Documents both retrievers like rise;
+     documents only one likes still get a chance. The constant <code>k = 60</code>
+     damps the difference between rank 1 and rank 2, so a single retriever cannot
+     dominate the fusion.</p>
+  <p class="tiny frag">Cormack et al. (2009). Two pages. Read all of it.</p>`,
+  notes:`Do the arithmetic on the board. It takes twenty seconds and it makes RRF stop
+  being magic.` },
+
+/* 13 ---------------------------------------------------------------- */
+{ t:"Hybrid loses", cls:"dark", html:`
+  <div class="tick" style="margin-top:44px"></div>
+  <p class="statement" style="font-size:34px">On our own Lab 3 corpus:<br><br>
+    <span class="mono" style="font-size:30px">dense &nbsp; nDCG@10 &nbsp; 0.846<br>
+    hybrid &nbsp; nDCG@10 &nbsp; 0.830</span></p>
+  <p class="attrib" style="max-width:66ch"><b style="color:#F0A18A">Hybrid loses.</b>
+    Fusion helps when the two retrievers are complementary <em>and</em> comparable in
+    quality. Fuse a strong one with a much weaker one and you drag good rankings down
+    more often than you rescue bad ones. Dense beats BM25 on 14 of the 18 questions
+    where they differ.</p>`,
+  notes:`<b>Do not skip this.</b> Students will otherwise apply hybrid as a rule.
+  <br><br>The mechanism: a modern embedding model already handles the exact
+  identifiers BM25 classically rescues, so the complementarity that makes fusion pay
+  is largely gone on this corpus.
+  <br><br>Then the general lesson, which is the point of the whole slide:
+  <b>a technique that is right on average can be wrong on your data. That is why you
+  measure.</b>` },
+
+/* 14 ---------------------------------------------------------------- */
+{ t:"Two-stage retrieval", html:`
+  <h2>Retrieve wide, rerank narrow</h2>
+  <div class="rule"></div>
+  <pre>query ──▶ hybrid retrieve k=30 ──▶ rerank ──▶ top 5 ──▶ generator
+          (cheap, high recall)      (expensive,  (precise,
+                                     accurate)    small context)</pre>
+  <p style="margin-top:16px">A <b>bi-encoder</b> — ordinary embeddings — encodes query
+     and document separately. That is what makes precomputation possible, and it also
+     means it <em>never sees them together</em>. A <b>cross-encoder</b> reads the pair
+     jointly and can judge relevance in a way a bi-encoder structurally cannot. Far
+     too slow for the whole corpus; exactly right for thirty candidates.</p>
+  <div class="pull frag" style="margin-top:14px"><p><b>Measured on our corpus, and
+    both results are instructive.</b> The off-the-shelf cross-encoder made nDCG@10
+    <em>worse</em> — 0.788 against 0.804 — because it is trained on web search and is
+    out of domain on insurance prose. The LLM reranker was clearly best at 0.860…
+    and took <b>28 seconds per query</b>, because it makes thirty sequential calls.</p></div>
+  <p class="small frag">That gives you two genuinely different answers in Lab 3: an
+     interactive search box gets no reranker; an overnight batch job gets the LLM one.
+     <b>Same measurement, opposite decisions.</b></p>`,
+  notes:`Parallelising those thirty calls is the obvious student fix and brings it to
+  1–2 seconds. Mention it — someone will ask.` },
+
+/* 15 ---------------------------------------------------------------- */
+{ t:"Query-side transforms", html:`
+  <h2>Query-side transforms</h2>
+  <div class="rule"></div>
+  <p>The query and the documents were written by different people for different
+     purposes, and often share almost no vocabulary. Three fixes:</p>
+  <table style="margin-top:6px">
+    <tr><td style="width:22%"><b>HyDE</b></td>
+      <td>Ask the model to <em>write the passage that would answer the question</em>,
+      then embed that. Questions and answers live in different regions of embedding
+      space; a hypothetical answer lands in the right one.</td></tr>
+    <tr><td><b>Multi-query</b></td>
+      <td>Generate three paraphrases, retrieve for each, fuse with RRF. Buys recall
+      when phrasing is unpredictable.</td></tr>
+    <tr><td><b>Decomposition</b></td>
+      <td>Split a multi-part question into parts and retrieve for each. Required for
+      genuine multi-hop questions.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:16px"><p>All three cost <b>one extra
+    small-model call per query</b>, plus the extra retrievals. Measure whether they
+    earn it. On our corpus, two of the three did not.</p></div>`,
+  notes:`Keep this brief — it is a menu, not a lesson. Lab 5 is where they pick from
+  it, and only after a diagnosis says which one is indicated.` },
+
+/* 16 ---------------------------------------------------------------- */
+{ t:"§3 Seven failure modes", cls:"dark", html:`
+  <p class="secnum mono">03</p>
+  <h2 style="font-size:44px">The seven failure modes</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    When a RAG system gives a wrong answer, <em>"RAG is bad"</em> is not a diagnosis.
+    Exactly one stage usually failed, and each has a different fix.</p>`,
+  notes:`45–70 min. <b>Protect this section.</b> Lab 5 runs entirely on it.` },
+
+/* 17 ---------------------------------------------------------------- */
+{ t:"The seven modes", html:`
+  <h2>One stage failed. Which one?</h2>
+  <p class="sub">Click any mode for how to confirm it, and what to do</p>
+  <div class="rule" style="margin-bottom:14px"></div>
+  <div class="body-scroll" id="modes"></div>`,
+  notes:`Open <b>mode 6</b> and stay on it. Then say the direction out loud, twice:
+  <b>gold context FIXING the answer means RETRIEVAL was at fault, not generation.</b>
+  People invert this every single time.` },
+
+/* 18 ---------------------------------------------------------------- */
+{ t:"The diagnostic tree", html:`
+  <h2>The diagnostic tree</h2>
+  <p class="sub">Answer three questions and you have localised the failure</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div id="treeBox"></div>`,
+  notes:`Walk the tree live, using a failure from your own run if you have one.
+  <br><br>The single most useful experiment in RAG debugging is the second question:
+  <b>run the generator on gold context.</b> It splits the problem cleanly in two and
+  takes ten minutes to set up. Do it before anything else.` },
+
+/* 19 ---------------------------------------------------------------- */
+{ t:"§4 Generation", cls:"dark", html:`
+  <p class="secnum mono">04</p>
+  <h2 style="font-size:44px">Generation, citation, refusal</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    Retrieval is most of the work, but the last stage has its own contract — and one
+    of its three rules is the cheapest hallucination check that exists.</p>`,
+  notes:`70–82 min.` },
+
+/* 20 ---------------------------------------------------------------- */
+{ t:"Three rules", html:`
+  <h2>Three non-negotiable rules in the answer prompt</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><td class="n" style="width:34px"><b>1</b></td>
+      <td style="width:28%"><b>Answer only from the sources</b></td>
+      <td>Explicitly forbid falling back on general knowledge. Without this the model
+      blends training data with retrieved content, and you cannot tell which is which
+      — not at review time, and not at incident time.</td></tr>
+    <tr><td class="n"><b>2</b></td><td><b>Cite by index</b></td>
+      <td>Number the sources; require <code>[1]</code>-style citations. Then
+      <b>validate the indices in code</b>. A citation to <code>[7]</code> when you
+      supplied five sources is a <em>detectable</em> hallucination — and it costs
+      three lines of regex to catch.</td></tr>
+    <tr><td class="n"><b>3</b></td><td><b>Give an explicit refusal string</b></td>
+      <td>A model with no legal way to fail will invent an answer. Refusal must be a
+      first-class, exactly-specified output — exact, so downstream code can detect it
+      by matching rather than guessing.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:16px"><p>Rule 2 is why the Lab 4 target for
+    citation validity is <b>1.000</b>, not 0.98. It is a <em>code guarantee</em>, not
+    a model behaviour — anyone below 1.000 has a bug, not a prompt problem.</p></div>`,
+  notes:`Emphasise that rule 2 is free. Numbering the sources costs nothing and turns
+  an invisible failure into a detectable one.` },
+
+/* 21 ---------------------------------------------------------------- */
+{ t:"Refusal both ways", cls:"dark", html:`
+  <div class="tick" style="margin-top:52px"></div>
+  <p class="statement" style="font-size:34px">Measure refusal in <em>both</em> directions.<br><br>
+    <span style="font-size:26px">recall — of the unanswerable, how many were refused?<br>
+    precision — of the refusals, how many were right?</span></p>
+  <p class="attrib">Reporting only one is how you ship a system that refuses
+    everything and scores beautifully. It is also the single most common omission in
+    Lab 4.</p>`,
+  notes:`Ask every pair for both numbers at show-and-tell. Most will proudly report
+  recall 5/5 and not have computed precision at all.` },
+
+/* 22 ---------------------------------------------------------------- */
+{ t:"Contradictions", html:`
+  <h2>Real corpora contradict themselves</h2>
+  <div class="rule"></div>
+  <p>Ours does, deliberately. <code>claims-timelines</code> says <b>45 days</b> for a
+     query response; <code>claims-timelines-2024-ARCHIVED</code> says <b>30</b>. Both
+     are in the index. Both will be retrieved.</p>
+  <table style="margin-top:8px">
+    <tr><td class="n" style="width:34px">1</td>
+      <td>Tell the generator to <b>surface</b> disagreement rather than pick silently.</td></tr>
+    <tr><td class="n">2</td>
+      <td>Add <code>status</code> and <code>effective_date</code> metadata, and filter
+      archived documents out at query time.</td></tr>
+    <tr><td class="n">3</td>
+      <td>Do not ingest superseded documents into the live index at all.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:16px"><p>Options 2 and 3 are
+    <b>data-layer</b> fixes, and they are strictly better than 1 — cheaper, more
+    reliable, and they cannot be talked out of by a clever prompt.</p></div>
+  <p class="small frag"><b>Measured:</b> adding the metadata filter took the three
+     trap questions from hit_rate@1 <b>0.667 to 1.000</b>. It required no change to
+     the retriever whatsoever.</p>`,
+  notes:`Write on the board: <b>most retrieval problems are solved before the query
+  is ever issued.</b> It is the sentence to leave the session with.` },
+
+/* 23 ---------------------------------------------------------------- */
+{ t:"Labs 3, 4, 5", html:`
+  <h2>Labs 3, 4 and 5</h2>
+  <p class="sub">The next three sessions all run on this material</p>
+  <div class="rule"></div>
+  <div class="grid3">
+    <div class="card"><h4>Lab 3 · Semantic search</h4>
+      <p class="small" style="margin:0">Four chunking strategies × three retrieval
+      methods × rerank on/off. Report nDCG@10, recall@5, hit_rate@1, cost, p95.
+      Recommend a configuration and justify it — twice, for two different
+      deployments.</p></div>
+    <div class="card"><h4>Lab 4 · RAG v1</h4>
+      <p class="small" style="margin:0">Generation with enforced citations and a
+      refusal contract. Measure both refusal directions, calibrate an LLM judge, and
+      run the gold-context decomposition.</p></div>
+    <div class="card"><h4>Lab 5 · RAG v2</h4>
+      <p class="small" style="margin:0">Classify every failure into one of the seven
+      modes. Predict what a fix will recover. Then measure it, and report the answer
+      whichever way it lands.</p></div>
+  </div>
+  <div class="pull frag" style="margin-top:18px"><p><b>One warning for Lab 3.</b>
+    <code>hit_rate@5</code> is already ~0.93 for plain BM25 on this corpus. It is
+    saturated, and it will tell you nothing. Choosing a metric with headroom is part
+    of the exercise — and the reference solution got this wrong on its first run.</p></div>`,
+  notes:`82–90 min.` },
+
+/* 24 ---------------------------------------------------------------- */
+{ t:"Check yourself", html:`
+  <h2>Check yourself</h2>
+  <p class="sub">Six questions. If you can answer them, you can start Lab 3.</p>
+  <div class="rule" style="margin-bottom:14px"></div>
+  <div class="body-scroll" id="quiz"></div>`,
+  notes:`Q4 and Q5 are the ones that reveal whether the diagnostic tree landed.` },
+
+/* 25 ---------------------------------------------------------------- */
+{ t:"Reading & references", html:`
+  <h2>Reading and references</h2>
+  <p class="sub">Roughly 45 minutes. Everything is free.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="body-scroll"><div class="refs">
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Gao, Y. et al. (2023). <b>Retrieval-Augmented Generation for Large Language
+      Models: A Survey.</b>
+      <a href="https://arxiv.org/abs/2312.10997">arxiv.org/abs/2312.10997</a>
+      <span class="why">§3–4. The best single map of the design space. Skim the rest.</span></div></div>
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Barnett, S. et al. (2024). <b>Seven Failure Points When Engineering a Retrieval
+      Augmented Generation System.</b>
+      <a href="https://arxiv.org/abs/2401.05856">arxiv.org/abs/2401.05856</a>
+      <span class="why">Where §3 of this session comes from. Short, practical, and it
+      is the structure Lab 5 is built on.</span></div></div>
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Cormack, G. et al. (2009). <b>Reciprocal Rank Fusion Outperforms Condorcet and
+      Individual Rank Learning Methods.</b>
+      <span class="why">Two pages. Read all of it — it is the whole justification for
+      fusing ranks rather than scores.</span></div></div>
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Malkov, Y. &amp; Yashunin, D. (2016). <b>Efficient and robust approximate
+      nearest neighbor search using HNSW graphs.</b>
+      <a href="https://arxiv.org/abs/1603.09320">arxiv.org/abs/1603.09320</a>
+      <span class="why">§3 and the figures. The one ANN algorithm worth understanding,
+      because it is the default in every vector store you will meet.</span></div></div>
+    <div class="ref"><span class="tag doc">Essay</span><div>
+      Anthropic (2024). <b>Introducing Contextual Retrieval.</b>
+      <a href="https://www.anthropic.com/news/contextual-retrieval">anthropic.com/news/contextual-retrieval</a>
+      <span class="why">The situating-sentence trick from §1, with numbers. A good
+      stretch goal for Lab 3.</span></div></div>
+    <div class="ref"><span class="tag book">Book</span><div>
+      Jurafsky &amp; Martin, <b>Speech and Language Processing</b>, 3rd ed. draft,
+      Ch 11 — Information Retrieval and RAG.
+      <a href="https://web.stanford.edu/~jurafsky/slp3/">web.stanford.edu/~jurafsky/slp3</a>
+      <span class="why">The IR background, including BM25 derived properly.</span></div></div>
+    <div class="ref"><span class="tag repo">Code</span><div>
+      <b><code>aip/chunking.py</code></b>, <b><code>aip/retrieval.py</code></b>,
+      <b><code>aip/rag.py</code></b>
+      <span class="why">All four chunkers, all four retrievers, both rerankers, and a
+      reference pipeline written as seven named stages so you can see where each
+      failure mode lives.</span></div></div>
+  </div></div>`,
+  notes:`If they read one thing, make it Barnett et al. It is the shape of Lab 5.` },
+
+/* 26 ---------------------------------------------------------------- */
+{ t:"Close", cls:"dark", html:`
+  <div class="tick" style="margin-top:56px"></div>
+  <p class="statement" style="font-size:34px">Most retrieval problems are solved
+    before the query is ever issued.</p>
+  <div class="byline" style="margin-top:auto">
+    <div><b>${AUTHOR}</b>AI in Practice I · Module 1 · Theory 4 of 4</div>
+    <div style="text-align:right">Next: Lab 3 — Semantic Search That Actually Works<br>
+      <span style="color:#7E94B4">Three labs run on this session</span></div>
+  </div>`,
+  notes:`Close the theory strand here. Everything from now on is lab.` },
+];
+
+/* ===================== data: chunking demo ========================== */
+const DOC = `# Filing a Claim
+
+## Route 2 — Reimbursement
+
+Use this at non-network hospitals, or where cashless was denied. Notify Aurora within 48 hours of an emergency admission, or 72 hours before a planned admission. Pay the hospital yourself and collect the complete document set. Submit the claim within 30 days of discharge.
+
+## Settlement timelines
+
+Aurora settles or rejects a complete reimbursement claim within 15 working days of receiving the last required document. If Aurora raises a query, the clock restarts when you supply the queried document.`;
+
+const STRATS = [
+  {k:"fixed", nm:"fixed",
+   note:"Hard cut every N characters. Words split mid-syllable, sentences split mid-clause. <b>This is the strawman</b> — it exists so you can see what the others are fixing."},
+  {k:"sliding", nm:"sliding",
+   note:"N characters with overlap, so a fact that straddles a boundary appears in full in at least one chunk. Overlap ≈ 10–20% of size. The usual default for unstructured prose."},
+  {k:"recursive", nm:"recursive",
+   note:"Split on the largest natural boundary that fits — paragraph, then line, then sentence, then word. A good general default, and what most frameworks give you."},
+  {k:"markdown", nm:"markdown-aware",
+   note:"Split on headings, and <b>prepend the heading path to every chunk</b>. Cheap, and unreasonably effective: it gives an otherwise context-free chunk enough signal for the embedding model to place it correctly."},
+];
+
+function chunkDoc(strategy, size){
+  const t=DOC;
+  if(strategy==="fixed"){
+    const out=[]; for(let i=0;i<t.length;i+=size) out.push(t.slice(i,i+size));
+    return out.filter(x=>x.trim());
+  }
+  if(strategy==="sliding"){
+    const ov=Math.round(size*0.18), step=size-ov, out=[];
+    for(let i=0;i<t.length;i+=step){ out.push(t.slice(i,i+size)); if(i+size>=t.length) break; }
+    return out.filter(x=>x.trim());
+  }
+  if(strategy==="recursive"){
+    const paras=t.split(/\n\n+/), out=[]; let buf="";
+    for(const p of paras){
+      if((buf+"\n\n"+p).length<=size){ buf = buf ? buf+"\n\n"+p : p; }
+      else { if(buf) out.push(buf);
+        if(p.length<=size) buf=p;
+        else { for(let i=0;i<p.length;i+=size) out.push(p.slice(i,i+size)); buf=""; } }
+    }
+    if(buf.trim()) out.push(buf);
+    return out;
+  }
+  // markdown-aware
+  const lines=t.split("\n"); const secs=[]; let path=[], body=[];
+  const flush=()=>{ const b=body.join("\n").trim();
+    if(b) secs.push({path:path.join(" > "), body:b}); body=[]; };
+  for(const L of lines){
+    const m=L.match(/^(#{1,6})\s+(.*)$/);
+    if(m){ flush(); path=path.slice(0,m[1].length-1).concat(m[2].trim()); }
+    else body.push(L);
+  }
+  flush();
+  const out=[];
+  for(const s of secs){
+    const prefix=`[${s.path}]\n`, room=Math.max(size-prefix.length,80);
+    for(let i=0;i<s.body.length;i+=room) out.push(prefix+s.body.slice(i,i+room));
+  }
+  return out;
+}
+
+/* ===================== data: retrieval race ======================== */
+const RACE = [
+  {id:"Q44", q:"AUR-HI-SIL-2026 — what are the sum insured options?",
+   why:"An <b>exact identifier</b>. A rare token with very high IDF, and a string the embedding model has almost certainly never seen.",
+   dense:0.50, bm25:1.00, hybrid:1.00,
+   read:"BM25 ranks it <b>first</b>; dense ranks it second. Fusion keeps the win. This is the case that makes the argument for hybrid."},
+  {id:"Q41", q:"If I skip paying on time, how long before I lose everything I've built up?",
+   why:"<b>Zero lexical overlap</b> with the passage, which is about the <em>grace period</em>. Not one content word is shared.",
+   dense:1.00, bm25:0.00, hybrid:0.50,
+   read:"Dense is perfect; BM25 scores <b>zero</b> — it has nothing to match on. And fusion <em>halves</em> the dense result, because a strong ranking is being averaged with a useless one."},
+  {id:"overall", q:"All 42 answerable questions — the aggregate",
+   why:"The two queries above pull in opposite directions. Which effect wins on the corpus as a whole?",
+   dense:0.846, bm25:0.701, hybrid:0.830, metric:"nDCG@10",
+   read:"<b>Dense wins outright, and hybrid loses to it.</b> Dense beats BM25 on 14 of the 18 questions where they differ, so fusing in a much weaker retriever drags more good rankings down than it rescues. A technique that is right on average can be wrong on your data."},
+];
+
+/* ===================== data: seven modes =========================== */
+const MODES = [
+  {n:1, t:"Missing content", s:"the answer is simply not in the corpus",
+   d:"You are asking a question the documents do not answer. No amount of retrieval tuning changes this, and a surprising number of “RAG is bad” complaints are this.",
+   fixLabel:"Confirm / fix", fix:"grep the corpus. Then fix the <b>data</b> — there is no retrieval fix for a document you do not have."},
+  {n:2, t:"Chunk boundary", s:"the answer straddles two chunks; neither retrieves alone",
+   d:"The fact lives across a split. Each half on its own is not a good match for the query, so neither surfaces — and the chunk that does surface looks superficially relevant and is incomplete.",
+   fixLabel:"Confirm / fix", fix:"Print the chunks either side of the gold answer and look. Then: larger chunks, more overlap, markdown-aware splitting, or small-to-big."},
+  {n:3, t:"Embedding mismatch", s:"the right chunk exists but ranks below 30",
+   d:"The chunk is fine, the query is fine, and they simply do not meet in embedding space — usually vocabulary mismatch, an identifier, or negation.",
+   fixLabel:"Confirm / fix", fix:"Search for the gold chunk's own text verbatim. <b>If that retrieves it, the query is the problem</b>, not the chunk. Then: hybrid, HyDE, or contextual retrieval."},
+  {n:4, t:"Ranking", s:"the right chunk is in the top 30 but not the top 5",
+   d:"Retrieval found it. Your cut-off threw it away. Cheap to diagnose and cheap to fix, which makes it worth checking early.",
+   fixLabel:"Confirm / fix", fix:"Compare hit_rate@30 with hit_rate@5. A large gap means ranking. Then: add a reranker, or raise the final k."},
+  {n:5, t:"Reranker error", s:"it was in the pool and the reranker dropped it",
+   d:"Your second stage actively made things worse — which happens more than people expect with an off-the-shelf cross-encoder out of its training domain.",
+   fixLabel:"Confirm / fix", fix:"Log the ids before and after reranking. Then: a different reranker, or keep the stage-1 top-1 unconditionally regardless of what the reranker says."},
+  {n:6, t:"Generation", s:"the right chunk was in the context and the answer is still wrong",
+   d:"Retrieval did its job. The model had the evidence in front of it and produced a wrong answer anyway — through distraction, a bad prompt, or a question needing synthesis it did not attempt.",
+   fixLabel:"Confirm / fix", fix:"<b>Run the generator on gold context.</b> Still wrong ⇒ generation. Note the direction carefully: gold context <em>fixing</em> the answer means <b>retrieval</b> was at fault. Then: a better prompt, fewer distractors, or a larger tier."},
+  {n:7, t:"Presentation", s:"the answer is correct; the citation is wrong or missing",
+   d:"A quality failure that looks like a correctness failure. The content is right and the audit trail is broken — which in a regulated setting is its own serious problem.",
+   fixLabel:"Confirm / fix", fix:"<code>enforce_citations()</code>, which is three lines of regex. Then: tighten the output contract and validate before returning."},
+];
+
+/* ===================== data: quiz ================================== */
+const QUIZ = [
+  {q:"Your corpus is 500 pages of policy documents. Why might markdown-aware chunking beat sliding-window chunking by more than switching embedding models would?",
+   a:"Because the heading path carries the topic. A chunk reading <code>[Claims > Reimbursement > Submission] Submit within 30 days of discharge</code> embeds far closer to <em>\"how long do I have to file?\"</em> than the bare sentence does — the sentence alone contains neither the topic nor any signal about which process it belongs to. Swapping embedding models changes how well the vector represents the text you gave it; chunking changes <em>what text you gave it</em>, which is a larger lever. Measured on our corpus: markdown 0.846 vs fixed 0.795 nDCG@10, and the prefix alone is worth +0.054."},
+  {q:"A user searches <code>AUR-HI-SIL-2026</code>. Dense retrieval returns nothing useful. Why, and what is the cheapest fix?",
+   a:"The embedding model has never seen that string, so it lands near other product-code-shaped noise rather than near the document containing it. Embeddings represent <em>meaning</em>, and an identifier has none — it has only identity. <b>Cheapest fix: BM25</b>, which matches the literal token and rewards it heavily because its IDF is enormous. Either fuse it in, or route identifier-shaped queries to it."},
+  {q:"Explain why RRF fuses ranks rather than scores. What breaks if you min-max normalise the scores and add them?",
+   a:"BM25 scores are unbounded and corpus-dependent; cosine similarities run −1 to 1. They are not comparable, and min-max normalisation is <b>per-query</b>: it maps whatever range that query happened to produce onto 0–1. A query where BM25 found nothing good gets its best weak result scaled to 1.0 and treated as a confident hit, so noise on one retriever gets promoted to certainty. Ranks avoid this entirely because rank 1 means the same thing on every query and every retriever."},
+  {q:"hit_rate@5 is 0.62; hit_rate@30 is 0.94. Which failure mode, and what do you change?",
+   a:"<b>Mode 4, ranking.</b> Retrieval is finding the right document in 94% of cases — it is your cut-off that discards it. The chunk exists, it is retrievable, it just is not in the top five. Fixes, cheapest first: raise final k; add a reranker so the top-30 pool is reordered before the cut; tune the fusion weights. Note what you would <em>not</em> do: change the chunker or the embedding model, because neither is the problem."},
+  {q:"You add a reranker and nDCG@5 goes down. Give two plausible explanations and an experiment that distinguishes them.",
+   a:"<b>(1) Domain mismatch</b> — the cross-encoder is trained on web search and your corpus is policy prose, so its notion of relevance is not yours. <b>(2) Pool too small</b> — you retrieved k=10 and reranked to 5, so the reranker mostly shuffles an already-good ordering and its errors dominate its gains. <b>The experiment:</b> log the pre- and post-rerank ids. If the gold chunk was rank 1 before and rank 6 after, that is domain mismatch. If it was never in the pool at all, the problem is upstream and the reranker is being blamed for a retrieval failure. Our measured result was (1): 0.788 against 0.804."},
+  {q:"Your system correctly refuses 5 of 5 unanswerable questions, and also refuses 12 of 40 answerable ones. Compute refusal precision and recall. Is this shippable for an insurance helpdesk? Argue both sides.",
+   a:"<b>Recall = 5/5 = 1.00.</b> <b>Precision = 5/17 ≈ 0.29</b> — of 17 total refusals, only 5 were right. <b>For:</b> in insurance a confident wrong answer about coverage can cause real financial harm and creates liability; a refusal degrades to a human, which is the existing process anyway. <b>Against:</b> it refuses 30% of answerable questions, so users learn it is useless and route around it — and a system nobody uses has zero value while still costing money. <b>The honest reading:</b> not shippable as a primary channel, possibly shippable as a suggestion layer with a human always in the loop. And the precision figure over 17 cases is extremely noisy — one case moves it six points."},
+];
+
+/* ===================== mounts ====================================== */
+function mountChunker(){
+  const chips=document.getElementById('chunkStrat'); if(!chips)return;
+  const out=document.getElementById('chunkOut'), slider=document.getElementById('s_cs');
+  let cur="markdown";
+  chips.innerHTML=STRATS.map(s=>`<button class="chip${s.k===cur?' active':''}" data-s="${s.k}">${s.nm}</button>`).join('');
+  function draw(){
+    const size=+slider.value;
+    document.getElementById('v_cs').textContent=size+" characters";
+    const chunks=chunkDoc(cur,size), s=STRATS.find(x=>x.k===cur);
+    out.innerHTML=`<p class="small" style="margin:0 0 10px">${s.note}
+        <b style="color:var(--ink)"> → ${chunks.length} chunks</b></p>` +
+      `<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto">` +
+      chunks.map((c,i)=>`<div style="background:var(--surface);border-left:3px solid var(--accent);
+         border-radius:0 5px 5px 0;padding:7px 11px;font-family:'IBM Plex Mono',monospace;
+         font-size:12px;line-height:1.42;white-space:pre-wrap">
+         <span style="color:var(--faint)">chunk ${i+1} · ${c.length} chars</span>
+         <br>${c.replace(/[<>&]/g,ch=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[ch]))}</div>`).join('') +
+      `</div>`;
+  }
+  chips.querySelectorAll('[data-s]').forEach(el=>el.onclick=()=>{
+    cur=el.dataset.s;
+    chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active'); draw();
+  });
+  slider.addEventListener('input',draw);
+  draw();
+}
+
+function mountRace(){
+  const chips=document.getElementById('raceQ'); if(!chips)return;
+  const out=document.getElementById('raceOut');
+  chips.innerHTML=RACE.map((r,n)=>`<button class="chip" data-r="${n}">${r.id==='overall'?'All 42 questions':r.id}</button>`).join('');
+  function bar(label,v,best,metric){
+    const pct=Math.round(v/Math.max(best,0.001)*100);
+    const col = v===best ? 'var(--ok)' : (v<0.2 ? 'var(--accent)' : 'var(--muted)');
+    return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <span style="font-family:Archivo,sans-serif;font-weight:600;font-size:15px;width:74px">${label}</span>
+      <div style="flex:1;background:var(--sunk);border-radius:4px;height:22px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${col};transition:width .3s"></div></div>
+      <span class="mono" style="width:56px;text-align:right;font-weight:600;font-size:15px">${v.toFixed(2)}</span></div>`;
+  }
+  chips.querySelectorAll('[data-r]').forEach(el=>el.onclick=()=>{
+    const r=RACE[+el.dataset.r];
+    chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    const best=Math.max(r.dense,r.bm25,r.hybrid);
+    out.innerHTML=`<p style="font-size:19px;margin:0 0 4px"><b>${r.q}</b></p>
+      <p class="small" style="margin:0 0 14px">${r.why}</p>
+      ${bar('dense',r.dense,best)}${bar('BM25',r.bm25,best)}${bar('hybrid',r.hybrid,best)}
+      <p class="tiny" style="margin:2px 0 10px">${r.metric||'MRR'} · measured on the Lab 3 corpus</p>
+      <div class="pull" style="margin:0"><p style="font-size:17px">${r.read}</p></div>`;
+  });
+}
+
+function mountTree(){
+  const box=document.getElementById('treeBox'); if(!box)return;
+  const Q=[
+    {q:"Is the answer in the corpus at all?", no:{mode:1,label:"Missing content — a data problem. No retrieval change helps."},
+     yesNext:1, how:"grep the corpus for the gold answer's key terms."},
+    {q:"Does GOLD context fix the answer?", no:{mode:6,label:"Generation. The model had the evidence and still got it wrong."},
+     yesNext:2, how:"Run the generator on the actual relevant documents, skipping retrieval entirely. <b>Gold context fixing it means RETRIEVAL was at fault.</b>"},
+    {q:"Is the right chunk in the top 30?", no:{mode:"2 or 3",label:"Chunking or embedding mismatch. Search the gold chunk's own text to tell them apart."},
+     yes:{mode:"4 or 5",label:"Ranking, or the reranker dropped it. Compare hit_rate@30 with hit_rate@5."},
+     how:"Retrieve wide and check whether the gold document appears anywhere in the pool."},
+  ];
+  let step=0;
+  function draw(){
+    const s=Q[step];
+    box.innerHTML=`
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        ${Q.map((_,i)=>`<div style="flex:1;height:4px;border-radius:2px;
+          background:${i<=step?'var(--accent)':'var(--rule)'}"></div>`).join('')}
+      </div>
+      <p style="font-size:24px;font-family:Archivo,sans-serif;font-weight:600;
+         color:var(--ink);margin:0 0 6px">${step+1}. ${s.q}</p>
+      <p class="small" style="margin:0 0 16px">${s.how}</p>
+      <div style="display:flex;gap:10px">
+        <button class="chip" data-ans="no">No</button>
+        <button class="chip" data-ans="yes">Yes</button>
+        ${step>0?'<button class="chip" data-ans="back" style="margin-left:auto">← back</button>':''}
+      </div>
+      <div id="verdict" style="margin-top:16px"></div>`;
+    box.querySelectorAll('[data-ans]').forEach(b=>b.onclick=()=>{
+      const a=b.dataset.ans;
+      if(a==="back"){ step--; draw(); return; }
+      const outcome = a==="no" ? s.no : (s.yes || null);
+      if(outcome){ show(outcome); }
+      else { step=s.yesNext; draw(); }
+    });
+  }
+  function show(o){
+    document.getElementById('verdict').innerHTML=
+      `<div class="pull" style="margin:0;border-left-color:var(--ok);background:var(--ok-soft)">
+        <p style="margin:0"><b>Failure mode ${o.mode}</b> — ${o.label}</p></div>
+       <button class="chip" style="margin-top:12px" onclick="mountTree()">Start again</button>`;
+  }
+  draw();
+}
+
+function mountModes(){
+  const host=document.getElementById('modes'); if(host) host.innerHTML=expList(MODES);
+}
+function mountQuiz(){
+  const host=document.getElementById('quiz'); if(host) host.innerHTML=quizList(QUIZ);
+}
+
+function mountAll(){ mountChunker(); mountRace(); mountTree(); mountModes(); mountQuiz(); }
+
+/* ===================== engine ======================================= */
+const stage=document.getElementById('stage'), bar=document.getElementById('bar'),
+      pos=document.getElementById('pos'), notes=document.getElementById('notes'),
+      notesBody=document.getElementById('notesbody'), grid=document.getElementById('grid');
+let i=0, frag=0, fragEls=[];
+
+function fit(){
+  const s=Math.min(innerWidth/1280, innerHeight/720)*0.94;
+  stage.style.transform=`translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize',fit);
+
+function build(){
+  stage.innerHTML = SLIDES.map((s,n)=>
+    `<section class="slide ${s.cls||''}" data-n="${n}">${s.html}</section>`).join('');
+  grid.innerHTML = SLIDES.map((s,n)=>
+    `<div class="thumb" data-go="${n}"><div class="tn">${String(n+1).padStart(2,'0')}</div>
+     <div class="tt">${s.t}</div></div>`).join('');
+  grid.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{go(+el.dataset.go);toggleGrid(false);});
+  mountReveals(); if (typeof mountAll === 'function') mountAll();
+}
+
+function go(n,f){
+  i=Math.max(0,Math.min(SLIDES.length-1,n));
+  stage.querySelectorAll('.slide').forEach(el=>el.classList.toggle('on',+el.dataset.n===i));
+  const cur=stage.querySelector('.slide.on');
+  fragEls=[...cur.querySelectorAll('.frag')];
+  frag = f==='end' ? fragEls.length : 0;
+  paint();
+  notesBody.innerHTML = SLIDES[i].notes || '<i style="color:#66738a">No notes for this slide.</i>';
+  pos.textContent=`${i+1} / ${SLIDES.length}`;
+  bar.style.width=`${((i+1)/SLIDES.length)*100}%`;
+  grid.querySelectorAll('.thumb').forEach((t,n)=>t.classList.toggle('cur',n===i));
+  location.hash=i+1;
+}
+function paint(){ fragEls.forEach((el,n)=>el.classList.toggle('show',n<frag)); }
+function next(){ if(frag<fragEls.length){frag++;paint();} else if(i<SLIDES.length-1) go(i+1); }
+function prev(){ if(frag>0){frag--;paint();} else if(i>0) go(i-1,'end'); }
+function toggleGrid(on){ grid.classList.toggle('on', on===undefined?!grid.classList.contains('on'):on); }
+
+addEventListener('keydown',e=>{
+  if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  const k=e.key.toLowerCase();
+  if(k==='arrowright'||k===' '||k==='pagedown'){e.preventDefault();next();}
+  else if(k==='arrowleft'||k==='pageup'){e.preventDefault();prev();}
+  else if(k==='home')go(0); else if(k==='end')go(SLIDES.length-1);
+  else if(k==='s'){notes.classList.toggle('on');}
+  else if(k==='o'){toggleGrid();}
+  else if(k==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  else if(k==='escape'){toggleGrid(false);notes.classList.remove('on');}
+});
+
+
+/* Generic: any <button data-reveal="id"> toggles <div id="id" class="reveal-body">. */
+function mountReveals(){
+  document.querySelectorAll('[data-reveal]').forEach(btn=>btn.onclick=()=>{
+    const body=document.getElementById(btn.dataset.reveal);
+    body.classList.toggle('open');
+    btn.textContent = body.classList.contains('open') ? 'Hide the answer' : 'Reveal the answer';
+  });
+}
+
+/* Generic: expandable rows. Each item {n,t,s,d,fix}. */
+function expList(items){
+  return items.map(f=>`
+    <div class="exp"><details><summary>
+      <span class="idx">${f.n}</span><span class="ttl">${f.t}</span>
+      <span class="hint">${f.s}</span></summary>
+      <div class="detail">${f.d}${f.fix?`<div class="fix"><b>${f.fixLabel||'Response'}:</b> ${f.fix}</div>`:''}</div>
+    </details></div>`).join('');
+}
+
+/* Generic: hidden-answer question list. Each item {q,a}. */
+function quizList(items){
+  return items.map((q,n)=>`
+    <div class="exp"><details><summary>
+      <span class="idx">${n+1}</span><span class="hint" style="color:var(--ink)">${q.q}</span>
+      </summary><div class="detail" style="padding-left:56px">${q.a}</div></details></div>`).join('');
+}
+
+/* Author helper: run overflowCheck() in the console before presenting.
+   A slide that overflows the 1280x720 stage is cropped on a projector and you
+   will not notice until you are standing in front of the room. */
+window.overflowCheck=()=>{
+  const bad=[];
+  document.querySelectorAll('.slide').forEach((el,n)=>{
+    const was=el.classList.contains('on'); el.classList.add('on');
+    const over=el.scrollHeight-el.clientHeight;
+    if(over>2) bad.push(`slide ${n+1} "${SLIDES[n].t}" overflows by ${over}px`);
+    if(!was) el.classList.remove('on');
+  });
+  console.log(bad.length?bad.join('\n'):'All slides fit the stage.');
+  return bad;
+};
+
+build(); fit();
+go(location.hash ? Math.max(0,parseInt(location.hash.slice(1),10)-1) : 0);
+</script>
+</body>
+</html>

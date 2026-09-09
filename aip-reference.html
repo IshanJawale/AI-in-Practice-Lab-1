@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>aip — the shared toolkit</title>
+<style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --code:#f4f4f0; --warn-soft:#fbf0e4;
+  --warn:#8a4b16;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --code:#232529; --warn-soft:#31261a;
+    --warn:#d99a5b;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.65 ui-serif,Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+.shell{max-width:1180px;margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:250px minmax(0,1fr);gap:44px}
+header{grid-column:1/-1;border-bottom:2px solid var(--fg);padding:40px 0 18px;margin-bottom:32px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:34px;line-height:1.15;margin:0 0 6px;font-weight:600}
+header p{color:var(--muted);margin:0}
+nav{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow-y:auto;
+  padding-bottom:40px;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+nav .lbl{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+nav ul{list-style:none;margin:0;padding:0}
+nav li{margin:0}
+nav a{display:block;padding:4px 0 4px 10px;color:var(--muted);text-decoration:none;
+  border-left:2px solid var(--line)}
+nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+nav .lvl3 a{padding-left:22px;font-size:13px}
+main{min-width:0;padding-bottom:100px}
+h2{font-size:26px;margin:52px 0 4px;font-weight:600;scroll-margin-top:20px}
+h2:after{content:"";display:block;height:1px;background:var(--line);margin-top:12px}
+h3{font-size:19px;margin:40px 0 10px;font-weight:600;scroll-margin-top:20px}
+h2 code,h3 code{font-size:.92em;background:none;padding:0}
+p{margin:0 0 14px}
+a{color:var(--accent)}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.87em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0;font-size:inherit}
+blockquote{margin:18px 0;padding:14px 18px;background:var(--warn-soft);
+  border-left:3px solid var(--warn);border-radius:0 4px 4px 0}
+blockquote p:last-child{margin:0}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;
+  font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.05em;
+  text-transform:uppercase;white-space:nowrap}
+td code{font-size:.9em}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 6px}
+.anchor{opacity:0;text-decoration:none;color:var(--muted);font-weight:400;margin-left:8px}
+h2:hover .anchor,h3:hover .anchor{opacity:1}
+@media (max-width:920px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav{position:static;max-height:none;margin-bottom:32px;
+      border-bottom:1px solid var(--line);padding-bottom:20px}
+}
+@media print{
+  nav{display:none} .shell{display:block;max-width:none}
+  body{background:#fff} h2,h3{break-after:avoid} pre,table,blockquote{break-inside:avoid}
+}
+</style></head><body>
+<div class="shell">
+  <header>
+    <div class="eyebrow">AI in Practice I · Module 1: Applied GenAI</div>
+    <h1><code>aip</code> — the shared toolkit</h1>
+    <p>Twelve modules, about 2,000 lines. Every lab runs on this package, and you
+       are expected to open it.</p>
+  </header>
+  <nav><p class="lbl">Contents</p><ul>
+<li class="lvl2"><a href="#design-rules">Design rules</a></li>
+<li class="lvl2"><a href="#how-the-pieces-fit">How the pieces fit</a></li>
+<li class="lvl3"><a href="#the-seven-layers">The seven layers</a></li>
+<li class="lvl3"><a href="#dependency-direction">Dependency direction</a></li>
+<li class="lvl3"><a href="#which-module-matters-in-which-lab">Which module matters in which lab</a></li>
+<li class="lvl3"><a href="#reading-order">Reading order</a></li>
+<li class="lvl2"><a href="#module-reference">Module reference</a></li>
+<li class="lvl3"><a href="#__init__py--the-public-surface">__init__.py — the public surface</a></li>
+<li class="lvl3"><a href="#configpy--model-tiers-and-settings">config.py — model tiers and settings</a></li>
+<li class="lvl3"><a href="#llmpy--the-model-client">llm.py — the model client</a></li>
+<li class="lvl3"><a href="#costpy--token-accounting-and-budgets">cost.py — token accounting and budgets</a></li>
+<li class="lvl3"><a href="#cachepy--the-content-addressed-cache">cache.py — the content-addressed cache</a></li>
+<li class="lvl3"><a href="#tracingpy--jsonl-spans">tracing.py — JSONL spans</a></li>
+<li class="lvl3"><a href="#chunkingpy--four-chunking-strategies">chunking.py — four chunking strategies</a></li>
+<li class="lvl3"><a href="#embedpy--embeddings">embed.py — embeddings</a></li>
+<li class="lvl3"><a href="#retrievalpy--retrievers-and-rerankers">retrieval.py — retrievers and rerankers</a></li>
+<li class="lvl3"><a href="#ragpy--the-reference-rag-pipeline">rag.py — the reference RAG pipeline</a></li>
+<li class="lvl3"><a href="#evalspy--the-evaluation-harness">evals.py — the evaluation harness</a></li>
+<li class="lvl3"><a href="#guardspy--guardrails-for-untrusted-input">guards.py — guardrails for untrusted input</a></li>
+<li class="lvl2"><a href="#configuration-and-environment">Configuration and environment</a></li>
+<li class="lvl2"><a href="#extending-or-replacing-a-module">Extending or replacing a module</a></li>
+  </ul></nav>
+  <main>
+<h2 id="design-rules">Design rules<a class="anchor" href="#design-rules">#</a></h2>
+<p>These five are stated in the package docstring, and your lab code is expected to
+follow them too.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Rule</th>
+<th>What it means in practice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Provider-agnostic</strong></td>
+<td>Model names are LiteLLM strings. Swapping Gemini for NVIDIA NIM or a local Ollama model changes one environment variable and no lab code.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Everything is cached</strong></td>
+<td>Identical requests never cost money twice. Re-running an evaluation is free.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Everything is counted</strong></td>
+<td>Tokens, cost and latency are recorded on every call, whether you asked or not.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Everything is traceable</strong></td>
+<td>Every call appends a JSONL trace record with a run id and a parent id.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Offline-capable</strong></td>
+<td>With <code>AIP_OFFLINE=1</code>, cached responses replay and an uncached request <strong>raises loudly</strong> rather than silently spending.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rule 5 is what makes the Lab 7 CI gate free and deterministic, and it is why the
+response cache is committed to the repository.</p>
+<hr />
+<h2 id="how-the-pieces-fit">How the pieces fit<a class="anchor" href="#how-the-pieces-fit">#</a></h2>
+<h3 id="the-seven-layers">The seven layers<a class="anchor" href="#the-seven-layers">#</a></h3>
+<p>T1 §4 claims every application in this module has the same seven-layer shape, and
+that <strong>layer 4 — the actual model call — is the smallest.</strong> The package is
+arranged so you can check that claim:</p>
+<pre><code> 7  INTERFACE       API / UI / batch job          labs/lab7/service.py, ui.py
+ 6  ORCHESTRATION   retries, routing, tool loop   llm.raw_call, guards.ToolGuard
+ 5  VALIDATION      schema, repair, guardrails    llm.structured, guards
+ 4  MODEL           the API call                  ~20 lines inside llm.raw_call
+ 3  CONTEXT         chunking, retrieval, prompts  chunking, retrieval, rag
+ 2  DATA            corpus, embeddings, cache     cache, embed
+ 1  OBSERVABILITY   traces, cost meter, evals     tracing, cost, evals
+</code></pre>
+<p>Layer 1 is not last. You build the meter before the engine — which is why Lab 2
+is an evaluation lab and comes before any of the RAG labs.</p>
+<h3 id="dependency-direction">Dependency direction<a class="anchor" href="#dependency-direction">#</a></h3>
+<p>One-way, no cycles, so any module can be read on its own.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Imports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>chunking</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>tracing</code></td>
+<td><code>config</code></td>
+</tr>
+<tr>
+<td><code>cache</code></td>
+<td><code>config</code></td>
+</tr>
+<tr>
+<td><code>cost</code></td>
+<td><code>config</code></td>
+</tr>
+<tr>
+<td><code>llm</code></td>
+<td><code>cache</code>, <code>config</code>, <code>cost</code>, <code>tracing</code></td>
+</tr>
+<tr>
+<td><code>embed</code></td>
+<td><code>cache</code>, <code>config</code>, <code>cost</code>, <code>tracing</code></td>
+</tr>
+<tr>
+<td><code>guards</code></td>
+<td><code>tracing</code></td>
+</tr>
+<tr>
+<td><code>evals</code></td>
+<td><code>cost</code>, <code>llm</code>, <code>tracing</code></td>
+</tr>
+<tr>
+<td><code>retrieval</code></td>
+<td><code>chunking</code>, <code>embed</code>, <code>llm</code>, <code>tracing</code></td>
+</tr>
+<tr>
+<td><code>rag</code></td>
+<td><code>guards</code>, <code>llm</code>, <code>retrieval</code>, <code>tracing</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Read left to right: <code>config</code> and <code>chunking</code> depend on nothing, <code>rag</code> sits on top
+of almost everything.</p>
+<h3 id="which-module-matters-in-which-lab">Which module matters in which lab<a class="anchor" href="#which-module-matters-in-which-lab">#</a></h3>
+<p><code>*</code> = imported directly by that lab's starter code. <code>·</code> = in play underneath,
+but you do not import it yourself.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th style="text-align: center;">L1</th>
+<th style="text-align: center;">L2</th>
+<th style="text-align: center;">L3</th>
+<th style="text-align: center;">L4</th>
+<th style="text-align: center;">L5</th>
+<th style="text-align: center;">L6</th>
+<th style="text-align: center;">L7</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+</tr>
+<tr>
+<td><code>llm</code></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>cost</code></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+</tr>
+<tr>
+<td><code>cache</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+</tr>
+<tr>
+<td><code>tracing</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+</tr>
+<tr>
+<td><code>evals</code></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>guards</code></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>chunking</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>embed</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>retrieval</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;"><strong>*</strong></td>
+<td style="text-align: center;">·</td>
+</tr>
+<tr>
+<td><code>rag</code></td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+<td style="text-align: center;">·</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two modules are never imported by a lab and still matter:</p>
+<ul>
+<li><strong><code>embed</code></strong> runs underneath every <code>DenseRetriever</code>. You will read it in Lab 3
+  when you need to know what <code>input_type</code> does and why the cache key includes it.</li>
+<li><strong><code>rag</code></strong> is a <em>reference implementation you read, then write your own version
+  of.</em> Lab 4 tells you to write <code>ANSWER_SYSTEM</code> yourself <strong>before</strong> looking at
+  <code>aip/rag.py</code>, then compare.</li>
+</ul>
+<p><strong>Lab 5 imports nothing from <code>aip</code> directly</strong> — it works on <code>reports/lab4.json</code>
+and on your Lab 3 loaders. That is deliberate: it is a diagnosis lab, not a
+building lab.</p>
+<h3 id="reading-order">Reading order<a class="anchor" href="#reading-order">#</a></h3>
+<p>If you read the package straight through, this order costs the least
+backtracking:</p>
+<ol>
+<li><code>config.py</code> — 10 min. Everything else resolves models through it.</li>
+<li><code>llm.py</code> — 30 min. <strong>Read this one properly.</strong> Lab 1 depends on knowing
+   exactly what <code>structured()</code> does on your behalf.</li>
+<li><code>cost.py</code>, <code>cache.py</code>, <code>tracing.py</code> — 20 min together. Short, and they explain
+   why re-runs are free and where the numbers come from.</li>
+<li><code>evals.py</code> — 30 min before Lab 2. It is the measuring instrument for the rest
+   of the module; do not quote a number from an instrument you have not read.</li>
+<li><code>chunking.py</code>, <code>embed.py</code>, <code>retrieval.py</code> — 30 min before Lab 3.</li>
+<li><code>guards.py</code> — 15 min before Lab 6. All 159 lines.</li>
+<li><code>rag.py</code> — after you have written your own in Lab 4.</li>
+</ol>
+<hr />
+<h2 id="module-reference">Module reference<a class="anchor" href="#module-reference">#</a></h2>
+<h3 id="__init__py--the-public-surface"><code>__init__.py</code> — the public surface<a class="anchor" href="#__init__py--the-public-surface">#</a></h3>
+<p><strong>29 lines.</strong> Re-exports the handful of names most lab code needs, so the common
+imports are one line.</p>
+<pre><code class="language-python">from aip import chat, structured, embed, Budget
+</code></pre>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Re-exported</th>
+<th>From</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MODELS</code>, <code>settings</code>, <code>resolve_model</code></td>
+<td><code>config</code></td>
+</tr>
+<tr>
+<td><code>Budget</code>, <code>BudgetExceeded</code>, <code>Usage</code></td>
+<td><code>cost</code></td>
+</tr>
+<tr>
+<td><code>chat</code>, <code>structured</code>, <code>StructuredOutputError</code></td>
+<td><code>llm</code></td>
+</tr>
+<tr>
+<td><code>embed</code>, <code>embed_batch</code></td>
+<td><code>embed</code></td>
+</tr>
+<tr>
+<td><code>trace</code>, <code>read_traces</code></td>
+<td><code>tracing</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Anything not in that list is imported from its module directly —
+<code>from aip.retrieval import DenseRetriever</code>. The short list is a convenience, not
+a boundary; nothing in the package is private to you.</p>
+<hr />
+<h3 id="configpy--model-tiers-and-settings"><code>config.py</code> — model tiers and settings<a class="anchor" href="#configpy--model-tiers-and-settings">#</a></h3>
+<p><strong>175 lines.</strong> The only place a model name is hard-coded. Everything else asks
+for a <em>tier</em>.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>settings</code></td>
+<td>A <code>Settings</code> dataclass read from the environment at import</td>
+</tr>
+<tr>
+<td><code>MODELS</code></td>
+<td>The resolved <code>{tier: model-id}</code> mapping for the active profile</td>
+</tr>
+<tr>
+<td><code>resolve_model(name_or_tier)</code></td>
+<td><code>"SMALL"</code> → a provider model string; passes real model ids through unchanged</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The four tiers.</strong> Lab code names a tier, never a model:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SMALL</code></td>
+<td>High-volume loops — extraction, per-item classification</td>
+</tr>
+<tr>
+<td><code>MAIN</code></td>
+<td>Quality-sensitive single calls — RAG answer generation</td>
+</tr>
+<tr>
+<td><code>LARGE</code></td>
+<td>Judging, and cascade escalation. <strong>Deliberately a different family from <code>MAIN</code></strong> so an LLM judge is not grading its own generator</td>
+</tr>
+<tr>
+<td><code>EMBED</code></td>
+<td>Embeddings</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from aip.config import settings, resolve_model
+settings.profile          # 'gemini'
+resolve_model(&quot;SMALL&quot;)    # 'gemini/gemini-3.5-flash-lite'
+</code></pre>
+<p><strong>Profiles.</strong> <code>gemini</code> (default, every target in every handout is measured on it)
+and <code>nvidia</code> are both verified end to end. <code>groq</code> is present but unverified;
+<code>ollama</code> runs fully local at zero cost; <code>anthropic</code> and <code>openai</code> are paid.</p>
+<p><strong>Used by:</strong> Lab 7 directly, for <code>/health</code> and <code>/metrics</code>. Every other lab uses
+it through <code>llm</code> and <code>embed</code> without importing it.</p>
+<blockquote>
+<p><strong>Worth knowing.</strong> Model ids rot. Every id in the first version of this
+repository was dead within months, which is why <code>scripts/list_models.py</code>
+exists — and why "listed by the API" and "callable on your key" are different
+things. On NVIDIA, 83 models are listed and four respond.</p>
+</blockquote>
+<hr />
+<h3 id="llmpy--the-model-client"><code>llm.py</code> — the model client<a class="anchor" href="#llmpy--the-model-client">#</a></h3>
+<p><strong>316 lines, and the one to read first.</strong> Two functions you call, one you should
+understand.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat(prompt, *, tier, system, max_tokens, temperature, return_full, ...)</code></td>
+<td>The text, or the full result dict with <code>return_full=True</code></td>
+</tr>
+<tr>
+<td><code>structured(prompt, *, schema, tier, max_repairs=2, ...)</code></td>
+<td>A validated instance of your Pydantic model, or raises <code>StructuredOutputError</code></td>
+</tr>
+<tr>
+<td><code>raw_call(messages, *, model, temperature, max_tokens, ...)</code></td>
+<td>The layer everything else goes through — retries, caching, cost, tracing</td>
+</tr>
+<tr>
+<td><code>extract_json(text)</code></td>
+<td>Tolerant JSON recovery from fenced or prose-wrapped output</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from pydantic import BaseModel, Field
+from aip import structured
+
+class Ticket(BaseModel):
+    category: Literal[&quot;billing&quot;, &quot;claims&quot;, &quot;technical&quot;]
+    urgency: int = Field(ge=1, le=5, description=&quot;1 = FAQ … 5 = emergency&quot;)
+
+t = structured(ticket_text, schema=Ticket, tier=&quot;SMALL&quot;)
+</code></pre>
+<p><strong>What <code>structured()</code> does for you</strong>, in order:</p>
+<ol>
+<li>Requests provider-native JSON mode where available, falling back to plain text
+   if the provider rejects it.</li>
+<li>Serialises <code>schema.model_json_schema()</code> <strong>into the system prompt</strong> — which is
+   why your <code>Field(description=…)</code> text reaches the model attached to the field
+   it governs.</li>
+<li>Parses tolerantly, stripping fences and surrounding prose.</li>
+<li>Validates with Pydantic.</li>
+<li>On failure, sends <strong>the validation errors back to the model</strong> and retries, up
+   to <code>max_repairs</code>.</li>
+<li>Treats truncation (<code>finish_reason == "length"</code>) separately and doubles the
+   budget, because truncated JSON is not a schema problem and must not be
+   "repaired" as one.</li>
+</ol>
+<p><strong>Used by:</strong> Lab 1 (<code>structured</code>, <code>StructuredOutputError</code>), Lab 4 and Lab 6
+(<code>chat</code>). Underneath Labs 2, 3 and 5 as well.</p>
+<blockquote>
+<p><strong>The trap.</strong> <code>structured()</code> validates <strong>shape</strong>, never <strong>truth</strong>. A perfectly
+valid record can still say <code>urgency: 1</code> about an ICU admission. And repairs are
+not free — every attempt goes through <code>raw_call</code>, so it is cached, counted and
+billed.</p>
+</blockquote>
+<hr />
+<h3 id="costpy--token-accounting-and-budgets"><code>cost.py</code> — token accounting and budgets<a class="anchor" href="#costpy--token-accounting-and-budgets">#</a></h3>
+<p><strong>143 lines.</strong> Every call is priced and counted; a <code>Budget</code> is a hard ceiling
+that stops a run rather than quietly billing you.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Budget(limit_usd, label)</code></td>
+<td>Context manager. Raises <code>BudgetExceeded</code> at the ceiling</td>
+</tr>
+<tr>
+<td><code>.report()</code></td>
+<td>The one-line summary you paste into a lab report</td>
+</tr>
+<tr>
+<td><code>Usage</code></td>
+<td>Per-call record: model, tokens, cost, latency, cached, priced</td>
+</tr>
+<tr>
+<td><code>is_priced(model)</code></td>
+<td>Can we state what this call cost?</td>
+</tr>
+<tr>
+<td><code>price_of(model, in, out)</code></td>
+<td>Cost in USD</td>
+</tr>
+<tr>
+<td><code>global_budget()</code></td>
+<td>The process-wide meter, used by Lab 7's <code>/metrics</code></td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from aip.cost import Budget
+
+with Budget(limit_usd=0.10, label=&quot;lab1-v0&quot;) as b:
+    ...
+print(b.report())
+# [lab1-v0] calls=40 (cache hits 0%) tokens=6100in/1200out cost=$0.0006 \
+#           latency p50=812ms p95=1204ms
+</code></pre>
+<p><strong>The three-way distinction that matters.</strong> A model is <em>priced</em> (we know the
+cost), <em>free</em> (<code>ollama/</code>, <code>local/</code> — <code>$0.00</code> is correct), or <strong>unpriced</strong> — a
+paid API with no published per-token price. NVIDIA NIM is the third case, and the
+report says so:</p>
+<pre><code>cost=$0.0006 + 1 UNPRICED call (nvidia_nim/...)
+</code></pre>
+<blockquote>
+<p><strong>Why that exists.</strong> The meter could have printed <code>$0.00</code> and looked tidy. A
+cost meter that silently reports zero for a paid API is exactly the class of
+bug this module teaches you to hate — so it refuses, and gives you token counts
+instead. Cost is proportional to tokens, so comparisons still rank correctly.</p>
+</blockquote>
+<p><strong>Used by:</strong> Labs 1, 4 and 6 wrap runs in a <code>Budget</code>; Lab 7 exposes
+<code>global_budget()</code> through <code>/metrics</code>.</p>
+<hr />
+<h3 id="cachepy--the-content-addressed-cache"><code>cache.py</code> — the content-addressed cache<a class="anchor" href="#cachepy--the-content-addressed-cache">#</a></h3>
+<p><strong>76 lines</strong> over SQLite. The reason re-running an evaluation is free.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make_key(kind, payload)</code></td>
+<td>SHA-256 over the normalised request</td>
+</tr>
+<tr>
+<td><code>get(key)</code> / <code>put(key, kind, request, response)</code></td>
+<td>Read / write</td>
+</tr>
+<tr>
+<td><code>stats()</code></td>
+<td><code>{'chat': 3361, 'embed': 341}</code></td>
+</tr>
+<tr>
+<td><code>clear(kind=None)</code></td>
+<td>Drop entries</td>
+</tr>
+</tbody>
+</table></div>
+<p>The key is the <strong>whole request</strong> — model, messages, temperature, and for
+embeddings the <code>input_type</code>. That has two consequences you will meet:</p>
+<ul>
+<li><strong>Change any parameter and you get a new call</strong>, correctly.</li>
+<li><strong>Do not change it and you get the old answer</strong>, also correctly — which is the
+  Lab 2 cascade bug. Two samples at temperature 0 are the <em>same request</em>, so the
+  second is served from the cache, the answers are byte-identical, disagreement
+  is never detected, and escalation reads 0%. Nothing errors. Drawing the second
+  sample at temperature 0.8 changes both the sampling and the key.</li>
+</ul>
+<p>With <code>AIP_OFFLINE=1</code> a miss raises <code>CacheMiss</code> instead of calling the provider.</p>
+<p><strong>Used by:</strong> Lab 7 directly (<code>/health</code> cache stats). Silently in every other lab —
+and in CI, where the committed cache makes the Lab 7 regression gate free and
+deterministic.</p>
+<hr />
+<h3 id="tracingpy--jsonl-spans"><code>tracing.py</code> — JSONL spans<a class="anchor" href="#tracingpy--jsonl-spans">#</a></h3>
+<p><strong>85 lines.</strong> A teaching-scale stand-in for Langfuse or LangSmith.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trace(name, **attrs)</code></td>
+<td>Context manager; writes a span with a run id and parent id</td>
+</tr>
+<tr>
+<td><code>event(name, **attrs)</code></td>
+<td>A point-in-time record</td>
+</tr>
+<tr>
+<td><code>read_traces(run_id=None)</code></td>
+<td>Read them back</td>
+</tr>
+<tr>
+<td><code>trace_file()</code></td>
+<td>Path to the current JSONL file</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from aip import trace
+with trace(&quot;http.ask&quot;, question=q[:120]) as span:
+    span[&quot;hits&quot;] = len(hits)
+</code></pre>
+<p>Spans nest through the parent id, so one request decomposes into embed →
+retrieve → generate → validate.</p>
+<p><strong>Used by:</strong> Lab 7 directly, where the bar is that traces alone must answer
+<em>"why did request X take nine seconds?"</em> — a total is not a diagnosis, and two of
+the likely causes (a repair retry, a rate-limit backoff) look like one slow call
+in a start/end log.</p>
+<hr />
+<h3 id="chunkingpy--four-chunking-strategies"><code>chunking.py</code> — four chunking strategies<a class="anchor" href="#chunkingpy--four-chunking-strategies">#</a></h3>
+<p><strong>119 lines.</strong> Chunking is the biggest single lever on retrieval quality, and the
+step most people skip in favour of tuning something more interesting.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Splits on</th>
+<th>Costs you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fixed_chunks(text, doc_id, size=800)</code></td>
+<td>Character count</td>
+<td>Cuts mid-sentence, mid-rule</td>
+</tr>
+<tr>
+<td><code>sliding_chunks(..., overlap=150)</code></td>
+<td>Character count, with overlap</td>
+<td>Duplication</td>
+</tr>
+<tr>
+<td><code>recursive_chunks(..., overlap=100)</code></td>
+<td>Paragraph → sentence → character</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>markdown_chunks(..., size=1200)</code></td>
+<td>Headings, <strong>prepending the heading path</strong></td>
+<td>Needs real markdown</td>
+</tr>
+<tr>
+<td><code>STRATEGIES</code></td>
+<td><code>{name: callable}</code>, for sweeping</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>A <code>Chunk</code> carries <code>text</code>, <code>doc_id</code>, <code>chunk_id</code> and a <code>meta</code> dict — and <code>meta</code> is
+where Lab 3 puts <code>status: current | archived</code> for the metadata-filter exercise.</p>
+<p><strong>Used by:</strong> Lab 3 (the sweep), Lab 4 and Lab 6 (<code>markdown_chunks</code>, the winner).</p>
+<blockquote>
+<p><strong>Measured on this corpus.</strong> At 800 chars: fixed 0.795, sliding 0.805,
+recursive 0.825, <strong>markdown 0.846</strong> nDCG@10. The heading-path prefix alone is
+worth <strong>+0.054 nDCG@10 and +0.143 hit_rate@1</strong> — and it <em>lowers</em> <code>hit_rate@5</code>,
+because it improves ranking, not recall.</p>
+</blockquote>
+<hr />
+<h3 id="embedpy--embeddings"><code>embed.py</code> — embeddings<a class="anchor" href="#embedpy--embeddings">#</a></h3>
+<p><strong>136 lines.</strong> Cached, batched, with a local fallback that needs no API key.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>embed_batch(texts, *, model, batch_size=64, input_type="passage")</code></td>
+<td>Returns an <code>(n, d)</code> array</td>
+</tr>
+<tr>
+<td><code>embed(text, *, model, input_type="query")</code></td>
+<td>One vector</td>
+</tr>
+<tr>
+<td><code>cosine(a, b)</code></td>
+<td>Similarity</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Asymmetric embeddings.</strong> Some models — NVIDIA NIM's, here — want to know
+whether they are embedding a <em>query</em> or a <em>passage</em>, and produce different
+vectors for the same text. The defaults are right for the common case: <code>embed()</code>
+defaults to <code>query</code>, <code>embed_batch()</code> to <code>passage</code>. <strong><code>input_type</code> is part of the
+cache key</strong>, so the two never collide.</p>
+<p>Vectors are stored base64 float32 rather than as JSON lists of floats. A
+3072-dimensional vector is ~60 KB as JSON text and ~16 KB packed — across a
+warmed corpus cache, the difference between a 44 MB file nobody wants in git and
+a 12 MB one that makes <code>AIP_OFFLINE=1</code> work for everybody.</p>
+<p><strong>Used by:</strong> nothing imports it directly — it runs underneath every
+<code>DenseRetriever</code>. Read it in Lab 3 when you want to know what the index actually
+cost to build (about $0.008 for this corpus).</p>
+<hr />
+<h3 id="retrievalpy--retrievers-and-rerankers"><code>retrieval.py</code> — retrievers and rerankers<a class="anchor" href="#retrievalpy--retrievers-and-rerankers">#</a></h3>
+<p><strong>238 lines.</strong> Implemented over plain NumPy and <code>rank_bm25</code> rather than a
+framework, because the whole point of Lab 3 is that you can see and change every
+step.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DenseRetriever(chunks)</code></td>
+<td>Embeddings + cosine. Exact, sub-millisecond at this scale</td>
+</tr>
+<tr>
+<td><code>Bm25Retriever(chunks)</code></td>
+<td>Lexical, term frequency × inverse document frequency</td>
+</tr>
+<tr>
+<td><code>HybridRetriever(retrievers, rrf_k=60, weights=None)</code></td>
+<td>Reciprocal Rank Fusion over <strong>any number</strong> of retrievers</td>
+</tr>
+<tr>
+<td><code>CrossEncoderReranker()</code></td>
+<td>Local <code>ms-marco-MiniLM-L-6-v2</code>; retrieve wide, rerank narrow</td>
+</tr>
+<tr>
+<td><code>LLMReranker()</code></td>
+<td>One model call per candidate</td>
+</tr>
+<tr>
+<td><code>ChromaRetriever(chunks, path=…)</code></td>
+<td>HNSW, persistence, and <code>where=</code> metadata filtering</td>
+</tr>
+<tr>
+<td><code>format_context(hits, max_chars=8000)</code></td>
+<td><strong>Numbered</strong> source block for the answer prompt</td>
+</tr>
+<tr>
+<td><code>Hit</code></td>
+<td><code>chunk</code>, <code>score</code>, <code>source</code>, <code>rank</code> — so a hybrid result stays explainable</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from aip.retrieval import DenseRetriever, format_context
+r = DenseRetriever(chunks)
+hits = r.search(&quot;how long do I have to file?&quot;, k=8)
+context = format_context(hits)          # &quot;[1] …\n[2] …&quot;
+</code></pre>
+<p><code>format_context</code> numbering is load-bearing: the model can only legitimately cite
+a number you supplied, so <code>[7]</code> with five sources is a <strong>provable</strong> error caught
+by three lines of regex — no judge, no cost.</p>
+<p><strong>Used by:</strong> Lab 3 (all of it), Lab 4 and Lab 6 (<code>DenseRetriever</code>,
+<code>format_context</code>), Lab 7 through your own pipeline.</p>
+<blockquote>
+<p><strong>Three measured results that contradict the textbook.</strong> On this corpus hybrid
+<strong>loses</strong> to dense (0.830 vs 0.846); the cross-encoder <strong>lowers</strong> nDCG@10
+(0.804 → 0.788) because it is out of domain on policy prose; and HNSW ties on
+quality while being <strong>3.6× slower</strong> at 164 vectors. Lab 3 makes you measure all
+three yourself.</p>
+</blockquote>
+<hr />
+<h3 id="ragpy--the-reference-rag-pipeline"><code>rag.py</code> — the reference RAG pipeline<a class="anchor" href="#ragpy--the-reference-rag-pipeline">#</a></h3>
+<p><strong>160 lines.</strong> The seven stages, named, so you can point at the one that failed.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RagPipeline(retriever, reranker=None, ...)</code></td>
+<td><code>.retrieve()</code> · <code>.rerank()</code> · <code>.generate()</code> · <code>.answer()</code></td>
+</tr>
+<tr>
+<td><code>RagAnswer</code></td>
+<td><code>answer</code>, <code>hits</code>, <code>citations_valid</code>, <code>invalid_citations</code>, <code>refused</code>, <code>stages</code></td>
+</tr>
+<tr>
+<td><code>ANSWER_SYSTEM</code></td>
+<td>The reference answer prompt</td>
+</tr>
+<tr>
+<td><code>REFUSAL</code></td>
+<td>The exact refusal string, so a refusal is machine-detectable</td>
+</tr>
+<tr>
+<td><code>hyde(question)</code></td>
+<td>Hypothetical document embedding — a query-side transform</td>
+</tr>
+<tr>
+<td><code>multi_query(question, n=3)</code></td>
+<td>Decompose into sub-questions</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>stages</code> is the point.</strong> It records what each stage did, which is what makes
+the Lab 5 failure classification possible at all.</p>
+<p><strong>Used by:</strong> nothing imports it. <strong>Lab 4 tells you to write <code>ANSWER_SYSTEM</code>
+yourself first, then compare with this file and note the differences.</strong> Reading
+it before you have tried is the one way to get less out of Lab 4 than you
+should.</p>
+<hr />
+<h3 id="evalspy--the-evaluation-harness"><code>evals.py</code> — the evaluation harness<a class="anchor" href="#evalspy--the-evaluation-harness">#</a></h3>
+<p><strong>376 lines — the largest module, and the most important.</strong> Read all of it before
+Lab 2.</p>
+<p><strong>Deterministic metrics</strong> — free, unarguable, and always preferred:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>exact_match(pred, gold)</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>field_accuracy(pred, gold, fields)</code></td>
+<td>Per-field <strong>and</strong> <code>record_accuracy</code></td>
+</tr>
+<tr>
+<td><code>json_valid(pred)</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>retrieval_metrics(retrieved, relevant, ks=(1,3,5,10))</code></td>
+<td><code>hit_rate@k</code>, <code>recall@k</code>, <code>MRR</code>, <code>nDCG@k</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>LLM-as-judge</strong> — for what has no deterministic test:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>JUDGE_RUBRIC_FAITHFULNESS</code>, <code>JUDGE_RUBRIC_CORRECTNESS</code></td>
+<td>Single-criterion, deliberately improvable</td>
+</tr>
+<tr>
+<td><code>llm_judge(prompt, tier="LARGE", max_tokens=2048)</code></td>
+<td>Retries once at double the budget on truncation; returns <code>parse_error</code> rather than a score</td>
+</tr>
+<tr>
+<td><code>judge_agreement(judge, human)</code></td>
+<td><strong>Cohen's κ.</strong> You may not report a judged number without it</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The runner:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Case</code>, <code>CaseResult</code>, <code>EvalReport</code></td>
+<td><code>id</code> / <code>input</code> / <code>expected</code>; results carry metrics, error and latency</td>
+</tr>
+<tr>
+<td><code>run_eval(name, cases, system, metric, *, budget_usd, workers=4)</code></td>
+<td>Threaded, budgeted, traced</td>
+</tr>
+<tr>
+<td><code>compare(*reports, metrics=...)</code></td>
+<td>The side-by-side table</td>
+</tr>
+<tr>
+<td><code>load_cases(path)</code></td>
+<td>JSONL → <code>list[Case]</code></td>
+</tr>
+<tr>
+<td><code>EvalReport.aggregate() / .summary() / .failures(metric) / .save(path)</code></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">from aip.evals import load_cases, run_eval, field_accuracy
+cases = load_cases(&quot;data/eval/extraction_dev.jsonl&quot;)
+rep = run_eval(&quot;lab1-c&quot;, cases, extract_c,
+               lambda p, g: field_accuracy(p, g, FIELDS), budget_usd=0.30)
+print(rep.summary())
+</code></pre>
+<p><strong>Used by:</strong> Labs 1, 2, 3 and 4 directly. Lab 5 consumes its saved output.</p>
+<blockquote>
+<p><strong>The war story, and it is in this file.</strong> Faithfulness was first measured at
+<strong>0.667</strong> when the true value was <strong>0.933</strong>. <code>llm_judge</code> capped output at 512
+tokens; the judge tier is a reasoning model that spent most of that budget on
+invisible thinking, so its verdict was truncated mid-object, failed to parse —
+<strong>and the parse failure was scored 0.</strong> Nothing errored. The rule it produced
+is now enforced here: <em>a parse failure is missing data, not a failing answer.</em>
+Check what your own harness does with one before you trust any number it gives
+you.</p>
+</blockquote>
+<hr />
+<h3 id="guardspy--guardrails-for-untrusted-input"><code>guards.py</code> — guardrails for untrusted input<a class="anchor" href="#guardspy--guardrails-for-untrusted-input">#</a></h3>
+<p><strong>159 lines.</strong> Everything here is a <strong>layer, not a solution.</strong> There is no known
+complete defence against prompt injection; the goal is to raise the cost of an
+attack and make a successful one visible.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Layer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>redact_pii(text)</code></td>
+<td>Typed placeholders + counts</td>
+</tr>
+<tr>
+<td><code>detect_injection(text)</code> → <code>InjectionVerdict</code></td>
+<td>Heuristic signatures: override, role switch, exfiltration</td>
+</tr>
+<tr>
+<td><code>delimit_untrusted(content, label)</code></td>
+<td>Wraps content <strong>and strips the closing tag from it</strong></td>
+</tr>
+<tr>
+<td><code>UNTRUSTED_SYSTEM_CLAUSE</code></td>
+<td>The system-prompt half of that layer</td>
+</tr>
+<tr>
+<td><code>ToolGuard(max_calls, allow, requires_confirmation, confirm_fn)</code></td>
+<td>Call budget, allowlist, human confirmation; raises <code>ToolDenied</code></td>
+</tr>
+<tr>
+<td><code>enforce_citations(answer, n_sources)</code></td>
+<td><code>(ok, invalid_indices)</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The controls map onto the OWASP Top 10 for LLM Applications — LLM01 prompt
+injection, LLM02 insecure output handling, LLM06 sensitive information
+disclosure, LLM10 unbounded consumption — and the module docstring says which.</p>
+<p><strong>Used by:</strong> Lab 1 (the PII patterns, for the <code>contains_pii</code> field), Lab 4
+(<code>delimit_untrusted</code>), Lab 6 (all of it).</p>
+<blockquote>
+<p><strong>Two things to notice.</strong> <code>delimit_untrusted</code> strips the closing tag from the
+content — without that, an attacker simply closes your tag early and writes
+outside it, and <em>a delimiter you do not enforce is decoration.</em> And
+<code>detect_injection</code> is a <strong>classifier</strong>, so it has two error rates: it is where
+your false positives come from, because ordinary English contains the words it
+looks for.</p>
+</blockquote>
+<hr />
+<h2 id="configuration-and-environment">Configuration and environment<a class="anchor" href="#configuration-and-environment">#</a></h2>
+<p>Everything is read from the environment at import, via <code>.env</code> in the repo root.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AIP_PROFILE</code></td>
+<td><code>gemini</code></td>
+<td>Which provider profile the tiers resolve against</td>
+</tr>
+<tr>
+<td><code>AIP_BUDGET_USD</code></td>
+<td><code>2.0</code></td>
+<td>Hard per-process ceiling. Trips <code>BudgetExceeded</code></td>
+</tr>
+<tr>
+<td><code>AIP_CACHE</code></td>
+<td><code>1</code></td>
+<td>Identical requests are free and instant</td>
+</tr>
+<tr>
+<td><code>AIP_OFFLINE</code></td>
+<td><code>0</code></td>
+<td><code>1</code> = replay only; a miss raises instead of spending</td>
+</tr>
+<tr>
+<td><code>AIP_TEMPERATURE</code></td>
+<td><code>0.0</code></td>
+<td>Deterministic by default</td>
+</tr>
+<tr>
+<td><code>AIP_TIMEOUT_S</code></td>
+<td><code>60</code></td>
+<td>Per-call timeout</td>
+</tr>
+<tr>
+<td><code>AIP_CACHE_DIR</code></td>
+<td><code>.aip_cache</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>AIP_TRACE_DIR</code></td>
+<td><code>.aip_traces</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>AIP_RUN_ID</code></td>
+<td>generated</td>
+<td>Set it to group traces across processes</td>
+</tr>
+</tbody>
+</table></div>
+<p>Plus exactly one provider key — <code>GEMINI_API_KEY</code>, <code>NVIDIA_API_KEY</code>, and so on.
+<code>.env</code> is gitignored and must never be committed.</p>
+<pre><code class="language-bash">make check      # verify the environment and make one live call
+make offline    # the same check in replay mode; costs nothing
+make cost       # what you have spent, and what is cached
+</code></pre>
+<hr />
+<h2 id="extending-or-replacing-a-module">Extending or replacing a module<a class="anchor" href="#extending-or-replacing-a-module">#</a></h2>
+<p>The package is a starting point, not a boundary. Some things students do, and
+where they belong:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>You want to</th>
+<th>Do this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add a provider</td>
+<td>A new entry in <code>PROFILES</code> in <code>config.py</code>. Nothing else changes</td>
+</tr>
+<tr>
+<td>A different chunker</td>
+<td>A function with the same signature, added to <code>STRATEGIES</code></td>
+</tr>
+<tr>
+<td>A different retriever</td>
+<td>Subclass <code>Retriever</code> and implement <code>.search(query, k)</code></td>
+</tr>
+<tr>
+<td>A different vector store</td>
+<td>Same — <code>ChromaRetriever</code> is the worked example</td>
+</tr>
+<tr>
+<td>A new metric</td>
+<td>A callable <code>(pred, gold) -&gt; dict[str, float]</code>, passed to <code>run_eval</code></td>
+</tr>
+<tr>
+<td>A new guard layer</td>
+<td>A function over the untrusted text, or a <code>ToolGuard</code> field</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two rules if you do:</p>
+<ol>
+<li><strong>Keep the tier indirection.</strong> Hard-coding a model id in lab code breaks the
+   provider portability that makes the module free to run.</li>
+<li><strong>Do not bypass <code>raw_call</code>.</strong> Calling <code>litellm</code> directly loses caching, cost
+   accounting, retries and tracing all at once — and the numbers in your report
+   come from those.</li>
+</ol>
+  </main>
+</div>
+</body></html>

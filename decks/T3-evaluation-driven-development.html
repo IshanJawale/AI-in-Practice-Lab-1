@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Subrat Panda">
+<meta name="description" content="Theory 3 of 4 — Evaluation-Driven Development for non-deterministic systems. Golden sets, metrics with headroom, and calibrated judges.">
+<title>T3 · Evaluation-Driven Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FCFCFD; --surface:#F1F3F6; --sunk:#E7EAEF;
+  --ink:#14161B; --body:#2B303A; --muted:#626A78; --faint:#8A929F;
+  --rule:#DCE0E7; --rule-strong:#BFC5D0;
+  --slate:#16212E; --slate-2:#1E2C3D; --slate-ink:#E9EDF3; --slate-muted:#8FA3BC;
+  --accent:#AE4224; --accent-ink:#8E3520; --accent-soft:#F7E7E1;
+  --teal:#1D5E5C; --teal-soft:#DCEBE8;
+  --gold:#8A6A16; --gold-soft:#F6EEDA;
+  --ok:#1F6B45; --ok-soft:#DFF0E6;
+  --shadow:0 1px 2px rgba(20,22,27,.06), 0 18px 44px -28px rgba(20,22,27,.4);
+  --stage-w:1280px; --stage-h:720px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#0B0F14}
+body{font-family:"Source Serif 4",Georgia,serif;color:var(--body);-webkit-font-smoothing:antialiased}
+.ui{font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- stage ---------- */
+#stage{position:absolute;top:50%;left:50%;width:var(--stage-w);height:var(--stage-h);
+  transform-origin:center center;background:var(--paper);overflow:hidden;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.slide{position:absolute;inset:0;padding:56px 72px;display:none;flex-direction:column;
+  background:var(--paper);animation:in .28s ease both}
+.slide.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}}
+
+/* ---------- typography ---------- */
+h1{font-family:Archivo,sans-serif;font-size:56px;font-weight:700;line-height:1.03;
+  letter-spacing:-.025em;margin:0 0 16px;color:#fff;text-wrap:balance}
+h2{font-family:Archivo,sans-serif;font-size:38px;font-weight:600;letter-spacing:-.018em;
+  margin:0 0 6px;color:var(--ink);line-height:1.12;text-wrap:balance}
+h3{font-family:Archivo,sans-serif;font-size:15px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+p{margin:0 0 15px;font-size:22px;line-height:1.5;max-width:64ch}
+.sub{font-size:19px;color:var(--accent-ink);font-weight:600;font-family:Archivo,sans-serif;
+  margin:-2px 0 20px}
+.rule{height:2px;background:var(--ink);margin:14px 0 26px;flex:none}
+.small{font-size:17px;line-height:1.45;color:var(--muted)}
+.tiny{font-size:14.5px;line-height:1.45;color:var(--faint)}
+b,strong{font-weight:600;color:var(--ink)}
+em{font-style:italic}
+.body-scroll{overflow-y:auto;flex:1;min-height:0;padding-right:6px}
+
+/* ---------- title & section slides ---------- */
+.dark{background:var(--slate);color:var(--slate-ink)}
+.dark h2{color:#fff}.dark p{color:#C3D0E0}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--slate-muted);margin:0 0 26px}
+.tick{width:74px;height:5px;background:var(--accent);margin:0 0 30px;border-radius:2px}
+.byline{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;
+  border-top:1px solid rgba(255,255,255,.14);padding-top:18px;
+  font-family:Archivo,sans-serif;font-size:15px;color:var(--slate-muted)}
+.byline b{color:#fff;font-weight:600;display:block;font-size:17px}
+.secnum{font-family:"IBM Plex Mono",monospace;font-size:80px;font-weight:600;
+  color:rgba(255,255,255,.16);line-height:1;margin-bottom:4px}
+
+/* ---------- statement ---------- */
+.statement{font-family:Archivo,sans-serif;font-size:40px;font-weight:600;line-height:1.24;
+  letter-spacing:-.016em;color:#fff;max-width:24ch;margin:0}
+.attrib{margin-top:26px;font-size:18px;line-height:1.5;color:#A9BBD0;max-width:62ch;
+  font-family:"Source Serif 4",serif}
+
+/* ---------- generic blocks ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:9px;padding:18px 20px}
+.card h4{font-family:Archivo,sans-serif;font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+.card.good h4{color:var(--ok)} .card.bad h4{color:var(--accent-ink)}
+.card ul{margin:0;padding-left:18px} .card li{font-size:17px;line-height:1.42;margin-bottom:8px}
+.card li:last-child{margin-bottom:0}
+
+.pull{border-left:4px solid var(--accent);background:var(--accent-soft);
+  padding:16px 22px;border-radius:0 7px 7px 0;margin:6px 0 18px}
+.pull p{margin:0;font-size:20px;color:var(--ink)}
+
+table{border-collapse:collapse;width:100%;font-size:17px}
+th{font-family:Archivo,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);text-align:left;padding:0 14px 8px 0;
+  border-bottom:2px solid var(--rule-strong)}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.38}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;padding-right:0;font-family:"IBM Plex Mono",monospace}
+
+pre{font-family:"IBM Plex Mono",monospace;font-size:15.5px;line-height:1.5;
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:16px 20px;margin:0;overflow:auto;color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--sunk);
+  padding:1px 5px;border-radius:4px}
+
+/* ---------- fragments ---------- */
+.frag{opacity:.12;filter:blur(.4px);transition:opacity .3s,filter .3s,transform .3s}
+.frag.show{opacity:1;filter:none}
+@media (prefers-reduced-motion:reduce){.frag{transition:none}}
+
+/* ---------- interactive: reveal ---------- */
+.reveal-btn{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;
+  background:var(--ink);color:#fff;border:0;border-radius:6px;padding:9px 16px;
+  cursor:pointer;letter-spacing:.02em}
+.reveal-btn:hover{background:var(--accent)}
+.reveal-body{display:none;margin-top:14px}
+.reveal-body.open{display:block;animation:in .25s ease both}
+
+/* ---------- interactive: clickable rows ---------- */
+.exp{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:7px;
+  background:var(--paper)}
+.exp summary{list-style:none;cursor:pointer;padding:11px 16px;display:flex;gap:14px;
+  align-items:center;font-size:17px;background:var(--surface)}
+.exp summary::-webkit-details-marker{display:none}
+.exp summary:hover{background:var(--sunk)}
+.exp[open] summary{background:var(--ink);color:#fff}
+.exp[open] summary .idx{background:var(--accent);color:#fff}
+.exp .idx{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  background:var(--sunk);color:var(--muted);width:26px;height:26px;border-radius:5px;
+  display:grid;place-items:center;flex:none}
+.exp .ttl{font-family:Archivo,sans-serif;font-weight:600;flex:none;min-width:210px}
+.exp .hint{color:var(--muted);font-size:15.5px}
+.exp[open] summary .hint{color:#B9C4D2}
+.exp .detail{padding:14px 16px 16px 56px;font-size:17px;line-height:1.5}
+.exp .detail .fix{margin-top:9px;padding-left:12px;border-left:3px solid var(--ok);
+  color:var(--ink)}
+
+/* ---------- interactive: boundary chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.chip{font-family:Archivo,sans-serif;font-size:16px;font-weight:600;padding:9px 15px;
+  border-radius:7px;border:1.5px solid var(--rule-strong);background:var(--paper);
+  cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.done{border-color:var(--rule);color:var(--faint)}
+#bslot{min-height:132px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:9px;padding:18px 22px}
+#bslot .who{font-family:Archivo,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:8px}
+#bslot .who.code{color:var(--ok)} #bslot .who.model{color:var(--accent-ink)}
+#bslot .why{font-size:19px;line-height:1.45;margin:0}
+
+/* ---------- interactive: cost calculator ---------- */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+.ctl{margin-bottom:15px}
+.ctl label{display:flex;justify-content:space-between;font-family:Archivo,sans-serif;
+  font-size:14px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.ctl label b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-size:15px}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.readout{background:var(--slate);border-radius:10px;padding:20px 22px;color:var(--slate-ink)}
+.readout .row{display:flex;justify-content:space-between;align-items:baseline;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.11)}
+.readout .row:last-child{border-bottom:none}
+.readout .lbl{font-family:Archivo,sans-serif;font-size:14px;color:var(--slate-muted)}
+.readout .val{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;color:#fff}
+.readout .val.big{font-size:31px}
+.readout .val.accent{color:#F0A18A}
+.verdict{margin-top:12px;font-size:16px;line-height:1.45;color:#C3D0E0;font-family:"Source Serif 4",serif}
+
+/* ---------- interactive: layer stack ---------- */
+.stack{display:flex;flex-direction:column-reverse;gap:5px}
+.layer{display:flex;align-items:center;gap:14px;padding:9px 16px;border-radius:7px;
+  background:var(--surface);border:1px solid var(--rule);cursor:pointer;transition:.15s}
+.layer:hover{border-color:var(--rule-strong);transform:translateX(3px)}
+.layer.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.layer.hl{border-color:var(--accent);border-width:2px}
+.layer .no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--faint);width:16px}
+.layer.active .no{color:#8FA3BC}
+.layer .nm{font-family:Archivo,sans-serif;font-weight:600;font-size:16px;min-width:150px}
+.layer .ds{font-size:15.5px;color:var(--muted)}
+.layer.active .ds{color:#B9C4D2}
+#lslot{margin-top:14px;background:var(--accent-soft);border-left:4px solid var(--accent);
+  border-radius:0 7px 7px 0;padding:14px 18px;font-size:17px;line-height:1.45;min-height:74px}
+#lslot .mod{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--accent-ink);
+  font-weight:600;display:block;margin-bottom:5px}
+
+/* ---------- references ---------- */
+.refs{display:grid;gap:9px}
+.ref{display:grid;grid-template-columns:112px 1fr;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--rule);font-size:16.5px;line-height:1.42}
+.ref:last-child{border-bottom:none}
+.ref .tag{font-family:Archivo,sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:#fff;background:var(--muted);border-radius:4px;
+  padding:3px 8px;height:fit-content;text-align:center}
+.ref .tag.paper{background:var(--teal)} .ref .tag.doc{background:var(--gold)}
+.ref .tag.repo{background:var(--accent)} .ref .tag.book{background:var(--slate-2)}
+.ref a{color:var(--accent-ink);word-break:break-word}
+.ref .why{display:block;color:var(--muted);font-size:15px;margin-top:3px}
+
+/* ---------- chrome ---------- */
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--accent);z-index:40;
+  transition:width .25s}
+#hud{position:fixed;right:16px;bottom:14px;z-index:40;font-family:Archivo,sans-serif;
+  font-size:13px;color:#8895A6;display:flex;gap:14px;align-items:center}
+#hud kbd{font-family:"IBM Plex Mono",monospace;background:#1A222C;color:#B9C4D2;
+  border-radius:4px;padding:2px 6px;font-size:11.5px}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;z-index:50;
+  background:#0E141B;color:#C7D2E0;border-top:2px solid var(--accent);padding:18px 26px;
+  display:none;font-size:15.5px;line-height:1.55}
+#notes.on{display:block}
+#notes h5{font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:#7A8899;margin:0 0 8px}
+#notes b{color:#fff}
+#grid{position:fixed;inset:0;z-index:60;background:#0B0F14;overflow:auto;padding:26px;
+  display:none;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px;
+  align-content:start}
+#grid.on{display:grid}
+.thumb{background:var(--paper);border-radius:7px;padding:12px;cursor:pointer;
+  border:2px solid transparent;min-height:104px}
+.thumb:hover,.thumb.cur{border-color:var(--accent)}
+.thumb .tn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint)}
+.thumb .tt{font-family:Archivo,sans-serif;font-size:13.5px;font-weight:600;color:var(--ink);
+  margin-top:5px;line-height:1.28}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* --- per-slide density adjustments -------------------------------------
+   Measured, not guessed: these two slides overflowed the 1280x720 stage by
+   33px and 25px respectively. A slide that overflows is silently cropped on
+   a projector, so the deck self-checks -- see the console helper at the
+   bottom of the script. --------------------------------------------------- */
+.slide.tight p{margin-bottom:10px;font-size:20.5px}
+.slide.tight .rule{margin:9px 0 15px}
+.slide.tight .ctl{margin-bottom:10px}
+.slide.tight .pull{margin:4px 0 0;padding:13px 20px}
+.slide.tight .pull p{font-size:18px}
+.slide.tight table{font-size:16.5px}
+.slide.tight table td{padding:6px 14px 6px 0}
+.slide.tight .sub{margin:-2px 0 12px}
+.slide.tight h2{font-size:34px}
+
+@media print{
+  html,body{overflow:visible;background:#fff;height:auto}
+  #stage{position:static;transform:none!important;width:100%;height:auto;box-shadow:none}
+  .slide{display:flex!important;position:relative;page-break-after:always;
+    height:190mm;animation:none}
+  .frag{opacity:1!important;filter:none!important}
+  .reveal-body{display:block!important}
+  .exp .detail{display:block!important}
+  #bar,#hud,#notes,#grid{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="stage" aria-live="polite"></div>
+<div id="bar"></div>
+<div id="hud">
+  <span id="pos" class="mono">1 / 1</span>
+  <span><kbd>←</kbd><kbd>→</kbd> move</span>
+  <span><kbd>S</kbd> notes</span>
+  <span><kbd>O</kbd> overview</span>
+  <span><kbd>F</kbd> full</span>
+</div>
+<div id="notes"><h5>Speaker notes</h5><div id="notesbody"></div></div>
+<div id="grid"></div>
+
+<script>
+/* =====================================================================
+   AI in Practice I — Module 1: Applied GenAI
+   T3 · Evaluation-Driven Development
+   Author: Subrat Panda · Plaksha University
+
+   Self-contained. Open in a browser and press F.
+     arrows / space  move      S  speaker notes
+     O  overview grid          F  full screen
+   Run overflowCheck() in the console before presenting.
+
+   Source: decks/src/T3.js  ·  Rebuild: python scripts/build_html_decks.py
+   ===================================================================== */
+
+const AUTHOR = "Subrat Panda";
+
+const SLIDES = [
+
+/* 1 ------------------------------------------------------------------ */
+{ t:"Title", cls:"dark", html:`
+  <p class="eyebrow">AI in Practice I · Module 1: Applied GenAI · Theory 3 of 4</p>
+  <div class="tick"></div>
+  <h1>Evaluation-Driven<br>Development</h1>
+  <p style="font-size:24px;max-width:60ch;color:#B6C3D4;margin-top:6px">
+    How to tell whether a system that gives a different answer every time actually
+    got better — and how to stop fooling yourself in the meantime.</p>
+  <div class="byline">
+    <div><b>${AUTHOR}</b>Plaksha University · MS in Artificial Intelligence</div>
+    <div style="text-align:right">90 minutes<br>
+      <span style="color:#7E94B4">Prepares you for Lab 2, and every lab after it</span></div>
+  </div>`,
+  notes:`<b>0–10 min.</b> The single most important habit in the module starts here.
+  Everything after this session depends on them believing it.` },
+
+/* 2 ------------------------------------------------------------------ */
+{ t:"Where we are going", html:`
+  <h2>Where we are going</h2>
+  <div class="rule"></div>
+  <div class="body-scroll">
+  <p>You now know how to specify a task and enforce a contract. The obvious next
+     question is whether the thing you built is any good — and that question is much
+     harder than it sounds when the system is stochastic.</p>
+  <div class="grid2" style="margin-top:18px">
+    <div class="card"><h4>1 · The golden set</h4>
+      <p class="small" style="margin:0">How big, what goes in it, and the discipline
+      of splits. Almost every failed evaluation effort failed right here.</p></div>
+    <div class="card"><h4>2 · Metrics that mean something</h4>
+      <p class="small" style="margin:0">Why aggregate accuracy lies, why you must
+      report cost and latency alongside quality, and how to spot a saturated metric.</p></div>
+    <div class="card"><h4>3 · LLM-as-judge</h4>
+      <p class="small" style="margin:0">Six documented biases, how to write a rubric
+      that survives them, and the calibration rule you must satisfy before you are
+      allowed to quote a judge number.</p></div>
+    <div class="card"><h4>4 · The loop</h4>
+      <p class="small" style="margin:0">Baseline, error analysis, one hypothesis, one
+      change, measure. Plus regression gates, so a win stays won.</p></div>
+  </div>
+  <p class="tiny" style="margin-top:18px">Full prose:
+     <code>theory/T3-evaluation-driven-development.md</code></p>
+  </div>`,
+  notes:`60 seconds.` },
+
+/* 3 ------------------------------------------------------------------ */
+{ t:"You cannot see it", html:`
+  <h2>Ordinary software has a property you never had to think about</h2>
+  <div class="rule"></div>
+  <p><b>It is deterministic.</b> Run the test, get the answer. Green or red.</p>
+  <p>A GenAI system has none of that:</p>
+  <table style="margin-top:6px">
+    <tr><td>The same input can give different outputs.</td></tr>
+    <tr><td>A change that fixes case A can break case B, invisibly.</td></tr>
+    <tr><td>The model behind your API can change under you, without notice.</td></tr>
+    <tr><td>"Better" is often a judgement call, not a comparison.</td></tr>
+    <tr><td>Your intuition about quality is formed by whichever ten examples you
+      happened to look at — and those are not a sample.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:18px"><p>Teams without a harness do not
+    iterate slowly. <b>They iterate randomly</b>, and plateau at whatever their first
+    guess achieved.</p></div>`,
+  notes:`The last row is the one to press. Ask how they currently decide whether a
+  prompt change helped. The honest answer is "I looked at a few outputs and it felt
+  better", and everyone in the room has done it.` },
+
+/* 4 ------------------------------------------------------------------ */
+{ t:"The thesis", cls:"dark", html:`
+  <div class="tick" style="margin-top:64px"></div>
+  <p class="statement">The evaluation harness is not a testing activity that follows
+    development.<br><br>It is the instrument that makes development possible.</p>
+  <p class="attrib">This is not a moral position, it is an economic one. Without a
+    harness, every change is a coin flip you cannot observe. With one, you compound.</p>`,
+  notes:`Five seconds of silence. Then move.` },
+
+/* 5 ------------------------------------------------------------------ */
+{ t:"The rule", cls:"dark", html:`
+  <div class="tick" style="margin-top:72px"></div>
+  <p class="statement" style="font-size:52px">No number, no claim.</p>
+  <p class="attrib" style="max-width:66ch">"It's better now" is not a result.
+    <b style="color:#F0A18A">"Record accuracy 0.71 → 0.94 on the 120-item test split,
+    at 1.8× cost and +340 ms p95"</b> is a result. You will hear this sentence in
+    every remaining session of this module.</p>`,
+  notes:`Say it, and mean it. Deduct for it visibly at every show-and-tell, or it
+  does not stick.` },
+
+/* 6 ------------------------------------------------------------------ */
+{ t:"§1 The golden set", cls:"dark", html:`
+  <p class="secnum mono">01</p>
+  <h2 style="font-size:44px">The golden set</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    A collection of inputs with known-good outputs. Everything else in evaluation
+    depends on it — and almost every failed evaluation effort failed right here.</p>`,
+  notes:`10–30 min.` },
+
+/* 7 ------------------------------------------------------------------ */
+{ t:"How big?", html:`
+  <h2>How big? Smaller than you think</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><th style="width:120px">Size</th><th>What it buys you</th></tr>
+    <tr><td class="mono"><b>10–20</b></td><td>A smoke test. Catches gross breakage.
+      <b>Not a measurement.</b></td></tr>
+    <tr><td class="mono"><b>50–100</b></td><td>The practical minimum for comparing two
+      variants at all.</td></tr>
+    <tr><td class="mono"><b>200–500</b></td><td>Reliable enough to detect a few points
+      of difference.</td></tr>
+    <tr><td class="mono"><b>1,000+</b></td><td>Rarely worth it before you have a real
+      user population to sample from.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:18px"><p><b>Representative matters far more
+    than large.</b> A thousand items drawn from one easy stratum tells you less than
+    eighty chosen across five.</p></div>
+  <p class="small frag">Next slide: what those numbers actually mean for the claims
+     you are allowed to make.</p>`,
+  notes:`Do not linger. The next slide is where this becomes visceral.` },
+
+/* 8 ------------------------------------------------------------------ */
+{ t:"Is your difference real?", cls:"tight", html:`
+  <h2>Try it: is your difference real?</h2>
+  <p class="sub">Move the sliders. This is the moment most people's evaluation practice changes.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="calc">
+    <div>
+      <div class="ctl"><label>Golden set size <b id="v_n">60</b></label>
+        <input type="range" id="s_n" min="20" max="600" step="10" value="60"></div>
+      <div class="ctl"><label>System A accuracy <b id="v_a">0.88</b></label>
+        <input type="range" id="s_a" min="50" max="100" step="1" value="88"></div>
+      <div class="ctl"><label>System B accuracy <b id="v_b">0.91</b></label>
+        <input type="range" id="s_b" min="50" max="100" step="1" value="91"></div>
+      <div style="border-top:1px solid var(--rule);margin:14px 0 10px;padding-top:10px">
+        <p class="tiny" style="margin:0 0 8px"><b>Paired comparison</b> — same items,
+          both systems. Count only the items where they disagree.</p>
+        <div class="ctl"><label>b · A right, B wrong <b id="v_bb">4</b></label>
+          <input type="range" id="s_bb" min="0" max="40" step="1" value="4"></div>
+        <div class="ctl"><label>c · B right, A wrong <b id="v_cc">10</b></label>
+          <input type="range" id="s_cc" min="0" max="40" step="1" value="10"></div>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="row"><span class="lbl">A · 95% CI (Wilson)</span>
+        <span class="val" id="r_ci_a">—</span></div>
+      <div class="row"><span class="lbl">B · 95% CI (Wilson)</span>
+        <span class="val" id="r_ci_b">—</span></div>
+      <div class="row"><span class="lbl">Intervals overlap?</span>
+        <span class="val accent" id="r_overlap">—</span></div>
+      <div class="row"><span class="lbl">Paired test (McNemar, exact)</span>
+        <span class="val" id="r_p">—</span></div>
+      <p class="verdict" id="r_say"></p>
+    </div>
+  </div>`,
+  notes:`<b>Do this live and slowly.</b> Start at the defaults: n=60, 0.88 vs 0.91.
+  The intervals overlap almost completely — <b>you cannot conclude B is better.</b>
+  <br><br>Now drag n to 400 and watch the intervals separate. That is the honest way
+  to get certainty, and it costs you 340 more labelled items.
+  <br><br>Then drag n back to 60 and use the paired sliders: b=4, c=10 gives
+  p≈0.18 — still not significant. b=2, c=14 gives p≈0.004, which is. <b>Same sample
+  size, real conclusion</b>, because pairing removes between-item variance, which is
+  the dominant component.
+  <br><br>Land it: at n=100 and p=0.90 the CI half-width is about ±0.06. <b>A
+  three-point difference on a hundred items is not a result.</b>` },
+
+/* 9 ------------------------------------------------------------------ */
+{ t:"What goes in it", html:`
+  <h2>What goes in it — stratify, do not sample randomly</h2>
+  <div class="rule"></div>
+  <p>A random sample of a support queue is 80% easy tickets, and you will spend your
+     evaluation budget re-confirming that easy things are easy.</p>
+  <table style="margin-top:6px">
+    <tr><th>Stratum</th><th class="n">Share</th><th>Why it is there</th></tr>
+    <tr><td><b>Typical cases</b></td><td class="n">~40%</td>
+      <td>The baseline you must not regress.</td></tr>
+    <tr><td><b>Hard but valid</b></td><td class="n">~25%</td>
+      <td>Where the differences between variants actually show up.</td></tr>
+    <tr><td><b>Edge cases</b></td><td class="n">~15%</td>
+      <td>Empty input, one word, ten thousand words, wrong language, mixed script.</td></tr>
+    <tr><td><b>Adversarial</b></td><td class="n">~10%</td>
+      <td>Injection attempts, contradictory content.</td></tr>
+    <tr><td><b>Should-fail</b></td><td class="n">~10%</td>
+      <td><b>Questions with no answer.</b> The most-skipped and most-informative
+      stratum of the five.</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:16px"><p>A system that answers everything
+    scores beautifully on a golden set containing only answerable questions — and is
+    dangerous in production, because it also confidently answers the ones it should
+    have refused. <b>Our RAG golden set is 11% unanswerable for exactly this
+    reason.</b></p></div>`,
+  notes:`The should-fail stratum is the one to dwell on. Ask what a system optimised
+  against an all-answerable set learns to do. Answer: never refuse.` },
+
+/* 10 ----------------------------------------------------------------- */
+{ t:"The splits", html:`
+  <h2>The splits, and the discipline</h2>
+  <div class="rule"></div>
+  <pre>dev   ( 60)  ── you look at these, iterate on these, debug on these
+test  (120)  ── you run these rarely, and you never read the failures in detail
+blind ( 60)  ── the instructor holds the labels</pre>
+  <p style="margin-top:18px">The discipline is the whole point. Iterating against the
+     test set means you are <b>fitting your prompt to it</b> — the same overfitting as
+     in classical ML, with the same consequence: your reported number is optimistic
+     and your system does not transfer.</p>
+  <div class="pull frag"><p>You may read dev failures freely. Run the test set when
+    you have a candidate, and <b>report what it says</b> — including when it is worse
+    than dev.</p></div>
+  <p class="small frag">If your dev score is 0.94 and your test score is 0.81, that
+     gap <em>is</em> a result. Report it. It tells you and everyone else something
+     true about your process, and hiding it helps nobody.</p>`,
+  notes:`Tell them the Lab 1 reference solution's dev→test gap was +0.002 on field
+  accuracy — essentially none — because the prompt was written against a published
+  annotation guideline rather than tuned against dev items. That is what good looks
+  like.` },
+
+/* 11 ----------------------------------------------------------------- */
+{ t:"§2 Metrics", cls:"dark", html:`
+  <p class="secnum mono">02</p>
+  <h2 style="font-size:44px">Metrics that mean something</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    Prefer deterministic metrics — they are free, fast and unarguable. Then learn to
+    recognise the two ways a metric quietly stops telling you anything.</p>`,
+  notes:`30–50 min.` },
+
+/* 12 ----------------------------------------------------------------- */
+{ t:"Field vs record accuracy", cls:"tight", html:`
+  <h2>Try it: the metric that flatters you</h2>
+  <p class="sub">Per-field accuracy looks excellent. Drag the sliders and watch what the business actually receives.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="calc">
+    <div>
+      <div class="ctl"><label>Fields per record <b id="v_f">6</b></label>
+        <input type="range" id="s_f" min="1" max="12" step="1" value="6"></div>
+      <div class="ctl"><label>Accuracy per field <b id="v_pa">0.95</b></label>
+        <input type="range" id="s_pa" min="70" max="100" step="1" value="95"></div>
+      <div class="ctl"><label>Records per day <b id="v_vol">10,000</b></label>
+        <input type="range" id="s_vol" min="100" max="50000" step="100" value="10000"></div>
+      <p class="tiny" style="margin-top:8px">Assumes independent errors. Correlated
+        errors — one bad ticket breaking several fields at once — make record accuracy
+        <em>higher</em> than this, because the damage concentrates in fewer records.
+        Worth knowing which you have.</p>
+    </div>
+    <div class="readout">
+      <div class="row"><span class="lbl">Field accuracy</span>
+        <span class="val big" id="r_field">0.950</span></div>
+      <div class="row"><span class="lbl">Record accuracy</span>
+        <span class="val big accent" id="r_rec">0.735</span></div>
+      <div class="row"><span class="lbl">Records needing a human, per day</span>
+        <span class="val" id="r_human">2,649</span></div>
+      <p class="verdict" id="r_note"></p>
+    </div>
+  </div>`,
+  notes:`Defaults give 0.95 field accuracy → <b>0.735 record accuracy</b>. A quarter
+  of the records have at least one error and need a human.
+  <br><br>Ask which number they would put on a slide for their manager, and which one
+  the operations lead needs. They are not the same number, and the gap is the whole
+  lesson: <b>field accuracy is the engineering metric; record accuracy is the one the
+  business feels.</b>
+  <br><br>Then drag fields to 8 and watch it fall below 0.7 with no change in
+  per-field quality at all.` },
+
+/* 13 ----------------------------------------------------------------- */
+{ t:"The triple", cls:"dark", html:`
+  <div class="tick" style="margin-top:64px"></div>
+  <p class="statement" style="font-size:46px">quality &nbsp;×&nbsp; cost &nbsp;×&nbsp; latency</p>
+  <p class="attrib" style="max-width:66ch">Quality alone is not a result. A
+    configuration that is two points better for thirty times the money is usually
+    worse. One that is a point worse and five times faster may be right for an
+    interactive product and wrong for a batch job.
+    <br><br><b style="color:#F0A18A">You cannot make the trade-off if you only
+    measured one axis</b> — and the person who only measured quality has not finished
+    the work.</p>`,
+  notes:`Every lab in this module asks for all three. Say so now so it is not a
+  surprise in the rubric.` },
+
+/* 14 ----------------------------------------------------------------- */
+{ t:"Choosing a metric", html:`
+  <h2>The second way a metric stops telling you anything</h2>
+  <div class="rule"></div>
+  <p>The first is aggregation, which you just saw. The second is <b>saturation</b>.</p>
+  <div class="pull"><p>When the reference solution first compared dense retrieval
+    against BM25, it used <code>hit_rate@5</code>, measured <b>0.976 against
+    0.929</b>, and concluded there was no interesting difference between them.</p></div>
+  <p class="frag">That conclusion was wrong. On <b>MRR</b> the same comparison is
+     <b>0.872 against 0.693</b> — an enormous gap — and the per-question picture is
+     dramatic.</p>
+  <div class="pull frag" style="border-left-color:var(--ok);background:var(--ok-soft)">
+    <p><b>A saturated metric does not report "no difference". It reports nothing at
+    all — and the two look identical.</b></p></div>
+  <p class="small frag"><b>Choosing a metric with headroom is part of the job.</b>
+     Before you trust a comparison, ask what the metric's ceiling is and how close to
+     it you already are. Lab 3 makes you fall into this on purpose.</p>`,
+  notes:`This is a genuine mistake from this course's own materials, and telling them
+  so is worth more than presenting it as a general principle. It also pre-loads the
+  Lab 3 moment.` },
+
+/* 15 ----------------------------------------------------------------- */
+{ t:"Separate the stages", html:`
+  <h2>Separate the stages. Always.</h2>
+  <div class="rule"></div>
+  <pre>   retrieval eval              generation eval
+   (needs: labelled            (needs: gold answers,
+    relevant docs)              given GOLD context)
+          │                             │
+          └──────────────┬──────────────┘
+                         ▼
+                  end-to-end eval</pre>
+  <p style="margin-top:16px">Evaluate generation <b>with gold context</b> as well as
+     with retrieved context. The difference between those two numbers is precisely
+     the damage your retriever is doing.</p>
+  <div class="pull frag"><p>It converts <em>"the answer was wrong"</em> into either
+    <em>"retrieval failed"</em> or <em>"generation failed"</em> — two completely
+    different repair jobs, and you would waste a week guessing between them.</p></div>
+  <p class="small frag">Measured on our own Lab 4 system: gold context 0.893,
+     retrieved context 0.821. Retrieval-attributable loss 0.071;
+     generation-attributable loss 0.107. <b>Generation was the bigger problem</b> —
+     which is not what anyone predicted.</p>`,
+  notes:`Lab 5 is built entirely on this decomposition. The number at the bottom is
+  real and it surprises people every time — everyone assumes retrieval is the
+  bottleneck.` },
+
+/* 16 ----------------------------------------------------------------- */
+{ t:"§3 LLM-as-judge", cls:"dark", html:`
+  <p class="secnum mono">03</p>
+  <h2 style="font-size:44px">LLM-as-judge</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    For open-ended text, deterministic metrics run out. So we use a model to grade.
+    This works — and it fails in specific, documented, avoidable ways.</p>`,
+  notes:`50–70 min.` },
+
+/* 17 ----------------------------------------------------------------- */
+{ t:"Six biases", html:`
+  <h2>Six documented biases</h2>
+  <p class="sub">Click each one for what it does to your numbers, and the mitigation</p>
+  <div class="rule" style="margin-bottom:14px"></div>
+  <div class="body-scroll" id="biases"></div>`,
+  notes:`Open <b>self-preference</b> and <b>scale compression</b>. Self-preference is
+  the one that quietly invalidates a lot of published comparisons; scale compression
+  is the one they will hit themselves tomorrow.` },
+
+/* 18 ----------------------------------------------------------------- */
+{ t:"A rubric that works", html:`
+  <h2>A rubric that works</h2>
+  <div class="rule"></div>
+  <p class="small" style="color:var(--accent-ink);font-weight:600;margin-bottom:8px">
+    Bad: "Rate the answer's quality from 1 to 10."</p>
+  <pre style="font-size:14.5px">Judge ONLY whether every claim in the ANSWER is supported by the CONTEXT.
+
+Do NOT judge helpfulness, style, or whether the answer is true in the
+real world. An answer stating anything not in the context is unsupported,
+even if it is correct in reality.
+
+Refusing to answer, when the context genuinely does not contain the
+answer, counts as SUPPORTED.
+
+Reply as JSON:
+  {"score": 0 or 1, "unsupported_claims": [...], "reason": "one sentence"}</pre>
+  <div class="grid2" style="margin-top:14px">
+    <div class="card good"><h4>What it does right</h4><ul>
+      <li><b>Isolates one dimension.</b> Support, not quality.</li>
+      <li><b>Rules out the confounders explicitly</b> — style, helpfulness,
+        real-world truth.</li>
+      <li><b>Handles refusal.</b> Without that clause, refusals score 0 and your
+        system learns never to refuse.</li>
+      <li><b>Forces the judge to name the offending claims</b>, which improves the
+        judgement and gives you something to read during error analysis.</li>
+    </ul></div>
+    <div class="card"><h4>When one dimension is not enough</h4>
+      <p class="small" style="margin:0">Run several <em>separate</em>
+      single-criterion judges rather than one multi-criterion judge. Aggregating is
+      your job, not the judge's — and a single number from a judge asked to weigh
+      four things at once is not recoverable into its parts.</p></div>
+  </div>`,
+  notes:`The refusal clause is the one people omit, and it is the one that does the
+  most damage — it teaches your system that declining is always wrong.` },
+
+/* 19 ----------------------------------------------------------------- */
+{ t:"Earning the right", cls:"tight", html:`
+  <h2>Try it: earning the right to use a judge</h2>
+  <p class="sub">Hand-label 20 cases. Then compute agreement. Drag to see what your κ actually means.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="calc">
+    <div>
+      <div class="ctl"><label>Cases you hand-labelled <b id="v_kn">20</b></label>
+        <input type="range" id="s_kn" min="10" max="100" step="5" value="20"></div>
+      <div class="ctl"><label>Raw agreement with the judge <b id="v_agree">0.80</b></label>
+        <input type="range" id="s_agree" min="40" max="100" step="1" value="80"></div>
+      <div class="ctl"><label>Share of cases you marked "supported" <b id="v_base">0.70</b></label>
+        <input type="range" id="s_base" min="10" max="95" step="5" value="70"></div>
+      <p class="tiny" style="margin-top:8px">Raw agreement flatters you whenever one
+        label dominates. Cohen's κ corrects for the agreement you would get by
+        chance — which is why it is the number to report.</p>
+    </div>
+    <div class="readout">
+      <div class="row"><span class="lbl">Raw agreement</span>
+        <span class="val" id="r_raw">0.80</span></div>
+      <div class="row"><span class="lbl">Agreement expected by chance</span>
+        <span class="val" id="r_pe">0.58</span></div>
+      <div class="row"><span class="lbl">Cohen's κ</span>
+        <span class="val big accent" id="r_k">0.52</span></div>
+      <p class="verdict" id="r_kv"></p>
+    </div>
+  </div>
+  <div class="pull frag" style="margin-top:12px"><p><b>Module rule:</b> you may not
+    report an LLM-judge number in any lab without its κ. And when κ is low, the fix
+    is almost always <b>the rubric</b>, not the model.</p></div>`,
+  notes:`Set agreement to 0.90 and base rate to 0.90 — raw agreement looks superb and
+  κ collapses to about 0.4. <b>That is the trap.</b> If 90% of your cases are
+  "supported", a judge that says "supported" every single time scores 0.90 raw
+  agreement and is worthless.
+  <br><br>Then the practical instruction: when κ is low, read your disagreements.
+  You will usually find your own labelling rule was never written down — the same
+  lesson as Lab 1's urgency scale.` },
+
+/* 20 ----------------------------------------------------------------- */
+{ t:"The judge that lied", cls:"dark", html:`
+  <div class="tick" style="margin-top:40px"></div>
+  <p class="statement" style="font-size:36px">Faithfulness read 0.667.<br>
+     The true value was 0.933.</p>
+  <p class="attrib" style="max-width:68ch">
+    This module's own Lab 4 harness capped the judge at 512 output tokens. The judge
+    is a reasoning model: it spent most of that budget thinking, and its JSON verdict
+    was cut off mid-object. The parse failed, and the harness <b>scored the parse
+    failure as zero</b>.
+    <br><br>
+    <b style="color:#F0A18A">A parse failure is missing data, not a failing answer.</b>
+    Scoring it 0 puts a silent, systematic, downward bias on your headline metric —
+    and the number that comes out looks disappointing but entirely plausible.</p>`,
+  notes:`Three cheap signals caught it, and all three are worth naming:
+  <br><b>1.</b> An internal contradiction — 8 of the 15 "unfaithful" answers were
+  simultaneously judged <em>fully correct</em>.
+  <br><b>2.</b> A free deterministic cross-check — every number in 14 of the 15 was
+  present in the corpus. A cheap check contradicting an expensive one should always
+  win your attention.
+  <br><b>3.</b> Reading the judge's raw output, which said, verbatim,
+  <code>\`\`\`json {"score": 1, "unsupported_</code>` },
+
+/* 21 ----------------------------------------------------------------- */
+{ t:"§4 The loop", cls:"dark", html:`
+  <p class="secnum mono">04</p>
+  <h2 style="font-size:44px">The loop</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    Five steps. One of them is worth far more of your time than the other four, and
+    it is not the one anyone enjoys.</p>`,
+  notes:`70–85 min.` },
+
+/* 22 ----------------------------------------------------------------- */
+{ t:"Five steps", html:`
+  <h2>Five steps, and step 2 is the one that pays</h2>
+  <div class="rule"></div>
+  <pre>      ┌──────────────────────────────────────────────────────┐
+      ▼                                                      │
+  1 BASELINE ─▶ 2 ERROR ANALYSIS ─▶ 3 HYPOTHESIS ─▶ 4 CHANGE ONE THING
+  run it,       read 20 failures,   "if I do X,             │
+  record it     cluster them         Y improves"            ▼
+                                                      5 MEASURE (dev)
+                                                            │
+                    6 ACCEPT or REVERT ◀────────────────────┘
+                    log the number either way</pre>
+  <div class="pull frag" style="margin-top:16px"><p><b>Error analysis is not a
+    metaphor.</b> Open twenty failing cases and read them. Put them in a spreadsheet,
+    one row each, with a free-text "what went wrong" column. Then cluster.</p></div>
+  <p class="small frag">You will nearly always find that 60–80% of failures fall into
+     two or three clusters, and that each cluster has a specific, cheap fix — usually
+     a field description, one few-shot example, or a chunking change.
+     <b>Nobody finds those by staring at an aggregate accuracy number</b>, and nobody
+     finds them by asking a model to summarise the failures for them.</p>`,
+  notes:`Step 4 — <b>change one thing</b> — is the other discipline. If you change the
+  model, the prompt and k at once and the score moves, you have learned nothing
+  transferable.` },
+
+/* 23 ----------------------------------------------------------------- */
+{ t:"Regression gates", html:`
+  <h2>Defend the number once you have it</h2>
+  <div class="rule"></div>
+  <p>In Lab 7 your CI runs the harness and fails the build if a key metric drops
+     beyond a stated tolerance:</p>
+  <pre>correctness:        min 0.75
+faithfulness:       min 0.90
+citation_validity:  min 0.98
+refusal_recall:     min 0.80
+cost_per_query_usd: max 0.010
+p95_latency_ms:     max 6000</pre>
+  <div class="pull frag" style="margin-top:16px"><p><b>Note that the gate covers cost
+    and latency, not only quality.</b> In a real system those regress too, and they
+    regress silently — nobody files a bug saying "the answers are still correct but
+    we are paying four times as much".</p></div>
+  <p class="small frag">Set the threshold about one standard error below what you
+     actually achieve. A gate set at your current number fails on noise; a gate set
+     far below it never fires at all.</p>`,
+  notes:`The cost gate is the one nobody thinks of, and it is the one that saves real
+  money.` },
+
+/* 24 ----------------------------------------------------------------- */
+{ t:"Lab 2 briefing", cls:"tight", html:`
+  <h2>Lab 2 — The Prompt Lab</h2>
+  <p class="sub">Next session · 3 hours · individual</p>
+  <div class="rule"></div>
+  <p>You have Lab 1's extractor. You now have to decide, with evidence, between
+     roughly a dozen configurations: three prompt strategies, two model tiers, with
+     and without a reasoning field, single call versus a small→large cascade.</p>
+  <p><b>You cannot decide by looking.</b> Build the harness, run the grid, produce a
+     table, and defend a recommendation on quality × cost × latency.</p>
+  <div class="pull frag"><p><b>There is no accuracy target in this lab</b>, and that
+    is deliberate. When the reference solution ran this grid, the honest answer was
+    <em>"none of the clever configurations beat the cheap baseline by a detectable
+    margin, so ship the cheap one."</em> Reaching that conclusion, with the paired
+    tests to support it, is full marks. Inventing an improvement is not.</p></div>
+  <p class="small frag">For calibration: on the test split, <code>SMALL</code>
+     zero-shot measured 0.930 field accuracy at $0.080 and 2,276 ms p95;
+     <code>MAIN</code> zero-shot measured 0.942 at $0.382 and 6,720 ms —
+     <b>4.8× the cost and 3× the latency for a difference the paired test could not
+     distinguish from noise (p = 0.71)</b>.</p>`,
+  notes:`85–90 min. Giving away the reference result here is deliberate: it stops
+  students assuming a flat result means they did it wrong, and it makes the honest
+  conclusion socially acceptable before they reach it.` },
+
+/* 25 ----------------------------------------------------------------- */
+{ t:"Check yourself", html:`
+  <h2>Check yourself</h2>
+  <p class="sub">Six questions. If you can answer them, you can build the harness.</p>
+  <div class="rule" style="margin-bottom:14px"></div>
+  <div class="body-scroll" id="quiz"></div>`,
+  notes:`Q1 and Q5 are the ones that reveal whether the statistics landed.` },
+
+/* 26 ----------------------------------------------------------------- */
+{ t:"Reading & references", html:`
+  <h2>Reading and references</h2>
+  <p class="sub">Roughly 45 minutes. Everything is free.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="body-scroll"><div class="refs">
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Zheng, L. et al. (2023). <b>Judging LLM-as-a-Judge with MT-Bench and Chatbot
+      Arena.</b> NeurIPS.
+      <a href="https://arxiv.org/abs/2306.05685">arxiv.org/abs/2306.05685</a>
+      <span class="why">§4 is the bias catalogue this session draws on. The
+      self-preference result is the one to read closely.</span></div></div>
+    <div class="ref"><span class="tag paper">Paper</span><div>
+      Es, S. et al. (2023). <b>RAGAS: Automated Evaluation of Retrieval Augmented
+      Generation.</b>
+      <a href="https://arxiv.org/abs/2309.15217">arxiv.org/abs/2309.15217</a>
+      <span class="why">Where faithfulness, context precision and answer relevance
+      come from. You will implement versions of these in Lab 4.</span></div></div>
+    <div class="ref"><span class="tag doc">Essay</span><div>
+      Husain, H. <b>Your AI product needs evals.</b>
+      <a href="https://hamel.dev/blog/posts/evals/">hamel.dev/blog/posts/evals/</a>
+      <span class="why">The best practitioner account of error analysis as an actual
+      activity rather than a slogan. Read the section on looking at your data.</span></div></div>
+    <div class="ref"><span class="tag doc">Reference</span><div>
+      <b>Cohen's κ, and why raw agreement misleads.</b>
+      <span class="why">Any statistics reference will do. What matters is
+      understanding the base-rate trap you saw on the calibration slide.</span></div></div>
+    <div class="ref"><span class="tag repo">Code</span><div>
+      <b><code>aip/evals.py</code></b> — the harness
+      <span class="why">Metrics, the runner, the judge scaffold, <code>compare()</code>.
+      <b>Read all of it before Lab 2.</b> It is the most important file in the
+      toolkit.</span></div></div>
+    <div class="ref"><span class="tag repo">Code</span><div>
+      <b><code>labs/lab2/stats.py</code></b> — Wilson intervals and McNemar's test
+      <span class="why">Forty lines. Both functions from the slider slide, with the
+      reasoning in the docstrings.</span></div></div>
+    <div class="ref"><span class="tag repo">Notes</span><div>
+      <b><code>theory/T3-evaluation-driven-development.md</code></b>
+      <span class="why">Full prose, with the golden-set design guidance and the judge
+      rubrics.</span></div></div>
+  </div></div>`,
+  notes:`Tell them <code>aip/evals.py</code> is required reading, not optional. Lab 2
+  is unpleasant without it.` },
+
+/* 27 ----------------------------------------------------------------- */
+{ t:"Close", cls:"dark", html:`
+  <div class="tick" style="margin-top:56px"></div>
+  <p class="statement" style="font-size:34px">Tomorrow you build the instrument.<br><br>
+    Everything after that is just reading it.</p>
+  <div class="byline" style="margin-top:auto">
+    <div><b>${AUTHOR}</b>AI in Practice I · Module 1 · Theory 3 of 4</div>
+    <div style="text-align:right">Next: Lab 2 — The Prompt Lab<br>
+      <span style="color:#7E94B4">Read <code style="background:#233042;color:#B9C4D2">aip/evals.py</code> tonight</span></div>
+  </div>`,
+  notes:`Close, then: read <code>aip/evals.py</code> tonight, all of it.` },
+];
+
+/* ===================== data: judge biases =========================== */
+const BIASES = [
+  {n:1, t:"Position", s:"the first-presented answer wins more often",
+   d:"In an A/B comparison, judges systematically favour whichever answer they saw first — independent of content. On some setups the effect is large enough to reverse a genuine ranking.",
+   fixLabel:"Mitigation", fix:"Run both orders and average. If the verdict flips when you swap them, record a tie — because that is what you actually learned."},
+  {n:2, t:"Verbosity", s:"longer answers score higher, regardless of content",
+   d:"A padded answer reads as more thorough. Judges reward it even when the extra material adds nothing, and even when it adds something unsupported.",
+   fixLabel:"Mitigation", fix:"Control for length — compare answers of similar length, or state the effect explicitly in the rubric. Consider reporting length alongside the score."},
+  {n:3, t:"Self-preference", s:"a model rates its own output above a neutral judge's rating",
+   d:"Well documented, and the reason a great many published “our model wins” comparisons are worth less than they appear. The judge recognises its own distribution and finds it more agreeable.",
+   fixLabel:"Mitigation", fix:"Judge with a different model family where you can. Where you cannot, <b>say so in your report</b> and state the direction of the bias. In this module, <code>LARGE</code> is deliberately a different generation from <code>MAIN</code>."},
+  {n:4, t:"Style over substance", s:"confident, well-formatted and wrong beats hesitant and right",
+   d:"Judges pick up the surface signals of authority — structure, decisiveness, formatting — and weight them far above whether the content is correct.",
+   fixLabel:"Mitigation", fix:"Name the substance criterion explicitly in the rubric, and rule out the confounders by name. “Do not judge style” is a real instruction that measurably helps."},
+  {n:5, t:"Scale compression", s:"on a 1–10 scale, everything lands between 7 and 9",
+   d:"Judges avoid the extremes. You end up with a metric whose effective range is three points, which then cannot distinguish the configurations you care about — a saturated metric by another route.",
+   fixLabel:"Mitigation", fix:"Use two or three points, or a binary criterion. <b>Binary with a named failure mode beats a ten-point scale every time.</b>"},
+  {n:6, t:"Leniency", s:"judges default to “acceptable”",
+   d:"Absent a specific reason to fail something, a judge passes it. Your faithfulness scores drift upward and stop tracking reality.",
+   fixLabel:"Mitigation", fix:"Force the judge to <em>name</em> the specific offending claims before scoring. If it cannot name one, the pass is more trustworthy; if it can, you have your error analysis for free."},
+];
+
+/* ===================== data: quiz =================================== */
+const QUIZ = [
+  {q:"Your golden set has 100 items. Variant A scores 0.88, variant B scores 0.91. What do you conclude, and what do you do next?",
+   a:"<b>You conclude nothing.</b> At n=100 and p≈0.90 the 95% CI half-width is about ±0.06, so the two intervals overlap almost entirely. Next: run a <b>paired</b> comparison on the same items and count only the discordant cases (A right / B wrong, and B right / A wrong), then McNemar's test. Pairing removes between-item variance — the dominant component — and can detect a real difference at a sample size where unpaired comparison cannot. If that is still not significant, choose on cost."},
+  {q:"Six fields, 97% accurate each. What is record accuracy? What if the errors are correlated rather than independent — higher or lower, and why?",
+   a:"Independent: 0.97⁶ ≈ <b>0.833</b>. With <b>correlated</b> errors record accuracy is <b>higher</b>, because the failures concentrate — one genuinely difficult input breaks several fields at once, so the same number of field errors is spread across fewer records. Which regime you are in matters operationally: correlated errors mean fewer records need review, but the ones that do are badly wrong."},
+  {q:"Why must a golden set contain unanswerable questions? What specifically goes undetected without them?",
+   a:"Without them you never measure <b>refusal</b>. A system that answers everything scores perfectly on an all-answerable set, and its failure mode — confidently answering questions it has no basis for — is completely invisible to your evaluation. You also cannot compute refusal precision, so you cannot tell a well-calibrated system from one that has simply never been asked to decline."},
+  {q:"Your judge has κ = 0.35. Give three concrete rubric changes to try, in the order you would try them.",
+   a:"<b>(1)</b> Reduce to a single criterion — if the rubric asks about support <em>and</em> helpfulness, split it into two judges. <b>(2)</b> Rule out the confounders by name: \"do not judge style, length, or real-world truth\". <b>(3)</b> Collapse the scale to binary and force the judge to name the specific offending claim before scoring. Only after all three would I consider a different judge model — and first I would re-read my own disagreements, because a low κ usually means <em>my</em> labelling rule was never written down."},
+  {q:"A RAG system answers a question wrongly. Describe an experiment, using only your golden set, that decides whether retrieval or generation is at fault.",
+   a:"Run the generator twice on the answerable questions: once with <b>retrieved</b> context (your real system) and once with <b>gold</b> context — the actual relevant documents, no retrieval. Call those B and A. Then <code>A − B</code> is retrieval-attributable loss and <code>1 − A</code> is generation-attributable loss. If A is 0.95 and B is 0.72, work on retrieval; if A is 0.78, no retrieval improvement will save you and the prompt is the problem."},
+  {q:"Why do the regression gates in Lab 7 include a maximum cost and a maximum latency, not just minimum quality?",
+   a:"Because cost and latency regress too, and unlike quality they regress <b>silently</b> — no user files a bug saying \"the answers are still correct but we are paying four times as much\". A prompt change that adds a retrieval hop, a model swap, or an extra repair loop can quietly double the bill while every quality metric holds. If it is not gated, nobody notices until finance does."},
+];
+
+/* ===================== helpers ====================================== */
+function wilson(k, n, z=1.96){
+  if(!n) return [0,0];
+  const p=k/n, d=1+z*z/n, c=(p+z*z/(2*n))/d,
+        h=z*Math.sqrt(p*(1-p)/n + z*z/(4*n*n))/d;
+  return [Math.max(0,c-h), Math.min(1,c+h)];
+}
+function logC(n,k){ let s=0; for(let i=0;i<k;i++) s+=Math.log(n-i)-Math.log(i+1); return s; }
+function mcnemarP(b,c){
+  const n=b+c; if(!n) return 1;
+  const k=Math.min(b,c); let tail=0;
+  for(let i=0;i<=k;i++) tail+=Math.exp(logC(n,i)-n*Math.LN2);
+  return Math.min(1, 2*tail);
+}
+
+/* ===================== mounts ======================================= */
+function mountSig(){
+  const g=id=>document.getElementById(id); if(!g('s_n'))return;
+  function calc(){
+    const n=+g('s_n').value, a=+g('s_a').value/100, b=+g('s_b').value/100,
+          bb=+g('s_bb').value, cc=+g('s_cc').value;
+    g('v_n').textContent=n; g('v_a').textContent=a.toFixed(2);
+    g('v_b').textContent=b.toFixed(2); g('v_bb').textContent=bb; g('v_cc').textContent=cc;
+    const [al,ah]=wilson(Math.round(a*n),n), [bl,bh]=wilson(Math.round(b*n),n);
+    g('r_ci_a').textContent=`${al.toFixed(2)}–${ah.toFixed(2)}`;
+    g('r_ci_b').textContent=`${bl.toFixed(2)}–${bh.toFixed(2)}`;
+    const overlap = al<=bh && bl<=ah;
+    g('r_overlap').textContent = overlap ? "yes" : "no";
+    g('r_overlap').style.color = overlap ? "#F0A18A" : "#7ED9A8";
+    const p=mcnemarP(bb,cc);
+    g('r_p').textContent = p<0.0001 ? "p < 0.0001" : `p = ${p.toFixed(4)}`;
+    g('r_say').innerHTML = overlap
+      ? `The intervals overlap, so the unpaired comparison <b style="color:#fff">cannot
+         distinguish these two systems</b>. ` + (p<0.05
+          ? `But the paired test can: <b style="color:#7ED9A8">p = ${p.toFixed(4)}</b>.
+             Same data, real conclusion — that is what pairing buys you.`
+          : `The paired test cannot either. <b style="color:#fff">Choose on cost.</b>`)
+      : `The intervals separate, so you can claim a difference — though the paired
+         test is still the stronger evidence.`;
+  }
+  ['s_n','s_a','s_b','s_bb','s_cc'].forEach(id=>g(id).addEventListener('input',calc));
+  calc();
+}
+
+function mountRecord(){
+  const g=id=>document.getElementById(id); if(!g('s_f'))return;
+  function calc(){
+    const f=+g('s_f').value, pa=+g('s_pa').value/100, vol=+g('s_vol').value;
+    const rec=Math.pow(pa,f);
+    g('v_f').textContent=f; g('v_pa').textContent=pa.toFixed(2);
+    g('v_vol').textContent=vol.toLocaleString('en-US');
+    g('r_field').textContent=pa.toFixed(3);
+    g('r_rec').textContent=rec.toFixed(3);
+    g('r_human').textContent=Math.round(vol*(1-rec)).toLocaleString('en-US');
+    const pct=Math.round((1-rec)*100);
+    g('r_note').innerHTML = `Per-field accuracy of <b style="color:#fff">${pa.toFixed(2)}</b>
+      across ${f} fields means <b style="color:#F0A18A">${pct}% of records</b> have at
+      least one error. Field accuracy is the engineering metric. Record accuracy is
+      the one the business feels.`;
+  }
+  ['s_f','s_pa','s_vol'].forEach(id=>g(id).addEventListener('input',calc));
+  calc();
+}
+
+function mountKappa(){
+  const g=id=>document.getElementById(id); if(!g('s_kn'))return;
+  function calc(){
+    const n=+g('s_kn').value, agree=+g('s_agree').value/100, base=+g('s_base').value/100;
+    g('v_kn').textContent=n; g('v_agree').textContent=agree.toFixed(2);
+    g('v_base').textContent=base.toFixed(2);
+    // Chance agreement if both rater and judge label at roughly the base rate.
+    const pe = base*base + (1-base)*(1-base);
+    const k = pe<1 ? (agree-pe)/(1-pe) : 1;
+    g('r_raw').textContent=agree.toFixed(2);
+    g('r_pe').textContent=pe.toFixed(2);
+    g('r_k').textContent=k.toFixed(2);
+    let verdict, colour;
+    if(k<0.20){ verdict="The judge is measuring something other than what you think. Do not use it."; colour="#F0A18A"; }
+    else if(k<0.40){ verdict="Weak. Fix the rubric before you quote any number from this judge."; colour="#F0A18A"; }
+    else if(k<0.60){ verdict="Moderate. Usable for tracking a trend, not for a headline claim."; colour="#E8C97A"; }
+    else if(k<0.80){ verdict="Good. This is what a well-specified rubric achieves."; colour="#7ED9A8"; }
+    else { verdict="Excellent — and worth checking your task was not trivially easy."; colour="#7ED9A8"; }
+    const warn = (base>0.82 && agree>0.82)
+      ? ` <b style="color:#F0A18A">Note the trap:</b> with a base rate this skewed, a
+         judge that answers the same way every time would score high raw agreement and
+         be worthless. κ is what exposes that.` : "";
+    g('r_kv').innerHTML=`<b style="color:${colour}">${verdict}</b>${warn}`;
+    if(n<20) g('r_kv').innerHTML += ` <b style="color:#F0A18A">Fewer than 20 hand
+      labels is too few to trust this estimate.</b>`;
+  }
+  ['s_kn','s_agree','s_base'].forEach(id=>g(id).addEventListener('input',calc));
+  calc();
+}
+
+function mountBiases(){
+  const host=document.getElementById('biases'); if(host) host.innerHTML=expList(BIASES);
+}
+function mountQuiz(){
+  const host=document.getElementById('quiz'); if(host) host.innerHTML=quizList(QUIZ);
+}
+
+function mountAll(){ mountSig(); mountRecord(); mountKappa(); mountBiases(); mountQuiz(); }
+
+/* ===================== engine ======================================= */
+const stage=document.getElementById('stage'), bar=document.getElementById('bar'),
+      pos=document.getElementById('pos'), notes=document.getElementById('notes'),
+      notesBody=document.getElementById('notesbody'), grid=document.getElementById('grid');
+let i=0, frag=0, fragEls=[];
+
+function fit(){
+  const s=Math.min(innerWidth/1280, innerHeight/720)*0.94;
+  stage.style.transform=`translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize',fit);
+
+function build(){
+  stage.innerHTML = SLIDES.map((s,n)=>
+    `<section class="slide ${s.cls||''}" data-n="${n}">${s.html}</section>`).join('');
+  grid.innerHTML = SLIDES.map((s,n)=>
+    `<div class="thumb" data-go="${n}"><div class="tn">${String(n+1).padStart(2,'0')}</div>
+     <div class="tt">${s.t}</div></div>`).join('');
+  grid.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{go(+el.dataset.go);toggleGrid(false);});
+  mountReveals(); if (typeof mountAll === 'function') mountAll();
+}
+
+function go(n,f){
+  i=Math.max(0,Math.min(SLIDES.length-1,n));
+  stage.querySelectorAll('.slide').forEach(el=>el.classList.toggle('on',+el.dataset.n===i));
+  const cur=stage.querySelector('.slide.on');
+  fragEls=[...cur.querySelectorAll('.frag')];
+  frag = f==='end' ? fragEls.length : 0;
+  paint();
+  notesBody.innerHTML = SLIDES[i].notes || '<i style="color:#66738a">No notes for this slide.</i>';
+  pos.textContent=`${i+1} / ${SLIDES.length}`;
+  bar.style.width=`${((i+1)/SLIDES.length)*100}%`;
+  grid.querySelectorAll('.thumb').forEach((t,n)=>t.classList.toggle('cur',n===i));
+  location.hash=i+1;
+}
+function paint(){ fragEls.forEach((el,n)=>el.classList.toggle('show',n<frag)); }
+function next(){ if(frag<fragEls.length){frag++;paint();} else if(i<SLIDES.length-1) go(i+1); }
+function prev(){ if(frag>0){frag--;paint();} else if(i>0) go(i-1,'end'); }
+function toggleGrid(on){ grid.classList.toggle('on', on===undefined?!grid.classList.contains('on'):on); }
+
+addEventListener('keydown',e=>{
+  if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  const k=e.key.toLowerCase();
+  if(k==='arrowright'||k===' '||k==='pagedown'){e.preventDefault();next();}
+  else if(k==='arrowleft'||k==='pageup'){e.preventDefault();prev();}
+  else if(k==='home')go(0); else if(k==='end')go(SLIDES.length-1);
+  else if(k==='s'){notes.classList.toggle('on');}
+  else if(k==='o'){toggleGrid();}
+  else if(k==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  else if(k==='escape'){toggleGrid(false);notes.classList.remove('on');}
+});
+
+
+/* Generic: any <button data-reveal="id"> toggles <div id="id" class="reveal-body">. */
+function mountReveals(){
+  document.querySelectorAll('[data-reveal]').forEach(btn=>btn.onclick=()=>{
+    const body=document.getElementById(btn.dataset.reveal);
+    body.classList.toggle('open');
+    btn.textContent = body.classList.contains('open') ? 'Hide the answer' : 'Reveal the answer';
+  });
+}
+
+/* Generic: expandable rows. Each item {n,t,s,d,fix}. */
+function expList(items){
+  return items.map(f=>`
+    <div class="exp"><details><summary>
+      <span class="idx">${f.n}</span><span class="ttl">${f.t}</span>
+      <span class="hint">${f.s}</span></summary>
+      <div class="detail">${f.d}${f.fix?`<div class="fix"><b>${f.fixLabel||'Response'}:</b> ${f.fix}</div>`:''}</div>
+    </details></div>`).join('');
+}
+
+/* Generic: hidden-answer question list. Each item {q,a}. */
+function quizList(items){
+  return items.map((q,n)=>`
+    <div class="exp"><details><summary>
+      <span class="idx">${n+1}</span><span class="hint" style="color:var(--ink)">${q.q}</span>
+      </summary><div class="detail" style="padding-left:56px">${q.a}</div></details></div>`).join('');
+}
+
+/* Author helper: run overflowCheck() in the console before presenting.
+   A slide that overflows the 1280x720 stage is cropped on a projector and you
+   will not notice until you are standing in front of the room. */
+window.overflowCheck=()=>{
+  const bad=[];
+  document.querySelectorAll('.slide').forEach((el,n)=>{
+    const was=el.classList.contains('on'); el.classList.add('on');
+    const over=el.scrollHeight-el.clientHeight;
+    if(over>2) bad.push(`slide ${n+1} "${SLIDES[n].t}" overflows by ${over}px`);
+    if(!was) el.classList.remove('on');
+  });
+  console.log(bad.length?bad.join('\n'):'All slides fit the stage.');
+  return bad;
+};
+
+build(); fit();
+go(location.hash ? Math.max(0,parseInt(location.hash.slice(1),10)-1) : 0);
+</script>
+</body>
+</html>
