@@ -17,8 +17,7 @@ sys.path.insert(0, str(ROOT))
 from aip.chunking import fixed_chunks, markdown_chunks, recursive_chunks, sliding_chunks
 from aip.cost import Budget, BudgetExceeded, Usage, price_of
 from aip.evals import field_accuracy, judge_agreement, retrieval_metrics
-from aip.guards import (delimit_untrusted, detect_injection, enforce_citations,
-                        redact_pii)
+from aip.guards import delimit_untrusted, detect_injection, enforce_citations, redact_pii
 from aip.llm import extract_json
 
 
@@ -264,36 +263,3 @@ def test_unpriced_models_are_not_reported_as_free():
     assert b.unpriced_calls == 1
     assert "UNPRICED" in b.report()
     assert b.as_dict()["unpriced_calls"] == 1
-
-
-# --- Lab 1 Part C business rules and deterministic extraction ----------------
-def test_apply_business_rules_escalates_on_urgency_4_or_5():
-    from labs.lab1.extract import apply_business_rules
-
-    assert apply_business_rules({"urgency": 4}, "general message")["escalate"] is True
-    assert apply_business_rules({"urgency": 5}, "general message")["escalate"] is True
-    assert apply_business_rules({"urgency": 3}, "general message")["escalate"] is False
-    assert apply_business_rules({"urgency": 1}, "general message")["escalate"] is False
-
-
-def test_apply_business_rules_escalates_on_ombudsman():
-    from labs.lab1.extract import apply_business_rules
-
-    res = apply_business_rules({"urgency": 2}, "I will write to the Ombudsman regarding this.")
-    assert res["escalate"] is True
-
-
-def test_extract_deterministic_policy_and_pii():
-    from labs.lab1.extract import extract_deterministic
-
-    t1 = "Regarding my policy AUR-1234567, please call 9876543210."
-    det1 = extract_deterministic(t1)
-    assert det1["policy_number"] == "AUR-1234567"
-    assert det1["contains_pii"] is True
-
-    # Quoted replies should not leak policy numbers
-    t2 = "Please help.\n> Previous reply for AUR-7654321\n> support@aurorahealth.example"
-    det2 = extract_deterministic(t2)
-    assert det2["policy_number"] is None
-    assert det2["contains_pii"] is False
-

@@ -1,0 +1,25 @@
+# AI in Practice I - Module 1: Applied GenAI
+# ---------------------------------------------------------------------------
+# LAB 1 ONLY. This is the fast path: ~290 MB and about 15 seconds.
+#
+# The full requirements.txt is ~1.8 GB, almost all of it PyTorch, pulled in by
+# sentence-transformers. Nothing before Lab 3 touches it -- the heavy imports
+# in aip/ are lazy (see aip/embed.py and aip/retrieval.py), so Lab 1 never
+# loads them.
+#
+# Before Lab 3:   make setup-full
+# ---------------------------------------------------------------------------
+
+# --- model access -----------------------------------------------------------
+litellm>=1.55.0            # one client for Anthropic / OpenAI / Gemini / Groq / Ollama
+python-dotenv>=1.0.0
+
+# --- contracts and validation -----------------------------------------------
+pydantic>=2.9.0
+
+# --- numerics (evals, statistics) -------------------------------------------
+numpy>=1.26.0
+
+# --- dev ---------------------------------------------------------------------
+pytest>=8.3.0
+ruff>=0.8.0

@@ -11,11 +11,17 @@
 | Min | Segment |
 |---|---|
 | 0–10 | §1 The problem: you cannot see whether it got better |
-| 10–30 | §2 Building a golden set that is worth having |
-| 30–50 | §3 Choosing metrics that mean something |
-| 50–70 | §4 LLM-as-judge, and how to earn the right to use it |
-| 70–85 | §5 The experiment loop, regression gates, and error analysis |
-| 85–90 | Lab 2 briefing |
+| 10–32 | §2 Building a golden set — including §2.5, is the difference real? |
+| 32–50 | §3 Choosing metrics that mean something |
+| 50–68 | §4 LLM-as-judge, and how to earn the right to use it |
+| 68–86 | §5 The experiment loop, regression gates, prioritising a backlog |
+| 86–90 | Lab 2 briefing |
+
+Two segments grew. **§2.5** is the statistics — it was always on the slide with
+the sliders and was missing from these notes; do it live, because feeling it is
+what changes practice. **§5.4** is Pareto, expected value and ablation, which is
+the spine of Lab 5 and was taught nowhere. The five minutes come from §3 and §4,
+both of which have material that survives being read rather than presented.
 
 ---
 
@@ -70,10 +76,25 @@ than that it is large.
 | 200–500 | Reliable enough to detect a few points of difference. |
 | 1,000+ | Rarely worth it before you have a real user population to sample from. |
 
-The statistics: at n = 100, a measured accuracy of 0.90 has a 95% confidence
-interval of roughly ±0.06. So **a 3-point difference on a 100-item set is not a
-result** — it is inside the noise. Either grow the set or run paired
-comparisons (same items, both systems, count the items where they differ).
+**The statistics, briefly** — §2.5 does this properly.
+
+At n = 100, a measured accuracy of 0.90 is known to about **±0.06**. But that is
+the interval on *one* number, and it is not the question you usually have. The
+question is whether *two* numbers differ, and that has a wider answer: treated as
+two independent proportions, a difference has to reach about **8 points** before
+you can call it real.
+
+So **a 3-point difference on 100 items is not a result.** Neither, less
+obviously, is a 7-point one.
+
+Two ways out, and only one of them is cheap:
+
+- **Grow the set.** To separate 0.88 from 0.91 this way takes roughly **800
+  items per system**. That is the price of refusing to pair.
+- **Pair.** Run both systems over the *same* items and count only the items
+  where they disagree. Item difficulty — the dominant source of noise — cancels,
+  and you can settle on 60 items what independent sampling cannot settle on 800.
+
 Lab 2 will make you feel this.
 
 ### 2.2 What goes in it
@@ -127,6 +148,109 @@ a candidate, and report what it says.**
 
 If your dev score is 0.94 and your test score is 0.81, that gap *is* a result.
 Report it. It tells you and everyone else something true about your process.
+
+---
+
+### 2.5 Is the difference real?
+
+You have two systems and two numbers. Before you claim one is better, you owe
+the claim two pieces of arithmetic. This is the section the slide with the
+sliders is about — do it there, live, because feeling it is what changes
+practice.
+
+**Confidence intervals.** A measured accuracy is an estimate. Report the range
+the true value plausibly lies in:
+
+```
+normal approximation:  p ± 1.96 · sqrt( p(1-p) / n )
+```
+
+At n = 100 and p = 0.90 the half-width is about **±0.06**.
+
+> **That is the interval on one number, not on a difference — and the difference
+> is what you are actually claiming.** Two measurements each carry that
+> uncertainty, so the uncertainty on the *gap* between them is √2 times larger:
+> **±0.083** at n = 100. Treated as independent proportions, a difference has to
+> clear roughly **8 points**, not 6.
+
+So a 3-point difference on 100 items is not a result. Neither is a 7-point one,
+and that is the half people get wrong — the ±0.06 figure invites you to treat 6
+points as the bar, and it is not.
+
+Use the **Wilson score interval** rather than that formula in code. It exists
+because the normal approximation breaks exactly where evaluation lives — small
+n, p near 1 — where it returns upper bounds above 1.0, which is not a
+probability. `labs/lab2/stats.py::wilson_interval`.
+
+> **The asymmetry that matters.** Non-overlapping intervals prove a difference.
+> **Overlapping intervals prove nothing** — comparing two CIs is a conservative
+> test. This is the entire reason the next paragraph exists.
+
+**Pair, and the sample size problem disappears.** Two systems run over the
+*same* items are not two independent proportions. Item difficulty — some
+tickets are hard for everything — is the dominant variance component, and
+comparing the same items cancels it.
+
+**McNemar's test.** Count only the items where the two disagree:
+
+```
+b = A right, B wrong
+c = B right, A wrong        Under H0 each discordant pair is a fair coin.
+```
+
+Items they agree on, right *or* wrong, carry no information about which is
+better, and are discarded. At these counts the exact two-sided binomial on
+`min(b,c)` out of `b+c` is the right test — four lines of `math.comb`.
+`labs/lab2/stats.py::paired_test`.
+
+**What it buys, and when.** Pairing does not make small differences significant
+by magic. It removes one specific source of noise, and how much that is worth
+depends on **how much the two systems agree**.
+
+Here is the whole mechanism in one table. Every row is the *same* comparison at
+n = 100 — 0.86 against 0.94, an 8-point gap that independent proportions cannot
+separate at any row:
+
+| A right, B wrong | B right, A wrong | They agree on | Paired *p* |
+|---|---|---|---|
+| 0 | 8 | 92 items | **0.008** |
+| 1 | 9 | 90 | **0.022** |
+| 2 | 10 | 88 | **0.039** |
+| 3 | 11 | 86 | 0.057 |
+| 5 | 13 | 82 | 0.096 |
+
+Same eight-point difference every row. Unpaired analysis rejects all five.
+Pairing separates the top three and not the bottom two — because **the more two
+systems agree elsewhere, the more informative their disagreements are.**
+
+Two prompt variants of the same extractor agree on most items. That is precisely
+the regime where pairing wins, and it is the regime you are in for all of Lab 2.
+
+**What a p-value is.** Assume there is genuinely no difference. The p-value is
+the probability of seeing a gap at least as large as yours by chance alone
+under that assumption. Small p: what you saw would be surprising if nothing
+were going on. Large p: it would not be.
+
+Three things it is not:
+
+1. Not the probability that the systems are the same.
+2. Not a measure of how *big* the difference is. Enough data makes a trivial
+   difference significant.
+3. Not a licence to keep testing until one comes up small. Seven comparisons
+   against one baseline at the 0.05 level, and you should expect about one to
+   look significant by chance.
+
+**"No significant difference" is a result.** It says the quality axis does not
+separate these two, so decide on the axes that do — which is cost and latency.
+
+**Dominated configurations.** Before you agonise over a trade-off, check
+whether there is one to make. Configuration X is *dominated* if another is at
+least as good on quality **and** cost **and** latency. There is no scenario in
+which you would pick it, so eliminate it without argument — and say which axes
+you checked, because domination is only as meaningful as they are.
+
+**The rule for this module:** *no number, no claim* has a sibling —
+**no interval, no difference.**
 
 ---
 
@@ -330,6 +454,51 @@ tolerance:
 
 Note that the gate covers cost and latency, not only quality. In a real system
 those regress too, and they regress silently.
+
+---
+
+### 5.4 Prioritising a backlog
+
+Error analysis gives you a list of failures. It does not tell you which to fix,
+and the instinct — start with the most interesting one — is usually wrong.
+
+**Pareto first.** Defects are never spread evenly: a small number of causes
+account for most of them. Sort your clusters by count, plot them descending,
+and read where the curve flattens. It converts *"we have 14 failures"* into
+*"two causes account for 13 of them"*, and it tells you that anything outside
+the head of the distribution cannot move your headline number much, however
+interesting its fix.
+
+**Then rank by expected value, because Pareto only knows about counts.**
+
+| Cluster | n | Fix | Est. recovery | Cost Δ | Latency Δ | Effort |
+|---|---|---|---|---|---|---|
+
+A cluster of 9 whose fix adds a model call per query can lose to a cluster of 6
+with a free fix. This is the same triple as everywhere else — quality against
+cost against latency — applied to a backlog instead of a configuration.
+
+Estimate recovery by **reading a sample of the cluster** and asking, per case,
+whether the fix would actually have helped. "Six of nine" is a better estimate
+than "most of them", and it is what your prediction gets compared against.
+
+**State the prediction before you implement.** *"I expect this to recover N of
+the M failures in this cluster."* In the report, not in your head. It turns a
+change into an experiment: afterwards you know not only what happened but
+whether your model of the system was right. Without one, any outcome can be
+narrated as the expected one.
+
+Being wrong is informative and is not penalised. **Not predicting is.**
+
+**Ablation, for the pipeline you already have.** Remove one component at a time
+and re-measure. What the number drops by is what that component is actually
+worth. Pipelines accumulate — a reranker added in week two, a query rewriter in
+week four, each justified when added and none re-checked since — and ablation is
+the only way to discover that two of them are now worth nothing. It is how you
+make a system cheaper without making it worse.
+
+> A fix that "worked" and an ablation showing it contributes nothing are the
+> same measurement taken at different times.
 
 ---
 

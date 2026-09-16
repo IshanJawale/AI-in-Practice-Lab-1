@@ -14,8 +14,9 @@ The controls implemented here map to OWASP LLM Top 10:
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 from aip import tracing
 
@@ -159,8 +160,8 @@ class ToolGuard:
                 )
             if schemas and name in schemas:
                 args = schemas[name].model_validate(args).model_dump()
-            if name in self.requires_confirmation:
-                if not (self.confirm_fn and self.confirm_fn(name, args)):
+            if name in self.requires_confirmation and not (
+                    self.confirm_fn and self.confirm_fn(name, args)):
                     raise ToolDenied(f"tool {name!r} requires confirmation and was not confirmed")
 
             self.calls_made += 1

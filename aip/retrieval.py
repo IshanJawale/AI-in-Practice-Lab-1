@@ -15,9 +15,10 @@ hybrid result set stays explainable.
 """
 from __future__ import annotations
 
+import contextlib
 import re
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Sequence
 
 import numpy as np
 
@@ -235,10 +236,9 @@ class ChromaRetriever(Retriever):
         self.model = model
         self.client = chromadb.PersistentClient(path=path)
         if reset:
-            try:
+            # An absent collection is fine -- this is the first run.
+            with contextlib.suppress(Exception):
                 self.client.delete_collection(collection)
-            except Exception:  # noqa: BLE001 - absent collection is fine
-                pass
         self.col = self.client.get_or_create_collection(
             collection, metadata={"hnsw:space": "cosine"}
         )

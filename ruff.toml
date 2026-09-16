@@ -1,0 +1,37 @@
+# Pinned so that `make lint` gives every student the same answer.
+#
+# Without this file ruff applies whatever its current default rule set is, and
+# that has changed between releases: on ruff 0.16 an unconfigured run reported
+# 235 findings across this repository, almost all of them house style. A lint
+# result that depends on which ruff a student happened to install is not a
+# check, and "ruff clean" is a graded line in the rubric.
+
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "C4"]
+ignore = [
+  "E501",    # line length is checked by the formatter, not here
+  "B008",    # FastAPI's Depends() idiom
+  "SIM108",  # ternaries are not always clearer
+  "E741",    # `for l in f` is used consistently throughout for a file line
+  "B905",    # zip(strict=) would be noise on same-length sequences here
+]
+
+[lint.per-file-ignores]
+# The deck builders are content, not code: long implicitly-concatenated
+# strings are the readable form for prose, and reformatting them would make
+# the slides harder to edit than the lint is worth.
+"scripts/build_decks.py"      = ["ISC", "E402"]
+"scripts/build_html_decks.py" = ["ISC", "E402"]
+"scripts/build_proposal_html.py" = ["ISC", "E402"]
+"scripts/build_syllabus_docx.py" = ["ISC", "E402"]
+# Re-exports.
+"aip/__init__.py" = ["F401"]
+# Lab starters import things the student is about to use in a TODO.
+# F841: `t0`/`span` in the Lab 7 skeleton are there for the student to use.
+"labs/*/*.py" = ["E402", "F401", "F841"]
+# Scripts insert the repo root on sys.path before importing aip.
+"scripts/*.py" = ["E402"]
+"tests/*.py"   = ["E402"]

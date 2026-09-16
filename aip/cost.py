@@ -59,7 +59,7 @@ class Usage:
     def total_tokens(self) -> int:
         return self.prompt_tokens + self.completion_tokens
 
-    def __add__(self, other: "Usage") -> "Usage":
+    def __add__(self, other: Usage) -> Usage:
         return Usage(
             model=self.model or other.model,
             prompt_tokens=self.prompt_tokens + other.prompt_tokens,
@@ -153,7 +153,7 @@ class Budget:
             "latency_p95_ms": round(self.percentile(95), 1),
         }
 
-    def __enter__(self) -> "Budget":
+    def __enter__(self) -> Budget:
         _ACTIVE.append(self)
         return self
 

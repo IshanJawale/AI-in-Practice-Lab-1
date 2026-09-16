@@ -307,16 +307,19 @@ const SLIDES = [
      takes it apart, and most of what you learn will be about the parts of that
      diagram nobody draws.</p>
   <div class="grid2" style="margin-top:18px">
-    <div class="card"><h4>1 · Ingestion and chunking</h4>
+    <div class="card"><h4>2 · Ingestion and chunking</h4>
       <p class="small" style="margin:0">Where most of the quality is decided, and the
       step almost everyone skips in favour of tuning something more interesting.</p></div>
-    <div class="card"><h4>2 · Indexing and retrieval</h4>
+    <div class="card"><h4>3 · Indexing</h4>
+      <p class="small" style="margin:0">What a vector database actually is, when you
+      genuinely need one, and the one algorithm inside all of them.</p></div>
+    <div class="card"><h4>4 · Retrieval</h4>
       <p class="small" style="margin:0">Dense, lexical, hybrid, reranked — and the
       measured result on our own corpus that contradicts the standard advice.</p></div>
-    <div class="card"><h4>3 · The seven failure modes</h4>
+    <div class="card"><h4>5 · The seven failure modes</h4>
       <p class="small" style="margin:0">A diagnostic tree that turns "the answer was
       wrong" into a specific, fixable stage. Lab 5 is built entirely on this.</p></div>
-    <div class="card"><h4>4 · Generation, citation, refusal</h4>
+    <div class="card"><h4>6 · Generation, citation, refusal</h4>
       <p class="small" style="margin:0">The last stage has its own contract: cite by
       index, validate in code, and give the system a legal way to say no.</p></div>
   </div>
@@ -351,8 +354,8 @@ const SLIDES = [
   every input token on every call.` },
 
 /* 4 ------------------------------------------------------------------ */
-{ t:"§1 Chunking", cls:"dark", html:`
-  <p class="secnum mono">01</p>
+{ t:"§2 Chunking", cls:"dark", html:`
+  <p class="secnum mono">02</p>
   <h2 style="font-size:44px">Ingestion and chunking</h2>
   <p style="font-size:22px;max-width:52ch;margin-top:10px">
     Where most of the quality is decided — and the step students skip, because
@@ -439,13 +442,91 @@ const SLIDES = [
   documents takes the trap questions from hit_rate@1 0.667 to <b>1.000</b>, free.` },
 
 /* 9 ----------------------------------------------------------------- */
-{ t:"§2 Retrieval", cls:"dark", html:`
-  <p class="secnum mono">02</p>
-  <h2 style="font-size:44px">Indexing and retrieval</h2>
+{ t:"§3 Indexing", cls:"dark", html:`
+  <p class="secnum mono">03</p>
+  <h2 style="font-size:44px">Indexing</h2>
+  <p style="font-size:22px;max-width:52ch;margin-top:10px">
+    What a vector database actually is, when you genuinely need one, and the one
+    algorithm inside all of them.</p>`,
+  notes:`25–32 min. Short section, and the point of it is mostly to stop them
+  reaching for infrastructure they do not need.` },
+
+/* --------------------------------------------------------------------- */
+{ t:"What a vector DB is", cls:"tight", html:`
+  <h2>A "vector database" is four things in a trench coat</h2>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <table>
+    <tr><td class="n" style="width:34px"><b>1</b></td>
+        <td><b>A vector index</b> for approximate nearest-neighbour search</td></tr>
+    <tr><td class="n"><b>2</b></td>
+        <td><b>A metadata store</b>, so you can filter by <span class="mono">plan == "gold"</span></td></tr>
+    <tr><td class="n"><b>3</b></td>
+        <td><b>Persistence and CRUD</b>, so one document updates without a rebuild</td></tr>
+    <tr><td class="n"><b>4</b></td>
+        <td><b>Operational features</b> — sharding, replication, auth, backups</td></tr>
+  </table>
+  <div class="pull" style="margin-top:16px"><p>At a few hundred chunks — Lab 3's real
+    scale — <b>you need none of them.</b> A NumPy array and an
+    <span class="mono">argsort</span> is exact, sub-millisecond, and has no failure
+    modes. <b>Exact search is the right answer up to roughly 100k vectors on a
+    laptop.</b></p></div>
+  <p class="small frag" style="margin-top:14px">You need a real one when you have
+     <b>millions of vectors</b>, <b>concurrent writes</b>, or <b>per-document access
+     control</b>. Chroma (embedded, no server) is what Lab 3 Part D uses. pgvector,
+     Qdrant, Weaviate, Milvus and the managed services differ mainly on
+     <em>operations</em> — not on retrieval quality.</p>`,
+  notes:`<b>3 minutes.</b> This slide exists to stop a specific reflex: standing up
+  a vector database as step one, then attributing every retrieval problem to the
+  wrong layer.
+  <br><br>Ask the room how many vectors they think they have. Lab 3's corpus is
+  <b>164 chunks</b>. Starting with exact search also removes ANN recall as a
+  confounder while they are still learning what good retrieval looks like.
+  <br><br>The last line is the one worth saying aloud: the products differ on
+  operations, not on quality. Choosing between them is an infrastructure decision,
+  not a retrieval one.` },
+
+/* --------------------------------------------------------------------- */
+{ t:"HNSW", cls:"tight", html:`
+  <h2>HNSW, and its three knobs</h2>
+  <p class="sub">The default index in essentially every vector store. Worth understanding once.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <p class="small"><b>The intuition.</b> Build a layered graph: the top layer has
+     long-range links, lower layers get progressively denser. Search greedily from
+     the top — big jumps to the right neighbourhood, then refine. Query is
+     <span class="mono">O(log n)</span> rather than <span class="mono">O(n)</span>.</p>
+  <table style="margin-top:10px">
+    <tr><td><b>Parameter</b></td><td><b>Raises</b></td><td><b>Costs</b></td></tr>
+    <tr><td><span class="mono">M</span> — links per node</td><td>recall</td>
+        <td>memory, build time</td></tr>
+    <tr><td><span class="mono">ef_construction</span></td><td>index quality</td>
+        <td>build time</td></tr>
+    <tr><td><span class="mono">ef_search</span></td><td>recall at query time</td>
+        <td>query latency</td></tr>
+  </table>
+  <div class="pull frag" style="margin-top:14px"><p><b>ANN is approximate. It will
+    miss results exact search finds.</b> Typical recall at defaults is 95–99%. When
+    you switch from exact to ANN and nDCG drops two points, <em>that</em> is the
+    reason — and Lab 3 makes you measure it so it is never a mystery later.</p></div>
+  <p class="small frag" style="margin-top:12px"><b>And measure at the right scale.</b>
+     On Lab 3's 164 vectors, HNSW ties on quality and is <b>3.6× slower</b> — graph
+     traversal in Python against one BLAS matmul. The crossover is real; find it
+     before you quote it.</p>`,
+  notes:`<b>4 minutes.</b> Do not go deeper than this — they need to recognise the
+  three parameters in a config file and know which direction each moves, not to
+  implement the algorithm.
+  <br><br>The last point is the one Lab 3 Part D is built on, and it is a
+  benchmark-validity lesson rather than a verdict on HNSW: a comparison run at the
+  wrong operating point tells you nothing about the one you will deploy at. They
+  will scale the index to 4k and 40k chunks and find the crossover themselves.` },
+
+/* --------------------------------------------------------------------- */
+{ t:"§4 Retrieval", cls:"dark", html:`
+  <p class="secnum mono">04</p>
+  <h2 style="font-size:44px">Retrieval</h2>
   <p style="font-size:22px;max-width:52ch;margin-top:10px">
     Dense, lexical, hybrid, reranked. And one measured result from our own corpus
     that contradicts the advice you will read everywhere else.</p>`,
-  notes:`25–45 min.` },
+  notes:`32–45 min.` },
 
 /* 10 ---------------------------------------------------------------- */
 { t:"Dense and its blind spot", html:`
@@ -580,8 +661,8 @@ const SLIDES = [
   it, and only after a diagnosis says which one is indicated.` },
 
 /* 16 ---------------------------------------------------------------- */
-{ t:"§3 Seven failure modes", cls:"dark", html:`
-  <p class="secnum mono">03</p>
+{ t:"§5 Seven failure modes", cls:"dark", html:`
+  <p class="secnum mono">05</p>
   <h2 style="font-size:44px">The seven failure modes</h2>
   <p style="font-size:22px;max-width:52ch;margin-top:10px">
     When a RAG system gives a wrong answer, <em>"RAG is bad"</em> is not a diagnosis.
@@ -610,8 +691,8 @@ const SLIDES = [
   takes ten minutes to set up. Do it before anything else.` },
 
 /* 19 ---------------------------------------------------------------- */
-{ t:"§4 Generation", cls:"dark", html:`
-  <p class="secnum mono">04</p>
+{ t:"§6 Generation", cls:"dark", html:`
+  <p class="secnum mono">06</p>
   <h2 style="font-size:44px">Generation, citation, refusal</h2>
   <p style="font-size:22px;max-width:52ch;margin-top:10px">
     Retrieval is most of the work, but the last stage has its own contract — and one

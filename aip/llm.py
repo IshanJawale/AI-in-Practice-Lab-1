@@ -20,7 +20,8 @@ import json
 import random
 import re
 import time
-from typing import Any, Sequence, Type, TypeVar
+from collections.abc import Sequence
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
@@ -258,7 +259,7 @@ def extract_json(text: str) -> Any:
 def structured(
     prompt_or_messages: str | Messages,
     *,
-    schema: Type[T],
+    schema: type[T],
     system: str | None = None,
     tier: str = "SMALL",
     model: str | None = None,

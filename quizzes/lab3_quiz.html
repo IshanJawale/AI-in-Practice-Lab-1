@@ -1,0 +1,409 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T4 + Lab 3 — Retrieval Engineering and Semantic Search — quiz</title><style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --warn:#8a4b16; --warn-soft:#fbf0e4;
+  --bad:#93261f; --bad-soft:#fbeae8; --code:#f4f4f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --warn:#d99a5b; --warn-soft:#31261a;
+    --bad:#e58a80; --bad-soft:#331f1d; --code:#232529;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 ui-serif,Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 96px}
+header{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px;font-weight:600}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;
+  padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.blurb{background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:24px 0 8px;border-radius:0 4px 4px 0}
+.blurb p{margin:0}
+.ident{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+.ident label{display:block;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text]{width:100%;padding:10px 12px;font:16px/1.4 inherit;
+  background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:22px 24px;margin:18px 0}
+.qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.qnum{font:700 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--accent);
+  letter-spacing:.06em}
+.qpart{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto}
+.stem{margin:0 0 14px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 14px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;
+  border:1px solid transparent;border-radius:6px;cursor:pointer;margin:2px 0}
+.opt:hover{background:var(--accent-soft)}
+.opt input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent)}
+.opt .lt{font:700 13px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  flex:0 0 auto;min-width:14px}
+.locked .opt{cursor:default}
+.locked .opt:hover{background:none}
+footer{margin-top:36px;border-top:1px solid var(--line);padding-top:24px}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;padding:13px 22px;
+  border-radius:6px;border:1px solid var(--accent);background:var(--accent);
+  color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:none;color:var(--accent)}
+.progress{font:600 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  margin-bottom:14px}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase}
+.scroll{overflow-x:auto}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.flag{background:var(--warn-soft);color:var(--warn);padding:1px 7px;
+  border-radius:99px;font:600 11px/1.6 ui-sans-serif,system-ui,sans-serif}
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .q{break-inside:avoid;border-color:#ccc}
+}
+@media (max-width:620px){ .ident{grid-template-columns:1fr} .wrap{padding:24px 16px 72px} }
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI in Practice I · Module 1 · Applied GenAI</div>
+  <h1>T4 + Lab 3 — Retrieval Engineering and Semantic Search</h1>
+  <p class="sub">End-of-lab quiz — theory session T4 and Lab 3 combined</p>
+  <div class="meta">
+    <span class="chip">20 questions</span>
+    <span class="chip">20 marks</span>
+    <span class="chip">25 minutes</span>
+    <span class="chip">Open notes, open repo</span>
+  </div>
+</header>
+
+<div class="blurb"><p>Twenty questions across the T4 theory session and the sweeps you just ran. Several have a correct answer that contradicts what the textbook advice predicts — which is the reason the lab exists. One mark each; multi-select questions are all-or-nothing. Options are deliberately all of similar length, so length tells you nothing.</p></div>
+
+<p class="note">Answer every question, then press <strong>Finish</strong>. The page
+gives you a <strong>submission code</strong> — copy it and post it where your
+instructor asked. Your score is not shown here; we go through the answers
+together once the codes are in.</p>
+
+<div class="ident noprint">
+  <div><label for="nm">Name</label><input type="text" id="nm" autocomplete="off"></div>
+  <div><label for="rl">Roll number</label><input type="text" id="rl" autocomplete="off"></div>
+</div>
+
+<form id="quiz">
+<section class="q" id="Q1">
+  <div class="qhead"><span class="qnum">Q1</span>
+    <span class="qpart">Part T4 §1</span></div>
+  <p class="stem">Your manager asks why you are not simply fine-tuning a model on Aurora's policy documents instead of building retrieval. Which pair of reasons is decisive in an insurance setting?</p>
+  
+  <label class="opt"><input type="radio" name="q0" value="0"><span class="lt">A</span><span>Fine-tuning needs far more labelled data than Aurora currently has available to it</span></label>
+<label class="opt"><input type="radio" name="q0" value="1"><span class="lt">B</span><span>Attribution to a source document, and per-document access control for each user</span></label>
+<label class="opt"><input type="radio" name="q0" value="2"><span class="lt">C</span><span>Fine-tuned models are slower at inference and cost more per query to operate</span></label>
+<label class="opt"><input type="radio" name="q0" value="3"><span class="lt">D</span><span>Retrieval always produces higher factual accuracy than a fine-tuned model does</span></label>
+  
+</section>
+<section class="q" id="Q2">
+  <div class="qhead"><span class="qnum">Q2</span>
+    <span class="qpart">Part T4 §1</span></div>
+  <p class="stem">The corpus is 30 documents and fits comfortably in a modern context window. What is the honest argument for retrieval over simply pasting everything into the prompt?</p>
+  
+  <label class="opt"><input type="radio" name="q1" value="0"><span class="lt">A</span><span>You pay for every input token on every call, and the corpus grows and changes</span></label>
+<label class="opt"><input type="radio" name="q1" value="1"><span class="lt">B</span><span>Retrieval is strictly faster than long context for every realistic query load</span></label>
+<label class="opt"><input type="radio" name="q1" value="2"><span class="lt">C</span><span>Long context windows cannot hold structured documents without losing formatting</span></label>
+<label class="opt"><input type="radio" name="q1" value="3"><span class="lt">D</span><span>Models reason less accurately whenever the supplied context exceeds a few pages</span></label>
+  
+</section>
+<section class="q" id="Q3">
+  <div class="qhead"><span class="qnum">Q3</span>
+    <span class="qpart">Part Setup</span></div>
+  <p class="stem">Three of the 45 golden questions (Q36, Q38, Q39) have no relevant document at all, and the handout says to exclude them, leaving n = 42. What is the reason?</p>
+  
+  <label class="opt"><input type="radio" name="q2" value="0"><span class="lt">A</span><span>They belong to the fourteen distractor documents rather than the real ones</span></label>
+<label class="opt"><input type="radio" name="q2" value="1"><span class="lt">B</span><span>Three questions is too small a stratum to produce any stable metric value</span></label>
+<label class="opt"><input type="radio" name="q2" value="2"><span class="lt">C</span><span>Those three questions were mislabelled and will be dropped from the dataset</span></label>
+<label class="opt"><input type="radio" name="q2" value="3"><span class="lt">D</span><span>Recall and nDCG are undefined when the set of relevant documents is empty</span></label>
+  
+</section>
+<section class="q" id="Q4">
+  <div class="qhead"><span class="qnum">Q4</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Sweeping chunk size on the winning strategy gives nDCG@10 of 0.853 at 400 characters, 0.846 at 800, and 0.808 at 1600. Why is the curve not monotonic?</p>
+  
+  <label class="opt"><input type="radio" name="q3" value="0"><span class="lt">A</span><span>The 1600 setting crosses a boundary where the chunker changes its algorithm</span></label>
+<label class="opt"><input type="radio" name="q3" value="1"><span class="lt">B</span><span>Larger chunks exceed the embedding model's maximum input length and get cut</span></label>
+<label class="opt"><input type="radio" name="q3" value="2"><span class="lt">C</span><span>Smaller chunks produce more vectors, and more vectors always rank better</span></label>
+<label class="opt"><input type="radio" name="q3" value="3"><span class="lt">D</span><span>A larger chunk holds the answer plus unrelated text, so its vector drifts</span></label>
+  
+</section>
+<section class="q" id="Q5">
+  <div class="qhead"><span class="qnum">Q5</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">At 800 characters the four strategies give fixed 0.795, sliding 0.805, recursive 0.825 and markdown-aware 0.846 nDCG@10, with markdown producing 164 chunks against fixed's 83. What is the mechanism?</p>
+  
+  <label class="opt"><input type="radio" name="q4" value="0"><span class="lt">A</span><span>It splits on the document's own headings and prepends the heading path to each chunk</span></label>
+<label class="opt"><input type="radio" name="q4" value="1"><span class="lt">B</span><span>Markdown chunks are shorter on average, so their embeddings are far less diluted</span></label>
+<label class="opt"><input type="radio" name="q4" value="2"><span class="lt">C</span><span>The corpus is markdown, so the other three chunkers cannot parse it correctly at all</span></label>
+<label class="opt"><input type="radio" name="q4" value="3"><span class="lt">D</span><span>Markdown produces roughly twice as many chunks, so there are more chances to match</span></label>
+  
+</section>
+<section class="q" id="Q6">
+  <div class="qhead"><span class="qnum">Q6</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Adding the heading-path prefix raises hit_rate@1 from 0.619 to 0.762 and nDCG@10 by 0.054, but <em>lowers</em> hit_rate@5 from 1.000 to 0.976. Is this a contradiction?</p>
+  
+  <label class="opt"><input type="radio" name="q5" value="0"><span class="lt">A</span><span>Yes — hit_rate@5 is the headline metric, so the prefix should be abandoned</span></label>
+<label class="opt"><input type="radio" name="q5" value="1"><span class="lt">B</span><span>No — the difference of one question is simply sampling noise at this size</span></label>
+<label class="opt"><input type="radio" name="q5" value="2"><span class="lt">C</span><span>Yes — a change that lowers any retrieval metric has introduced a genuine bug</span></label>
+<label class="opt"><input type="radio" name="q5" value="3"><span class="lt">D</span><span>No — the prefix improves ranking rather than recall, and those can diverge</span></label>
+  
+</section>
+<section class="q" id="Q7">
+  <div class="qhead"><span class="qnum">Q7</span>
+    <span class="qpart">Part T4 §2</span></div>
+  <p class="stem">T4 argues that ingestion deserves more attention than it usually gets. Which statement matches its position on parsing?</p>
+  
+  <label class="opt"><input type="radio" name="q6" value="0"><span class="lt">A</span><span>Parsing is best handled by the language model itself at query time, not at ingest</span></label>
+<label class="opt"><input type="radio" name="q6" value="1"><span class="lt">B</span><span>Parsing is unglamorous but upstream of everything, so its errors cannot be recovered</span></label>
+<label class="opt"><input type="radio" name="q6" value="2"><span class="lt">C</span><span>Parsing matters little once a sufficiently strong embedding model has been selected</span></label>
+<label class="opt"><input type="radio" name="q6" value="3"><span class="lt">D</span><span>Parsing should be deferred until retrieval quality has first been measured properly</span></label>
+  
+</section>
+<section class="q" id="Q8">
+  <div class="qhead"><span class="qnum">Q8</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">Questions Q29–Q31 have a correct answer in <code>claims-timelines</code> and a wrong one in <code>claims-timelines-2024-ARCHIVED</code>. Adding a status field and filtering takes hit_rate@1 from 0.667 to 1.000. What is the lesson?</p>
+  
+  <label class="opt"><input type="radio" name="q7" value="0"><span class="lt">A</span><span>Archived documents should always be deleted from a production corpus entirely</span></label>
+<label class="opt"><input type="radio" name="q7" value="1"><span class="lt">B</span><span>Metadata filtering is a more powerful ranking signal than embeddings ever are</span></label>
+<label class="opt"><input type="radio" name="q7" value="2"><span class="lt">C</span><span>The best fix for poor retrieval is often not a change to the retriever at all</span></label>
+<label class="opt"><input type="radio" name="q7" value="3"><span class="lt">D</span><span>Traps of this kind are artificial and would not arise in a real document set</span></label>
+  
+</section>
+<section class="q" id="Q9">
+  <div class="qhead"><span class="qnum">Q9</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">A user searches for the exact policy identifier <code>AUR-HI-SIL-2026</code> (Q44) and dense retrieval scores MRR 0.50 while BM25 scores 1.00. What explains the gap?</p>
+  
+  <label class="opt"><input type="radio" name="q8" value="0"><span class="lt">A</span><span>Dense retrieval truncates long tokens, so the identifier is corrupted at index</span></label>
+<label class="opt"><input type="radio" name="q8" value="1"><span class="lt">B</span><span>BM25 indexes identifiers separately from prose, giving them a dedicated field</span></label>
+<label class="opt"><input type="radio" name="q8" value="2"><span class="lt">C</span><span>The embedding model was never trained on any insurance-specific terminology</span></label>
+<label class="opt"><input type="radio" name="q8" value="3"><span class="lt">D</span><span>Dense vectors capture meaning, and a rare identifier token carries almost none</span></label>
+  
+</section>
+<section class="q" id="Q10">
+  <div class="qhead"><span class="qnum">Q10</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Q41 asks "if I skip paying on time, how long before I lose everything" and the document says "grace period". Dense scores MRR 1.00, BM25 scores 0.00. Why?</p>
+  
+  <label class="opt"><input type="radio" name="q9" value="0"><span class="lt">A</span><span>Dense retrieval benefits here from having seen this exact question in training</span></label>
+<label class="opt"><input type="radio" name="q9" value="1"><span class="lt">B</span><span>BM25 discards common words, so the question becomes too short to match on</span></label>
+<label class="opt"><input type="radio" name="q9" value="2"><span class="lt">C</span><span>The question and the document share no terms, and BM25 matches only terms</span></label>
+<label class="opt"><input type="radio" name="q9" value="3"><span class="lt">D</span><span>The relevant document is too long for BM25's length normalisation to handle</span></label>
+  
+</section>
+<section class="q" id="Q11">
+  <div class="qhead"><span class="qnum">Q11</span>
+    <span class="qpart">Part T4 §4</span></div>
+  <p class="stem">Reciprocal Rank Fusion combines two retrievers by fusing their <em>ranks</em> rather than their scores. Why is that the right design?</p>
+  
+  <label class="opt"><input type="radio" name="q10" value="0"><span class="lt">A</span><span>Ranks are cheaper to compute than scores, which saves time on every query</span></label>
+<label class="opt"><input type="radio" name="q10" value="1"><span class="lt">B</span><span>Scores from different retrievers are on incomparable and unstable scales</span></label>
+<label class="opt"><input type="radio" name="q10" value="2"><span class="lt">C</span><span>Fusing scores would require retraining both retrievers on the same corpus</span></label>
+<label class="opt"><input type="radio" name="q10" value="3"><span class="lt">D</span><span>Ranks preserve more information about relevance than raw scores manage to</span></label>
+  
+</section>
+<section class="q" id="Q12">
+  <div class="qhead"><span class="qnum">Q12</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Sweeping RRF's <code>k</code> over 10, 30, 60 and 100 gives nDCG@10 of 0.838, 0.833, 0.830 and 0.838. How should this be reported?</p>
+  
+  <label class="opt"><input type="radio" name="q11" value="0"><span class="lt">A</span><span>As insensitivity, which is exactly why RRF is a dependable default choice</span></label>
+<label class="opt"><input type="radio" name="q11" value="1"><span class="lt">B</span><span>As proof that the fusion step is contributing nothing to the final ranking</span></label>
+<label class="opt"><input type="radio" name="q11" value="2"><span class="lt">C</span><span>As a failed sweep, since no setting produced a measurable improvement at all</span></label>
+<label class="opt"><input type="radio" name="q11" value="3"><span class="lt">D</span><span>As evidence that k should be tuned per query kind rather than set globally</span></label>
+  
+</section>
+<section class="q" id="Q13">
+  <div class="qhead"><span class="qnum">Q13</span> <span class="flag">select all</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Your measurements give dense nDCG@10 0.846 and hybrid 0.830, while T4 §4.3 calls hybrid "the strongest single change most RAG systems can make". Which responses are correct? (Select all that apply.)</p>
+  
+  <label class="opt"><input type="checkbox" name="q12" value="0"><span class="lt">A</span><span>Report that hybrid loses on this corpus, and give the per-question mechanism</span></label>
+<label class="opt"><input type="checkbox" name="q12" value="1"><span class="lt">B</span><span>Suppress the result, since it contradicts the published literature on fusion</span></label>
+<label class="opt"><input type="checkbox" name="q12" value="2"><span class="lt">C</span><span>Note that fusing a weaker retriever can drag down more rankings than it saves</span></label>
+<label class="opt"><input type="checkbox" name="q12" value="3"><span class="lt">D</span><span>Conclude that hybrid retrieval is a discredited technique and stop using it</span></label>
+  
+</section>
+<section class="q" id="Q14">
+  <div class="qhead"><span class="qnum">Q14</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">On hit_rate@5, dense scores 0.976 and BM25 scores 0.929, suggesting little difference. On MRR the same comparison is 0.872 against 0.693. What went wrong the first time?</p>
+  
+  <label class="opt"><input type="radio" name="q13" value="0"><span class="lt">A</span><span>hit_rate@5 is the more reliable metric, so the original conclusion was correct</span></label>
+<label class="opt"><input type="radio" name="q13" value="1"><span class="lt">B</span><span>The two metrics disagree because they were computed on different question sets</span></label>
+<label class="opt"><input type="radio" name="q13" value="2"><span class="lt">C</span><span>hit_rate@5 is saturated here, so it reports nothing rather than no difference</span></label>
+<label class="opt"><input type="radio" name="q13" value="3"><span class="lt">D</span><span>MRR overstates differences by weighting the first result far too heavily indeed</span></label>
+  
+</section>
+<section class="q" id="Q15">
+  <div class="qhead"><span class="qnum">Q15</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Adding the <code>ms-marco-MiniLM-L-6-v2</code> cross-encoder moves nDCG@10 from 0.804 to 0.788 and adds 131 ms. What is the most likely explanation?</p>
+  
+  <label class="opt"><input type="radio" name="q14" value="0"><span class="lt">A</span><span>The reranker needs a larger candidate pool than thirty documents to work</span></label>
+<label class="opt"><input type="radio" name="q14" value="1"><span class="lt">B</span><span>Cross-encoders only improve results when the first-stage retriever is weak</span></label>
+<label class="opt"><input type="radio" name="q14" value="2"><span class="lt">C</span><span>It was trained on web search and is out of domain on insurance policy prose</span></label>
+<label class="opt"><input type="radio" name="q14" value="3"><span class="lt">D</span><span>The latency budget was exceeded, which causes the reranker to time out early</span></label>
+  
+</section>
+<section class="q" id="Q16">
+  <div class="qhead"><span class="qnum">Q16</span> <span class="flag">select all</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">The LLM reranker gives the best quality in the lab — hit@1 0.810, nDCG@10 0.860 — at a p95 of 27,976 ms and $1.55 per thousand queries. Which conclusions are sound? (Select all that apply.)</p>
+  
+  <label class="opt"><input type="checkbox" name="q15" value="0"><span class="lt">A</span><span>Quality alone decides the deployment, so it should be shipped in every case</span></label>
+<label class="opt"><input type="checkbox" name="q15" value="1"><span class="lt">B</span><span>It is a reasonable choice for an overnight batch job where latency is free</span></label>
+<label class="opt"><input type="checkbox" name="q15" value="2"><span class="lt">C</span><span>Its 28 seconds are irreducible, being inherent to how reranking must work</span></label>
+<label class="opt"><input type="checkbox" name="q15" value="3"><span class="lt">D</span><span>It is unusable for an interactive search box, whatever its quality advantage</span></label>
+  
+</section>
+<section class="q" id="Q17">
+  <div class="qhead"><span class="qnum">Q17</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">Timing exact NumPy search against Chroma's HNSW index at roughly 160 chunks, HNSW is about 3.6× <em>slower</em> while quality is identical. Why?</p>
+  
+  <label class="opt"><input type="radio" name="q16" value="0"><span class="lt">A</span><span>The embedding dimension is too high for HNSW's graph structure to work well</span></label>
+<label class="opt"><input type="radio" name="q16" value="1"><span class="lt">B</span><span>The HNSW index was not given enough time to finish building before the test</span></label>
+<label class="opt"><input type="radio" name="q16" value="2"><span class="lt">C</span><span>Approximate search is only faster once the corpus is far larger than this one</span></label>
+<label class="opt"><input type="radio" name="q16" value="3"><span class="lt">D</span><span>Chroma adds a network round trip that NumPy avoids by staying in the process</span></label>
+  
+</section>
+<section class="q" id="Q18">
+  <div class="qhead"><span class="qnum">Q18</span>
+    <span class="qpart">Part T4 §5</span></div>
+  <p class="stem">A RAG answer is wrong. You re-run the generator with the gold context pasted in, and now the answer is correct. Which stage was at fault?</p>
+  
+  <label class="opt"><input type="radio" name="q17" value="0"><span class="lt">A</span><span>Presentation, because the citation did not point at the correct source text</span></label>
+<label class="opt"><input type="radio" name="q17" value="1"><span class="lt">B</span><span>Retrieval, because supplying the right context is what repaired the answer</span></label>
+<label class="opt"><input type="radio" name="q17" value="2"><span class="lt">C</span><span>The corpus, because the answer was evidently missing from it to begin with</span></label>
+<label class="opt"><input type="radio" name="q17" value="3"><span class="lt">D</span><span>Generation, because the model produced a wrong answer on its first attempt</span></label>
+  
+</section>
+<section class="q" id="Q19">
+  <div class="qhead"><span class="qnum">Q19</span>
+    <span class="qpart">Part T4 §5</span></div>
+  <p class="stem">Your system reports hit_rate@5 of 0.62 but hit_rate@30 of 0.94. Which failure mode is this, and what is the fix?</p>
+  
+  <label class="opt"><input type="radio" name="q18" value="0"><span class="lt">A</span><span>Ranking — the chunk is retrieved but buried, so rerank or raise the final k</span></label>
+<label class="opt"><input type="radio" name="q18" value="1"><span class="lt">B</span><span>Embedding mismatch — the query and passage vectors are too far apart to match</span></label>
+<label class="opt"><input type="radio" name="q18" value="2"><span class="lt">C</span><span>Chunk boundary — the answer is split across two chunks and neither can match</span></label>
+<label class="opt"><input type="radio" name="q18" value="3"><span class="lt">D</span><span>Missing content — the answer is simply not present anywhere in the corpus</span></label>
+  
+</section>
+<section class="q" id="Q20">
+  <div class="qhead"><span class="qnum">Q20</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">The search space has five axes and cannot be explored exhaustively in three hours, so you sweep one axis at a time and fix each winner. What must your report acknowledge?</p>
+  
+  <label class="opt"><input type="radio" name="q19" value="0"><span class="lt">A</span><span>That greedy sweeps take longer overall than a full grid search would have</span></label>
+<label class="opt"><input type="radio" name="q19" value="1"><span class="lt">B</span><span>That the axes interact, so a greedy path can miss a better joint setting</span></label>
+<label class="opt"><input type="radio" name="q19" value="2"><span class="lt">C</span><span>That one-axis sweeps are invalid unless each is repeated several times</span></label>
+<label class="opt"><input type="radio" name="q19" value="3"><span class="lt">D</span><span>That the winner of each axis must be confirmed against the test split too</span></label>
+  
+</section>
+</form>
+
+<footer>
+  <div class="progress noprint" id="prog">0 of 20 answered</div>
+  <button id="go" class="noprint" disabled>Finish and generate my code</button>
+  <div id="out" style="display:none;margin-top:24px">
+    <p><strong>Submitted.</strong> Copy this and post it as instructed. If you
+    reload this page you will start again, and the code will say so.</p>
+    <textarea id="code" readonly onclick="this.select()"></textarea>
+    <p style="margin-top:12px">
+      <button class="ghost" id="cp" type="button">Copy code</button></p>
+  </div>
+</footer>
+</div>
+
+<script>
+
+function enc(o){
+  const s=JSON.stringify(o), b=new TextEncoder().encode(s);
+  let bin=''; b.forEach(c=>bin+=String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function dec(t){
+  t=t.trim().replace(/-/g,'+').replace(/_/g,'/');
+  while(t.length%4)t+='=';
+  const bin=atob(t), b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(b));
+}
+
+const N=20, IDS=["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20"],
+      MULTI=[false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, true, false, false, false, false];
+const t0=Date.now();
+const form=document.getElementById('quiz'), go=document.getElementById('go'),
+      prog=document.getElementById('prog'), nm=document.getElementById('nm'),
+      rl=document.getElementById('rl');
+
+function picked(i){
+  return [...form.querySelectorAll(`input[name=q${i}]:checked`)]
+           .map(e=>+e.value).sort((a,b)=>a-b);
+}
+function refresh(){
+  let done=0; for(let i=0;i<N;i++) if(picked(i).length) done++;
+  prog.textContent=done+' of '+N+' answered'
+    + (done<N ? ' — '+(N-done)+' to go' : ' — ready');
+  go.disabled = !(done===N && nm.value.trim() && rl.value.trim());
+}
+form.addEventListener('change',refresh);
+nm.addEventListener('input',refresh); rl.addEventListener('input',refresh);
+
+const KEYSAFE='aip-quiz-lab3-attempt';
+go.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!confirm('Submit? You cannot change your answers afterwards.')) return;
+  let att=1; try{ att=(+localStorage.getItem(KEYSAFE)||0)+1;
+                   localStorage.setItem(KEYSAFE,att); }catch(_){ att=0; }
+  const payload={v:1,lab:3,n:N,
+    name:nm.value.trim(), roll:rl.value.trim(),
+    a:Array.from({length:N},(_,i)=>picked(i)),
+    secs:Math.round((Date.now()-t0)/1000),
+    at:new Date().toISOString().slice(0,16), att:att};
+  document.getElementById('code').value='AIPQ1.'+enc(payload);
+  document.getElementById('out').style.display='block';
+  form.classList.add('locked');
+  form.querySelectorAll('input').forEach(i=>i.disabled=true);
+  nm.disabled=true; rl.disabled=true; go.disabled=true;
+  go.textContent='Submitted';
+  document.getElementById('out').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('cp').addEventListener('click',()=>{
+  const t=document.getElementById('code'); t.select();
+  navigator.clipboard?.writeText(t.value).then(
+    ()=>{document.getElementById('cp').textContent='Copied';},
+    ()=>{document.execCommand('copy');});
+});
+refresh();
+</script>
+</body></html>

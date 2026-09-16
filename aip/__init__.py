@@ -21,11 +21,11 @@ Design rules the package follows (and that your lab code should follow too):
 
 __version__ = "1.0.0"
 
-from aip.config import MODELS, settings, resolve_model
+from aip.config import MODELS, resolve_model, settings
 from aip.cost import Budget, BudgetExceeded, Usage
-from aip.llm import chat, structured, StructuredOutputError
 from aip.embed import embed, embed_batch
-from aip.tracing import trace, read_traces
+from aip.llm import StructuredOutputError, chat, structured
+from aip.tracing import read_traces, trace
 
 __all__ = [
     "MODELS", "settings", "resolve_model",

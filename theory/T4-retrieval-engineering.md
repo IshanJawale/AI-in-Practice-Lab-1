@@ -13,10 +13,11 @@
 |---|---|
 | 0–10 | §1 Why RAG, and what it is really competing with |
 | 10–25 | §2 Ingestion and chunking — where most of the quality is decided |
-| 25–45 | §3 Indexing: exact, ANN, and what a vector database actually is |
-| 45–60 | §4 Retrieval: dense, lexical, hybrid, rerank |
-| 60–80 | §5 The seven failure modes, and how to tell them apart |
-| 80–90 | §6 Generation, citations, refusal · Labs 3–5 briefing |
+| 25–32 | §3 Indexing: exact, ANN, and what a vector database actually is |
+| 32–45 | §4 Retrieval: dense, lexical, hybrid, rerank |
+| 45–70 | §5 The seven failure modes, and how to tell them apart |
+| 70–82 | §6 Generation, citations, refusal |
+| 82–90 | Labs 3–5 briefing |
 
 ---
 
@@ -154,9 +155,12 @@ the right answer up to roughly 100k vectors on a laptop**, and starting there
 removes ANN recall as a confounder while you are learning.
 
 You need a real vector database when you have millions of vectors, concurrent
-writes, or per-document access control. Chroma (embedded, no server) is what we
-use from Lab 4 for persistence; pgvector, Qdrant, Weaviate, Milvus and the
-managed services differ mainly on operations, not on retrieval quality.
+writes, or per-document access control. Chroma (embedded, no server) is what
+**Lab 3 Part D** measures against exact search — and it is the only place in this
+module that uses one, because at 164 chunks nothing else is warranted. Labs 4–7
+run on `DenseRetriever` over a NumPy array, deliberately. pgvector, Qdrant,
+Weaviate, Milvus and the managed services differ mainly on operations, not on
+retrieval quality.
 
 ### 3.2 ANN: the one algorithm to understand
 

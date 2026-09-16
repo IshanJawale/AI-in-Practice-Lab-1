@@ -84,7 +84,7 @@ def put(key: str, kind: str, request: dict[str, Any], response: dict[str, Any]) 
 def stats() -> dict[str, int]:
     with _LOCK, _connect() as conn:
         rows = conn.execute("SELECT kind, COUNT(*) FROM calls GROUP BY kind").fetchall()
-    return {kind: n for kind, n in rows}
+    return dict(rows)
 
 
 def clear(kind: str | None = None) -> int:

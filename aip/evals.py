@@ -30,10 +30,11 @@ from __future__ import annotations
 import json
 import statistics
 import time
+from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any
 
 from aip import cost, tracing
 

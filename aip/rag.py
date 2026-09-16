@@ -22,11 +22,11 @@ of an afternoon.
 """
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Sequence
+from typing import Any
 
 from aip import tracing
-from aip.chunking import Chunk, STRATEGIES
 from aip.guards import UNTRUSTED_SYSTEM_CLAUSE, delimit_untrusted, enforce_citations
 from aip.llm import chat
 from aip.retrieval import Hit, Retriever, format_context
@@ -176,7 +176,8 @@ def multi_query(question: str, n: int = 3, tier: str = "SMALL") -> list[str]:
     Buys recall when users phrase things unpredictably. Costs one small call
     plus n retrievals per query.
     """
-    from aip.llm import chat as _chat, extract_json
+    from aip.llm import chat as _chat
+    from aip.llm import extract_json
 
     out = _chat(
         f"Rewrite this question in {n} different ways that a search engine would "

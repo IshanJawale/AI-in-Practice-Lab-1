@@ -426,21 +426,34 @@ const SLIDES = [
         <span class="val" id="r_ci_b">—</span></div>
       <div class="row"><span class="lbl">Intervals overlap?</span>
         <span class="val accent" id="r_overlap">—</span></div>
+      <div class="row"><span class="lbl">B − A, 95% CI <span class="tiny">(unpaired)</span></span>
+        <span class="val" id="r_ci_d">—</span></div>
       <div class="row"><span class="lbl">Paired test (McNemar, exact)</span>
         <span class="val" id="r_p">—</span></div>
       <p class="verdict" id="r_say"></p>
     </div>
   </div>`,
   notes:`<b>Do this live and slowly.</b> Start at the defaults: n=60, 0.88 vs 0.91.
-  The intervals overlap almost completely — <b>you cannot conclude B is better.</b>
-  <br><br>Now drag n to 400 and watch the intervals separate. That is the honest way
-  to get certainty, and it costs you 340 more labelled items.
-  <br><br>Then drag n back to 60 and use the paired sliders: b=4, c=10 gives
-  p≈0.18 — still not significant. b=2, c=14 gives p≈0.004, which is. <b>Same sample
-  size, real conclusion</b>, because pairing removes between-item variance, which is
-  the dominant component.
-  <br><br>Land it: at n=100 and p=0.90 the CI half-width is about ±0.06. <b>A
-  three-point difference on a hundred items is not a result.</b>` },
+  A is [0.78, 0.94], B is [0.82, 0.96] — they overlap almost completely.
+  <b>You cannot conclude B is better.</b>
+  <br><br>Now drag n all the way to 600, the maximum. The intervals shrink — and
+  they <b>still overlap</b>. Say the number out loud: to separate 0.88 from 0.91
+  by this route you would need about <b>800 items per system</b> — 1,600 labelled
+  in total. That is what certainty costs when you refuse to pair, and it is why
+  nobody does it this way.
+  <br><br>Then drag n back to 60 and use the paired sliders. b=4, c=10 gives
+  <b>p = 0.18</b> — still not significant. b=2, c=14 gives <b>p = 0.004</b>, which
+  is. <b>Same sixty items, real conclusion</b> — because pairing cancels
+  between-item variance, and item difficulty is the dominant component.
+  <br><br>One caution worth saying explicitly: non-overlapping intervals prove a
+  difference, but <b>overlapping intervals prove nothing</b>. Comparing two CIs is
+  a conservative test. That asymmetry is the whole reason the paired test is on
+  this slide.
+  <br><br>Point at the <b>B − A</b> row while you say this: ±0.06 is the interval
+  on <em>one</em> number, and the claim is about the <em>difference</em>, which is
+  √2 wider — <b>±0.083</b> at n=100. So the bar is about <b>8 points, not 6</b>.
+  <b>A three-point difference on a hundred items is not a result — and neither is
+  a seven-point one</b>, which is the half people get wrong.` },
 
 /* 9 ------------------------------------------------------------------ */
 { t:"What goes in it", html:`
@@ -749,6 +762,40 @@ Reply as JSON:
   transferable.` },
 
 /* 23 ----------------------------------------------------------------- */
+{ t:"Prioritising a backlog", cls:"tight", html:`
+  <h2>Error analysis gives you a list. It does not tell you what to fix</h2>
+  <p class="sub">And the instinct — start with the most interesting one — is usually wrong.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="grid2">
+    <div class="card"><h4>1 · Pareto, by count</h4>
+      <p class="small" style="margin:0">Defects are never spread evenly. Sort clusters
+      descending and read where the curve flattens. Turns <em>"14 failures"</em> into
+      <em>"two causes account for 13"</em> — and tells you nothing outside the head can
+      move your headline number.</p></div>
+    <div class="card"><h4>2 · Then by expected value</h4>
+      <p class="small" style="margin:0">Pareto only knows counts. A cluster of 9 whose
+      fix adds a call per query loses to a cluster of 6 with a free fix. The same
+      triple — quality, cost, latency — applied to a backlog.</p></div>
+  </div>
+  <p class="small" style="margin-top:14px">Estimate recovery by <b>reading a sample</b>
+     and asking, per case, whether the fix would have helped. "Six of nine" beats
+     "most of them" — and it is what your prediction is compared against.</p>
+  <div class="pull frag" style="margin-top:14px"><p><b>State the prediction before you
+    implement.</b> In the report, not in your head. It turns a change into an
+    experiment. Being wrong is informative and is not penalised. <b>Not predicting
+    is.</b></p></div>
+  <p class="small frag" style="margin-top:12px"><b>Ablation.</b> Remove one component
+     at a time and re-measure. Pipelines accumulate — a reranker in week two, a
+     rewriter in week four, none re-checked since. It is the only way to find the two
+     now worth nothing.</p>`,
+  notes:`<b>3 minutes.</b> This is the spine of Lab 5, and Lab 5's reference outcome
+  is a fix that measured <b>−0.050</b>. Tell them that here, not in the lab: it is a
+  full-marks Lab 5, because what is graded is diagnosing before fixing and predicting
+  before measuring.
+  <br><br>The ablation point lands well with anyone who has inherited a codebase. Ask
+  who has shipped a component nobody has re-measured since it went in.` },
+
+/* --------------------------------------------------------------------- */
 { t:"Regression gates", html:`
   <h2>Defend the number once you have it</h2>
   <div class="rule"></div>
@@ -926,6 +973,12 @@ function mountSig(){
     const overlap = al<=bh && bl<=ah;
     g('r_overlap').textContent = overlap ? "yes" : "no";
     g('r_overlap').style.color = overlap ? "#F0A18A" : "#7ED9A8";
+    // The interval on the DIFFERENCE -- sqrt(2)x wider than either one alone,
+    // and the quantity the claim is actually about.
+    const hd = 1.96*Math.sqrt(a*(1-a)/n + b*(1-b)/n), d = b-a;
+    const excludesZero = Math.abs(d) > hd;
+    g('r_ci_d').textContent = `${d>=0?'+':'−'}${Math.abs(d).toFixed(3)} ± ${hd.toFixed(3)}`;
+    g('r_ci_d').style.color = excludesZero ? "#7ED9A8" : "#F0A18A";
     const p=mcnemarP(bb,cc);
     g('r_p').textContent = p<0.0001 ? "p < 0.0001" : `p = ${p.toFixed(4)}`;
     g('r_say').innerHTML = overlap

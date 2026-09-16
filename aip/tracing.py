@@ -16,8 +16,9 @@ import os
 import threading
 import time
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from aip.config import settings
 
@@ -85,9 +86,8 @@ def event(name: str, **attrs: Any) -> None:
 
 def _write(record: dict[str, Any]) -> None:
     line = json.dumps(record, default=str)
-    with _WRITE_LOCK:
-        with _TRACE_FILE.open("a", encoding="utf-8") as fh:
-            fh.write(line + "\n")
+    with _WRITE_LOCK, _TRACE_FILE.open("a", encoding="utf-8") as fh:
+        fh.write(line + "\n")
 
 
 def read_traces(run_id: str | None = None) -> list[dict[str, Any]]:
