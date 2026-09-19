@@ -25,6 +25,8 @@
 
 **Dilution Explanation:** The curve is non-monotonic (U-shaped). Too small -> answer is split across chunks (recall drops). Too large -> embedding is diluted by unrelated text (ranking quality/nDCG drops). The sweet spot keeps rules intact but focused.
 
+**Limitation:** The greedy one‑axis‑at‑a‑time sweep could miss interactions between axes (e.g., chunk size and retrieval method), so a different combination might yield a better configuration.
+
 ### A3 — Markdown WITH vs WITHOUT '[heading > path]' prefix
 | config | hit_rate@1 | hit_rate@5 | recall@5 | mrr | ndcg@10 | latency_p95_ms |
 |---|---|---|---|---|---|---|

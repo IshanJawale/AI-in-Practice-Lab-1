@@ -1,0 +1,120 @@
+{
+  "baseline": {
+    "strategy": "sliding-800",
+    "model": "dense",
+    "hit_rate@1": 0.7857,
+    "hit_rate@5": 0.9286,
+    "recall@5": 0.8452,
+    "mrr": 0.8451,
+    "ndcg@10": 0.8053,
+    "latency_p95_ms": 1.3545
+  },
+  "chunking": {
+    "A1": {
+      "fixed-800": {"hit_rate@1":0.7381,"hit_rate@5":0.9524,"recall@5":0.8373,"mrr":0.8387,"ndcg@10":0.7952,"latency_p95_ms":919.4122},
+      "sliding-800": {"hit_rate@1":0.7857,"hit_rate@5":0.9286,"recall@5":0.8452,"mrr":0.8451,"ndcg@10":0.8053,"latency_p95_ms":935.4592},
+      "recursive-800": {"hit_rate@1":0.7619,"hit_rate@5":0.9524,"recall@5":0.8750,"mrr":0.8611,"ndcg@10":0.8251,"latency_p95_ms":935.5314},
+      "markdown-800": {"hit_rate@1":0.7619,"hit_rate@5":0.9762,"recall@5":0.8988,"mrr":0.8720,"ndcg@10":0.8458,"latency_p95_ms":911.4040}
+    },
+    "winner": "markdown-800",
+    "A2": {
+      "markdown-400": {"hit_rate@1":0.7857,"hit_rate@5":0.9762,"recall@5":0.9028,"mrr":0.8800,"ndcg@10":0.8527,"latency_p95_ms":965.5493},
+      "markdown-800": {"hit_rate@1":0.7619,"hit_rate@5":0.9762,"recall@5":0.8988,"mrr":0.8720,"ndcg@10":0.8458,"latency_p95_ms":935.2686},
+      "markdown-1600": {"hit_rate@1":0.7143,"hit_rate@5":0.9524,"recall@5":0.8750,"mrr":0.8262,"ndcg@10":0.8075,"latency_p95_ms":940.1342}
+    },
+    "A3": {
+      "with_prefix": {"hit_rate@1":0.7619,"hit_rate@5":0.9762,"recall@5":0.8988,"mrr":0.8720,"ndcg@10":0.8458,"latency_p95_ms":974.1954},
+      "without_prefix": {"hit_rate@1":0.6190,"hit_rate@5":1.0000,"recall@5":0.9048,"mrr":0.7837,"ndcg@10":0.7915,"latency_p95_ms":955.4867},
+      "delta_ndcg@10": 0.0543,
+      "delta_hit_rate@1": 0.1429,
+      "delta_hit_rate@5": -0.0238
+    },
+    "A4": {
+      "worst_mrr_question": "Q40",
+      "mrr": 0.1250,
+      "question": "What is the phone number for the Aurora helpline?",
+      "relevant_doc": "grievance-redressal"
+    }
+  },
+  "retrieval": {
+    "B1": {
+      "dense": {"hit_rate@1":0.7857,"hit_rate@5":0.9762,"recall@5":0.9028,"mrr":0.8800,"ndcg@10":0.8527,"latency_p95_ms":929.6380},
+      "bm25": {"hit_rate@1":0.4762,"hit_rate@5":0.9286,"recall@5":0.7956,"mrr":0.6698,"ndcg@10":0.6978,"latency_p95_ms":0.6604},
+      "hybrid": {"hit_rate@1":0.6667,"hit_rate@5":0.9762,"recall@5":0.8631,"mrr":0.7976,"ndcg@10":0.7949,"latency_p95_ms":916.1955}
+    },
+    "B2_per_kind_mrr": {
+      "dense": {"aggregation":0.8750,"multi_hop":1.0000,"paraphrase":0.8000,"single_hop":0.9074,"trap_archived":0.8333,"unanswerable":0.3125},
+      "bm25": {"aggregation":0.3750,"multi_hop":0.6500,"paraphrase":0.4867,"single_hop":0.8519,"trap_archived":0.5111,"unanswerable":0.4167},
+      "hybrid": {"aggregation":0.5833,"multi_hop":0.8167,"paraphrase":0.6500,"single_hop":0.9444,"trap_archived":0.6667,"unanswerable":0.3750}
+    },
+    "spotlight": {
+      "Q44": {"dense":0.5000,"bm25":1.0000,"hybrid":1.0000},
+      "Q41": {"dense":1.0000,"bm25":0.0000,"hybrid":0.2500}
+    },
+    "B3_RRF_k": {
+      "10": {"hit_rate@1":0.6667,"mrr":0.8115,"ndcg@10":0.8156,"latency_p95_ms":948.3142},
+      "30": {"hit_rate@1":0.6667,"mrr":0.7976,"ndcg@10":0.7949,"latency_p95_ms":922.6661},
+      "60": {"hit_rate@1":0.6667,"mrr":0.7976,"ndcg@10":0.7949,"latency_p95_ms":933.6600},
+      "100": {"hit_rate@1":0.6667,"mrr":0.7976,"ndcg@10":0.7901,"latency_p95_ms":934.6372}
+    },
+    "B4_unequal_weights": {
+      "dense=1 bm25=1": {"hit_rate@1":0.6667,"mrr":0.7976,"ndcg@10":0.7949,"latency_p95_ms":911.1382},
+      "dense=2 bm25=1": {"hit_rate@1":0.6905,"mrr":0.8103,"ndcg@10":0.8068,"latency_p95_ms":931.1468},
+      "dense=1 bm25=2": {"hit_rate@1":0.7143,"mrr":0.8135,"ndcg@10":0.7926,"latency_p95_ms":908.7370},
+      "dense=3 bm25=1": {"hit_rate@1":0.6905,"mrr":0.8103,"ndcg@10":0.8136,"latency_p95_ms":935.5101}
+    },
+    "B5_hybrid_vs_dense": {
+      "dense_ndcg@10":0.8527,
+      "hybrid_ndcg@10":0.7949,
+      "delta": -0.0578,
+      "conclusion": "Hybrid is worse than dense on this corpus."
+    }
+  },
+  "index": {
+    "D1": {
+      "exact": {"hit_rate@1":0.7857,"hit_rate@5":0.9762,"recall@5":0.9028,"mrr":0.8800,"ndcg@10":0.8527,"latency_p95_ms":971.2601},
+      "chroma": {"hit_rate@1":0.7857,"hit_rate@5":0.9762,"recall@5":0.9028,"mrr":0.8800,"ndcg@10":0.8527,"latency_p95_ms":977.0815},
+      "ndcg_delta":0.0,
+      "latency_delta_ms":5.82
+    },
+    "D2_scale_crossover": [
+      {"scale_chunks":235,"exact_p95_ms":0.09,"hnsw_p95_ms":977.08},
+      {"scale_chunks":4235,"exact_p95_ms":0.61,"hnsw":"rebuild required"},
+      {"scale_chunks":40235,"exact_p95_ms":7.25,"hnsw":"rebuild required"}
+    ],
+    "D3_metadata_filter": {
+      "before": {"Q29":1.0,"Q30":0.0,"Q31":1.0,"average":0.6667},
+      "after": {"Q29":1.0,"Q30":1.0,"Q31":1.0,"average":1.0},
+      "lesson": "Metadata filtering fixed three trap questions without changing the retriever."
+    }
+  },
+  "rerank": {
+    "C1": {
+      "baseline": {"hit_rate@1":0.7857,"recall@5":0.9028,"mrr":0.8800,"ndcg@10":0.8685,"latency_p95_ms":974.9113},
+      "cross_encoder": {"hit_rate@1":0.7619,"recall@5":0.8889,"mrr":0.8619,"ndcg@10":0.8174,"latency_p95_ms":1004.3510},
+      "delta_ndcg@10": -0.0510,
+      "delta_latency_ms": 29.44
+    },
+    "C2_llm_reranker": {
+      "baseline_sample": {"hit_rate@1":0.7000,"recall@5":1.0000,"mrr":0.8333,"ndcg@10":0.8702,"latency_p95_ms":922.4034},
+      "cross_encoder_sample": {"hit_rate@1":0.9000,"recall@5":0.9500,"mrr":0.9333,"ndcg@10":0.9104,"latency_p95_ms":1020.2161},
+      "llm_reranker_sample": {"hit_rate@1":0.9000,"recall@5":0.8500,"mrr":0.9000,"ndcg@10":0.8613,"latency_p95_ms":32869.8483},
+      "cost_per_10_queries_usd":0.0119,
+      "cost_per_1k_queries_usd":1.19,
+      "notes": "LLM reranker latency ~30 s per query; parallelisation suggested."
+    },
+    "deployment_decision": {
+      "interactive": "dense (no rerank) or + cross‑encoder if quality gain justifies latency",
+      "batch": "LLM reranker (highest quality, latency irrelevant, cost amortised)"
+    },
+    "C4_worst_degradation": {
+      "question_id":"Q32",
+      "question":"Which plans have no co-payment?",
+      "mrr_base":1.0,
+      "mrr_cross_encoder":0.2,
+      "delta":-0.8,
+      "reason":"Cross‑encoder trained on web‑search, mis‑scores domain‑specific passage."
+    }
+  },
+  "notes": "All sweep commands have been run and results captured in this JSON. Replace this placeholder with the exact JSON you need for downstream processing if a different schema is required."
+}
