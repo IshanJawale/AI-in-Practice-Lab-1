@@ -1,0 +1,409 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab 4 — RAG v1: Grounded Answers with Citations — quiz</title><style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --warn:#8a4b16; --warn-soft:#fbf0e4;
+  --bad:#93261f; --bad-soft:#fbeae8; --code:#f4f4f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --warn:#d99a5b; --warn-soft:#31261a;
+    --bad:#e58a80; --bad-soft:#331f1d; --code:#232529;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 ui-serif,Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 96px}
+header{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px;font-weight:600}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;
+  padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.blurb{background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:24px 0 8px;border-radius:0 4px 4px 0}
+.blurb p{margin:0}
+.ident{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+.ident label{display:block;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text]{width:100%;padding:10px 12px;font:16px/1.4 inherit;
+  background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:22px 24px;margin:18px 0}
+.qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.qnum{font:700 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--accent);
+  letter-spacing:.06em}
+.qpart{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto}
+.stem{margin:0 0 14px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 14px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;
+  border:1px solid transparent;border-radius:6px;cursor:pointer;margin:2px 0}
+.opt:hover{background:var(--accent-soft)}
+.opt input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent)}
+.opt .lt{font:700 13px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  flex:0 0 auto;min-width:14px}
+.locked .opt{cursor:default}
+.locked .opt:hover{background:none}
+footer{margin-top:36px;border-top:1px solid var(--line);padding-top:24px}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;padding:13px 22px;
+  border-radius:6px;border:1px solid var(--accent);background:var(--accent);
+  color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:none;color:var(--accent)}
+.progress{font:600 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  margin-bottom:14px}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase}
+.scroll{overflow-x:auto}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.flag{background:var(--warn-soft);color:var(--warn);padding:1px 7px;
+  border-radius:99px;font:600 11px/1.6 ui-sans-serif,system-ui,sans-serif}
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .q{break-inside:avoid;border-color:#ccc}
+}
+@media (max-width:620px){ .ident{grid-template-columns:1fr} .wrap{padding:24px 16px 72px} }
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI in Practice I · Module 1 · Applied GenAI</div>
+  <h1>Lab 4 — RAG v1: Grounded Answers with Citations</h1>
+  <p class="sub">End-of-lab quiz</p>
+  <div class="meta">
+    <span class="chip">20 questions</span>
+    <span class="chip">20 marks</span>
+    <span class="chip">20 minutes</span>
+    <span class="chip">Open notes, open repo</span>
+  </div>
+</header>
+
+<div class="blurb"><p>Twenty questions on the system you just built and the judge you had to earn the right to use. Several questions are about knowing when a number is too noisy to quote. One mark each; multi-select questions are all-or-nothing.</p></div>
+
+<p class="note">Answer every question, then press <strong>Finish</strong>. The page
+gives you a <strong>submission code</strong> — copy it and post it where your
+instructor asked. Your score is not shown here; we go through the answers
+together once the codes are in.</p>
+
+<div class="ident noprint">
+  <div><label for="nm">Name</label><input type="text" id="nm" autocomplete="off"></div>
+  <div><label for="rl">Roll number</label><input type="text" id="rl" autocomplete="off"></div>
+</div>
+
+<form id="quiz">
+<section class="q" id="Q1">
+  <div class="qhead"><span class="qnum">Q1</span> <span class="flag">select all</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Which of these belong in <code>ANSWER_SYSTEM</code>, per the T4 §6.1 requirements? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q0" value="0"><span class="lt">A</span><span>A worked example of a correct answer for each of the five question kinds</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="1"><span class="lt">B</span><span>An explicit prohibition on using general knowledge — answer only from the numbered sources</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="2"><span class="lt">C</span><span>An exact refusal string, given verbatim so it can be detected in code</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="3"><span class="lt">D</span><span>What to do when two sources disagree: surface the conflict rather than picking one silently</span></label>
+  
+</section>
+<section class="q" id="Q2">
+  <div class="qhead"><span class="qnum">Q2</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">The prompt requires length discipline — two or three sentences unless the question needs more. Why is that not cosmetic?</p>
+  
+  <label class="opt"><input type="radio" name="q1" value="0"><span class="lt">A</span><span>Output tokens dominate both latency and cost, so answer length is one of the few generation-side levers on the triple</span></label>
+<label class="opt"><input type="radio" name="q1" value="1"><span class="lt">B</span><span>The judge penalises long answers</span></label>
+<label class="opt"><input type="radio" name="q1" value="2"><span class="lt">C</span><span>The context window would otherwise overflow</span></label>
+<label class="opt"><input type="radio" name="q1" value="3"><span class="lt">D</span><span>Long answers confuse the citation regex</span></label>
+  
+</section>
+<section class="q" id="Q3">
+  <div class="qhead"><span class="qnum">Q3</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Why does numbering the sources in the context block make one class of hallucination <em>provably</em> detectable?</p>
+  
+  <label class="opt"><input type="radio" name="q2" value="0"><span class="lt">A</span><span>The model can only legitimately cite a number you supplied, so <code>[7]</code> when five sources were given is a mechanical error found by three lines of regex — no judge, no model, no cost</span></label>
+<label class="opt"><input type="radio" name="q2" value="1"><span class="lt">B</span><span>Numbering lets the reranker score citations</span></label>
+<label class="opt"><input type="radio" name="q2" value="2"><span class="lt">C</span><span>It forces the model into JSON mode</span></label>
+<label class="opt"><input type="radio" name="q2" value="3"><span class="lt">D</span><span>Numbered sources are easier for the model to attend to</span></label>
+  
+</section>
+<section class="q" id="Q4">
+  <div class="qhead"><span class="qnum">Q4</span> <span class="flag">select all</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem"><code>validate_answer()</code> must check which of these? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q3" value="0"><span class="lt">A</span><span>The answer is non-empty and was not truncated — <code>finish_reason != "length"</code></span></label>
+<label class="opt"><input type="checkbox" name="q3" value="1"><span class="lt">B</span><span>If the answer is not a refusal, at least one citation is present</span></label>
+<label class="opt"><input type="checkbox" name="q3" value="2"><span class="lt">C</span><span>Every cited source is actually relevant to the claim it is attached to</span></label>
+<label class="opt"><input type="checkbox" name="q3" value="3"><span class="lt">D</span><span>Every <code>[n]</code> is within the range of supplied sources</span></label>
+  
+</section>
+<section class="q" id="Q5">
+  <div class="qhead"><span class="qnum">Q5</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B3 offers three failure policies: retry with a corrective message, strip the invalid citations and return, or fall back to refusal. The handout says there is no single right answer — but one behaviour is definitely wrong. Which?</p>
+  
+  <label class="opt"><input type="radio" name="q4" value="0"><span class="lt">A</span><span>Stripping citations, because the answer then has none</span></label>
+<label class="opt"><input type="radio" name="q4" value="1"><span class="lt">B</span><span>Retrying, because it doubles the cost of the failing queries</span></label>
+<label class="opt"><input type="radio" name="q4" value="2"><span class="lt">C</span><span>Falling back to refusal, because it lowers refusal precision</span></label>
+<label class="opt"><input type="radio" name="q4" value="3"><span class="lt">D</span><span>Silently returning the answer with a bogus citation attached</span></label>
+  
+</section>
+<section class="q" id="Q6">
+  <div class="qhead"><span class="qnum">Q6</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Q37 asks: “Does Aurora cover treatment in Singapore, and up to what limit?” The corpus confirms a Platinum international benefit exists, but the addendum describing the limit is absent. What is the correct behaviour?</p>
+  
+  <label class="opt"><input type="radio" name="q5" value="0"><span class="lt">A</span><span>Answer the whole question, inferring a plausible limit from the other plan documents</span></label>
+<label class="opt"><input type="radio" name="q5" value="1"><span class="lt">B</span><span>A <strong>partial</strong> answer: confirm the benefit that is supported, and refuse the part that is not</span></label>
+<label class="opt"><input type="radio" name="q5" value="2"><span class="lt">C</span><span>Return the closest document and let the agent decide</span></label>
+<label class="opt"><input type="radio" name="q5" value="3"><span class="lt">D</span><span>Refuse the whole question — part of it is unanswerable</span></label>
+  
+</section>
+<section class="q" id="Q7">
+  <div class="qhead"><span class="qnum">Q7</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">A system refuses every question. What do its refusal numbers look like, and what does that tell you about reporting them?</p>
+  
+  <label class="opt"><input type="radio" name="q6" value="0"><span class="lt">A</span><span>Both 1.00 — refusal metrics cannot detect over-refusal</span></label>
+<label class="opt"><input type="radio" name="q6" value="1"><span class="lt">B</span><span>Recall 0.00 and precision 1.00</span></label>
+<label class="opt"><input type="radio" name="q6" value="2"><span class="lt">C</span><span>Both undefined, since no answers were produced</span></label>
+<label class="opt"><input type="radio" name="q6" value="3"><span class="lt">D</span><span>Recall 1.00 and precision near 0.11 — reporting recall alone would make a useless system look perfect, so both directions must always be reported</span></label>
+  
+</section>
+<section class="q" id="Q8">
+  <div class="qhead"><span class="qnum">Q8</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">There are only 5 unanswerable questions, and the reference solution declined 7 in total. What constraint does that put on your claims?</p>
+  
+  <label class="opt"><input type="radio" name="q7" value="0"><span class="lt">A</span><span>Refusal metrics should be dropped and replaced with correctness on the unanswerable subset</span></label>
+<label class="opt"><input type="radio" name="q7" value="1"><span class="lt">B</span><span>You should generate more unanswerable questions to reach n = 30</span></label>
+<label class="opt"><input type="radio" name="q7" value="2"><span class="lt">C</span><span>None — the metrics are exact counts, not estimates</span></label>
+<label class="opt"><input type="radio" name="q7" value="3"><span class="lt">D</span><span>One case moves precision by about 0.12 and recall by 0.20, so report the raw counts alongside the ratios and do not claim a difference smaller than roughly 0.15 on either</span></label>
+  
+</section>
+<section class="q" id="Q9">
+  <div class="qhead"><span class="qnum">Q9</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">C4 asks where you would set the refusal threshold for an insurance helpdesk, <em>as a product decision with a reason</em>. Which is an acceptable reason?</p>
+  
+  <label class="opt"><input type="radio" name="q8" value="0"><span class="lt">A</span><span>“Whichever setting maximises the F1 of the two refusal numbers”</span></label>
+<label class="opt"><input type="radio" name="q8" value="1"><span class="lt">B</span><span>“Higher precision, because precision is the more important metric”</span></label>
+<label class="opt"><input type="radio" name="q8" value="2"><span class="lt">C</span><span>“A wrong claim deadline sent to a customer can cost them a valid claim and costs us a regulatory finding; an unnecessary refusal costs one agent two minutes — so we accept several false refusals per avoided false answer, and set it strict”</span></label>
+<label class="opt"><input type="radio" name="q8" value="3"><span class="lt">D</span><span>“The reference solution measured 0.714, so we match it”</span></label>
+  
+</section>
+<section class="q" id="Q10">
+  <div class="qhead"><span class="qnum">Q10</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">Why does D1 require <strong>two separate single-criterion rubrics</strong> — faithfulness and correctness — rather than one judge scoring overall answer quality?</p>
+  
+  <label class="opt"><input type="radio" name="q9" value="0"><span class="lt">A</span><span>They measure different things and can disagree: an answer can be perfectly faithful to the context and still wrong, or correct from world knowledge and unsupported by the sources. Collapsing them hides which one failed</span></label>
+<label class="opt"><input type="radio" name="q9" value="1"><span class="lt">B</span><span>Single-criterion rubrics produce shorter judge outputs, avoiding truncation</span></label>
+<label class="opt"><input type="radio" name="q9" value="2"><span class="lt">C</span><span>Cohen’s κ can only be computed on binary criteria</span></label>
+<label class="opt"><input type="radio" name="q9" value="3"><span class="lt">D</span><span>Two calls are cheaper than one long one</span></label>
+  
+</section>
+<section class="q" id="Q11">
+  <div class="qhead"><span class="qnum">Q11</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D2 requires you to hand-label 20 answers <em>before</em> looking at the judge’s verdicts, then compute Cohen’s κ. Why in that order, and what is the rule about κ?</p>
+  
+  <label class="opt"><input type="radio" name="q10" value="0"><span class="lt">A</span><span>Labelling first is only needed for faithfulness, not correctness</span></label>
+<label class="opt"><input type="radio" name="q10" value="1"><span class="lt">B</span><span>The order is for cost reasons — judge calls are expensive and should come last</span></label>
+<label class="opt"><input type="radio" name="q10" value="2"><span class="lt">C</span><span>Order does not matter; the rule is that κ must exceed 0.8</span></label>
+<label class="opt"><input type="radio" name="q10" value="3"><span class="lt">D</span><span>Seeing the judge’s labels first anchors yours, and κ then measures how well you copied it rather than whether it is right. You may not report a judge number without its κ, and if κ < 0.4 you fix the rubric and re-run</span></label>
+  
+</section>
+<section class="q" id="Q12">
+  <div class="qhead"><span class="qnum">Q12</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">The reference solution first measured faithfulness at <strong>0.667</strong>. The true value was <strong>0.933</strong>. What had happened?</p>
+  
+  <label class="opt"><input type="radio" name="q11" value="0"><span class="lt">A</span><span><code>llm_judge</code> capped output at 512 tokens; the judge tier is a reasoning model that spent most of that budget on invisible thinking, so its JSON verdict was truncated mid-object, failed to parse — and <strong>the parse failure was scored 0</strong></span></label>
+<label class="opt"><input type="radio" name="q11" value="1"><span class="lt">B</span><span>The gold answers were wrong for a third of the questions</span></label>
+<label class="opt"><input type="radio" name="q11" value="2"><span class="lt">C</span><span>Self-preference bias: the judge was the same model that generated the answers</span></label>
+<label class="opt"><input type="radio" name="q11" value="3"><span class="lt">D</span><span>The judge rubric was too strict and was later relaxed</span></label>
+  
+</section>
+<section class="q" id="Q13">
+  <div class="qhead"><span class="qnum">Q13</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">What is the general rule the truncation bug produced, now implemented in <code>aip.evals.llm_judge</code>?</p>
+  
+  <label class="opt"><input type="radio" name="q12" value="0"><span class="lt">A</span><span><strong>A parse failure is missing data, not a failing answer.</strong> Scoring it 0 puts a silent, systematic downward bias on the headline metric — so retry at double the budget, return <code>parse_error</code>, and let the caller exclude the case</span></label>
+<label class="opt"><input type="radio" name="q12" value="1"><span class="lt">B</span><span>Cap judge output at 512 tokens and require the judge to answer with a single digit</span></label>
+<label class="opt"><input type="radio" name="q12" value="2"><span class="lt">C</span><span>Judge every answer twice and take the higher score</span></label>
+<label class="opt"><input type="radio" name="q12" value="3"><span class="lt">D</span><span>Always use the LARGE tier for judging</span></label>
+  
+</section>
+<section class="q" id="Q14">
+  <div class="qhead"><span class="qnum">Q14</span> <span class="flag">select all</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">Three cheap signals caught the truncation bug. Which were they? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q13" value="0"><span class="lt">A</span><span>The p95 latency of the judge calls rose sharply</span></label>
+<label class="opt"><input type="checkbox" name="q13" value="1"><span class="lt">B</span><span>An internal contradiction — 8 of the 15 “unfaithful” answers were simultaneously judged fully correct</span></label>
+<label class="opt"><input type="checkbox" name="q13" value="2"><span class="lt">C</span><span>A deterministic cross-check — every number in 14 of the 15 was present in the corpus</span></label>
+<label class="opt"><input type="checkbox" name="q13" value="3"><span class="lt">D</span><span>Reading the judge’s raw output, which ended mid-token</span></label>
+  
+</section>
+<section class="q" id="Q15">
+  <div class="qhead"><span class="qnum">Q15</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D3 asks about self-preference. If your judge is the same model that generated the answer, what must you say?</p>
+  
+  <label class="opt"><input type="radio" name="q14" value="0"><span class="lt">A</span><span>That it makes the judge more consistent, so the numbers are more reliable</span></label>
+<label class="opt"><input type="radio" name="q14" value="1"><span class="lt">B</span><span>That models tend to score their own output more favourably, so your quality numbers are biased <em>upward</em> — and use a different tier or a different provider profile if you can</span></label>
+<label class="opt"><input type="radio" name="q14" value="2"><span class="lt">C</span><span>That the bias is downward, because the model is a harsh critic of its own style</span></label>
+<label class="opt"><input type="radio" name="q14" value="3"><span class="lt">D</span><span>Nothing — self-preference only applies to preference rankings, not to rubric scoring</span></label>
+  
+</section>
+<section class="q" id="Q16">
+  <div class="qhead"><span class="qnum">Q16</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">The gold-context decomposition. You measure correctness with gold context A = 0.893 and with retrieved context B = 0.821. What are the two attributed losses?</p>
+  
+  <label class="opt"><input type="radio" name="q15" value="0"><span class="lt">A</span><span>Both losses are 0.0895 — the total splits evenly by construction</span></label>
+<label class="opt"><input type="radio" name="q15" value="1"><span class="lt">B</span><span>Retrieval-attributable 0.107, generation-attributable 0.072</span></label>
+<label class="opt"><input type="radio" name="q15" value="2"><span class="lt">C</span><span>Retrieval-attributable 0.072 (A − B), generation-attributable 0.107 (1 − A)</span></label>
+<label class="opt"><input type="radio" name="q15" value="3"><span class="lt">D</span><span>Retrieval-attributable 0.179, generation-attributable 0.072</span></label>
+  
+</section>
+<section class="q" id="Q17">
+  <div class="qhead"><span class="qnum">Q17</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Why is the gold-context run described as “the most useful experiment in RAG debugging”?</p>
+  
+  <label class="opt"><input type="radio" name="q16" value="0"><span class="lt">A</span><span>It is the cheapest experiment in the lab</span></label>
+<label class="opt"><input type="radio" name="q16" value="1"><span class="lt">B</span><span>It splits an otherwise entangled problem cleanly into two independent halves — retrieval and generation — with one extra run, and tells you which half is worth working on before you spend a lab on either</span></label>
+<label class="opt"><input type="radio" name="q16" value="2"><span class="lt">C</span><span>It produces the headline correctness number that is reported to the business</span></label>
+<label class="opt"><input type="radio" name="q16" value="3"><span class="lt">D</span><span>It is the only way to detect hallucination</span></label>
+  
+</section>
+<section class="q" id="Q18">
+  <div class="qhead"><span class="qnum">Q18</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Correctness by question kind came out: single_hop 0.917, trap_archived 0.833, paraphrase 0.800, aggregation 0.750, <strong>multi_hop 0.700</strong>. What does that pattern suggest, and what should you do with it?</p>
+  
+  <label class="opt"><input type="radio" name="q17" value="0"><span class="lt">A</span><span>The judge is harsher on longer answers, so the ordering is an artefact</span></label>
+<label class="opt"><input type="radio" name="q17" value="1"><span class="lt">B</span><span>The multi-hop gold answers are wrong and should be excluded</span></label>
+<label class="opt"><input type="radio" name="q17" value="2"><span class="lt">C</span><span>Questions requiring several facts to be combined are the weak spot — this is the Lab 5 backlog, and it should be carried forward as a named cluster rather than as an aggregate</span></label>
+<label class="opt"><input type="radio" name="q17" value="3"><span class="lt">D</span><span>Retrieval is failing on multi-hop; raise final_k</span></label>
+  
+</section>
+<section class="q" id="Q19">
+  <div class="qhead"><span class="qnum">Q19</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Citation validity is targeted at <strong>1.00</strong> while faithfulness is targeted at ≥ 0.90. Why is one target absolute and the other not?</p>
+  
+  <label class="opt"><input type="radio" name="q18" value="0"><span class="lt">A</span><span>The two targets were set at different times and the difference is historical</span></label>
+<label class="opt"><input type="radio" name="q18" value="1"><span class="lt">B</span><span>Citation validity is easier for the model to get right</span></label>
+<label class="opt"><input type="radio" name="q18" value="2"><span class="lt">C</span><span>Citation validity is a <em>code guarantee</em> — you can reject or repair any answer that violates it — whereas faithfulness is a model behaviour judged by another model, and no amount of prompting makes it certain</span></label>
+<label class="opt"><input type="radio" name="q18" value="3"><span class="lt">D</span><span>Faithfulness is measured on a smaller sample, so it cannot reach 1.00</span></label>
+  
+</section>
+<section class="q" id="Q20">
+  <div class="qhead"><span class="qnum">Q20</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">A pair reports: “faithfulness 0.95, correctness 0.88, citation validity 1.00.” What is missing before those numbers can be accepted?</p>
+  
+  <label class="opt"><input type="radio" name="q19" value="0"><span class="lt">A</span><span>Nothing — all three targets are met</span></label>
+<label class="opt"><input type="radio" name="q19" value="1"><span class="lt">B</span><span>The cost per query and the p95 latency</span></label>
+<label class="opt"><input type="radio" name="q19" value="2"><span class="lt">C</span><span>Cohen’s κ for both judge rubrics — without it the two judged numbers are an unvalidated instrument reporting on an unvalidated system</span></label>
+<label class="opt"><input type="radio" name="q19" value="3"><span class="lt">D</span><span>The confidence intervals on all three</span></label>
+  
+</section>
+</form>
+
+<footer>
+  <div class="progress noprint" id="prog">0 of 20 answered</div>
+  <button id="go" class="noprint" disabled>Finish and generate my code</button>
+  <div id="out" style="display:none;margin-top:24px">
+    <p><strong>Submitted.</strong> Copy this and post it as instructed. If you
+    reload this page you will start again, and the code will say so.</p>
+    <textarea id="code" readonly onclick="this.select()"></textarea>
+    <p style="margin-top:12px">
+      <button class="ghost" id="cp" type="button">Copy code</button></p>
+  </div>
+</footer>
+</div>
+
+<script>
+
+function enc(o){
+  const s=JSON.stringify(o), b=new TextEncoder().encode(s);
+  let bin=''; b.forEach(c=>bin+=String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function dec(t){
+  t=t.trim().replace(/-/g,'+').replace(/_/g,'/');
+  while(t.length%4)t+='=';
+  const bin=atob(t), b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(b));
+}
+
+const N=20, IDS=["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20"],
+      MULTI=[true, false, false, true, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false];
+const t0=Date.now();
+const form=document.getElementById('quiz'), go=document.getElementById('go'),
+      prog=document.getElementById('prog'), nm=document.getElementById('nm'),
+      rl=document.getElementById('rl');
+
+function picked(i){
+  return [...form.querySelectorAll(`input[name=q${i}]:checked`)]
+           .map(e=>+e.value).sort((a,b)=>a-b);
+}
+function refresh(){
+  let done=0; for(let i=0;i<N;i++) if(picked(i).length) done++;
+  prog.textContent=done+' of '+N+' answered'
+    + (done<N ? ' — '+(N-done)+' to go' : ' — ready');
+  go.disabled = !(done===N && nm.value.trim() && rl.value.trim());
+}
+form.addEventListener('change',refresh);
+nm.addEventListener('input',refresh); rl.addEventListener('input',refresh);
+
+const KEYSAFE='aip-quiz-lab4-attempt';
+go.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!confirm('Submit? You cannot change your answers afterwards.')) return;
+  let att=1; try{ att=(+localStorage.getItem(KEYSAFE)||0)+1;
+                   localStorage.setItem(KEYSAFE,att); }catch(_){ att=0; }
+  const payload={v:1,lab:4,n:N,
+    name:nm.value.trim(), roll:rl.value.trim(),
+    a:Array.from({length:N},(_,i)=>picked(i)),
+    secs:Math.round((Date.now()-t0)/1000),
+    at:new Date().toISOString().slice(0,16), att:att};
+  document.getElementById('code').value='AIPQ1.'+enc(payload);
+  document.getElementById('out').style.display='block';
+  form.classList.add('locked');
+  form.querySelectorAll('input').forEach(i=>i.disabled=true);
+  nm.disabled=true; rl.disabled=true; go.disabled=true;
+  go.textContent='Submitted';
+  document.getElementById('out').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('cp').addEventListener('click',()=>{
+  const t=document.getElementById('code'); t.select();
+  navigator.clipboard?.writeText(t.value).then(
+    ()=>{document.getElementById('cp').textContent='Copied';},
+    ()=>{document.execCommand('copy');});
+});
+refresh();
+</script>
+</body></html>
