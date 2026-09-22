@@ -48,7 +48,7 @@ We measured refusal behaviour on the 5 *unanswerable* questions (Q36‑Q40) usin
 | Strictness | Refusal Recall | Refusal Precision |
 |------------|----------------|-------------------|
 | **Default** (as implemented above) | 1.000 (5/5) | 0.714 (5/7) |
-| **Stricter** (e.g. explicitly instructing the model to refuse when any doubt) | N/A | N/A |
+| **Stricter** (e.g. explicitly instructing the model to refuse when any doubt) | not evaluated (service unavailable) | not evaluated (service unavailable) |
 
 *Raw counts* are reported alongside the ratios (e.g. `5/5`). The numbers are taken from `labs/lab4/result.txt`.
 
