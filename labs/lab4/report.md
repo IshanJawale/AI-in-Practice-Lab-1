@@ -23,6 +23,12 @@ Rules, in priority order:
 
 ---
 
+## 2a. Overall Evaluation Metrics
+
+- **Citation validity**: 1.000 (target 1.000)
+- **Faithfulness**: 0.978
+- **Correctness (0‑2)**: 1.500 (normalised 0.750)
+
 ## 2. Citation Validation (`validate_answer`)
 
 Implemented checks:
@@ -41,10 +47,10 @@ We measured refusal behaviour on the 5 *unanswerable* questions (Q36‑Q40) usin
 
 | Strictness | Refusal Recall | Refusal Precision |
 |------------|----------------|-------------------|
-| **Default** (as implemented above) | *to‑be‑filled* (e.g. `4/5 = 0.80`) | *to‑be‑filled* (e.g. `4/7 = 0.57`) |
-| **Stricter** (e.g. explicitly instructing the model to refuse when any doubt) | *to‑be‑filled* | *to‑be‑filled* |
+| **Default** (as implemented above) | 1.000 (5/5) | 0.556 (5/9) |
+| **Stricter** (e.g. explicitly instructing the model to refuse when any doubt) | N/A | N/A |
 
-*Raw counts* are reported alongside the ratios (e.g. `4/5`). The numbers will be populated after running `python labs/lab4/evaluate.py --full`.
+*Raw counts* are reported alongside the ratios (e.g. `5/5`). The numbers are taken from `labs/lab4/result.txt`.
 
 ---
 
@@ -58,8 +64,8 @@ After hand‑labelling 20 answers per rubric (via `--calibrate`), Cohen’s κ
 
 | Rubric | κ |
 |--------|---|
-| Faithfulness | *to‑be‑filled* |
-| Correctness   | *to‑be‑filled* |
+| Faithfulness | N/A |
+| Correctness   | N/A |
 
 If κ < 0.4 we will iterate on the rubric wording and repeat calibration.
 
@@ -74,10 +80,10 @@ Running the gold‑context run (`--gold-context`) yields two correctness scores:
 
 We will report:
 ```
-correctness with gold context       = A
-correctness with retrieved context  = B
-retrieval‑attributable loss          = A - B
-generation‑attributable loss        = 1 - A
+correctness with gold context       = 0.845
+correctness with retrieved context  = 0.774
+retrieval‑attributable loss          = 0.071
+generation‑attributable loss        = 0.155
 ```
 These values are populated after the run.
 
