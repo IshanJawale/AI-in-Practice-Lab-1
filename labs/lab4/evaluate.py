@@ -39,8 +39,7 @@ def build_retriever():
     # markdown chunking (size=400) was the best in Lab 3 sweeps (A2)
     chunks = [c for doc_id, text in corpus.items()
               for c in markdown_chunks(text, doc_id, size=400)]
-    # Build a DenseRetriever with retry logic (provided by _build_retriever)
-    return _build_retriever(chunks)
+    return DenseRetriever(chunks)
 
 
 # ---------------------------------------------------------------------------

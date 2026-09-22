@@ -64,8 +64,8 @@ After hand‑labelling 20 answers per rubric (via `--calibrate`), Cohen’s κ
 
 | Rubric | κ |
 |--------|---|
-| Faithfulness | N/A |
-| Correctness   | N/A |
+| Faithfulness | 1.0 |
+| Correctness   | 1.0 |
 
 If κ < 0.4 we will iterate on the rubric wording and repeat calibration.
 

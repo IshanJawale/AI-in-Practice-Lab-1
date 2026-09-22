@@ -37,6 +37,7 @@ Rules, in priority order:
 4. If sources disagree, say so and cite both.
 5. Be concise. Two or three sentences unless the question needs more.
 6. The answer must not contain any content outside the supplied sources.
+7. If you are not completely certain about any part of the answer, output the exact refusal string.
 
 {UNTRUSTED_SYSTEM_CLAUSE}
 """
