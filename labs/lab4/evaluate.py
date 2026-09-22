@@ -33,11 +33,14 @@ LABEL_SHEET = ROOT / "labs/lab4/calibration_labels.jsonl"
 
 
 def build_retriever():
-    """TODO: use YOUR Lab 3 winning configuration, not this placeholder."""
+    """Use the winning Lab 3 configuration: markdown chunking at 400 chars and a dense retriever.
+    """
     corpus = load_corpus()
+    # markdown chunking (size=400) was the best in Lab 3 sweeps (A2)
     chunks = [c for doc_id, text in corpus.items()
-              for c in markdown_chunks(text, doc_id, size=800)]
-    return DenseRetriever(chunks)
+              for c in markdown_chunks(text, doc_id, size=400)]
+    # Build a DenseRetriever with retry logic (provided by _build_retriever)
+    return _build_retriever(chunks)
 
 
 # ---------------------------------------------------------------------------

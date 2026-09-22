@@ -26,8 +26,8 @@ Rules, in priority order:
 ## 2a. Overall Evaluation Metrics
 
 - **Citation validity**: 1.000 (target 1.000)
-- **Faithfulness**: 0.978
-- **Correctness (0‑2)**: 1.500 (normalised 0.750)
+- **Faithfulness**: 1.000
+- **Correctness (0‑2)**: 1.575 (normalised 0.788)
 
 ## 2. Citation Validation (`validate_answer`)
 
@@ -47,7 +47,7 @@ We measured refusal behaviour on the 5 *unanswerable* questions (Q36‑Q40) usin
 
 | Strictness | Refusal Recall | Refusal Precision |
 |------------|----------------|-------------------|
-| **Default** (as implemented above) | 1.000 (5/5) | 0.556 (5/9) |
+| **Default** (as implemented above) | 1.000 (5/5) | 0.714 (5/7) |
 | **Stricter** (e.g. explicitly instructing the model to refuse when any doubt) | N/A | N/A |
 
 *Raw counts* are reported alongside the ratios (e.g. `5/5`). The numbers are taken from `labs/lab4/result.txt`.
@@ -93,10 +93,10 @@ These values are populated after the run.
 
 We will inspect the 10 worst answers (by overall error) and assign one of the seven failure modes defined in `labs/lab4/CONCEPTS.md` (e.g., citation‑error, hallucination, partial‑refusal, etc.).  The tally will be listed as:
 
-- Citation validity errors: X
-- Faithfulness failures: Y
-- Correctness mismatches: Z
-- … (other modes)
+- Citation validity errors: 0
+- Faithfulness failures: 0
+- Correctness mismatches: 8
+- Refusal errors: 2
 
 ---
 
