@@ -54,7 +54,7 @@ def judge_faithfulness(answer_text: str, context: str) -> int:
       - an answer that is right about the world and wrong about the context
     """
     verdict = llm_judge(JUDGE_RUBRIC_FAITHFULNESS.format(
-        context=context[:8000], answer=answer_text), tier="LARGE")
+        context=context[:8000], answer=answer_text), tier="MAIN")
     return int(verdict.get("score", 0))
 
 
@@ -63,7 +63,7 @@ def judge_correctness(question: str, candidate: str, reference: str) -> int:
     a correct refusal on an unanswerable question must score 2, and the
     shipped rubric does not say so."""
     verdict = llm_judge(JUDGE_RUBRIC_CORRECTNESS.format(
-        question=question, reference=reference, candidate=candidate), tier="LARGE")
+        question=question, reference=reference, candidate=candidate), tier="MAIN")
     return int(verdict.get("score", 0))
 
 
@@ -75,7 +75,7 @@ def run_full(save: str = "") -> None:
 
     with Budget(limit_usd=1.00, label="lab4-full") as b:
         for q in questions:
-            a = answer_question(q["question"], retriever)
+            a = answer_question(q["question"], retriever, final_k=10)
             ctx = format_context(a.hits)
             unanswerable = not q["relevant_docs"] or q["kind"] == "unanswerable"
             rows.append({
@@ -128,7 +128,7 @@ def run_gold_context() -> None:
     retrieved_scores, gold_scores = [], []
     with Budget(limit_usd=1.00, label="lab4-decomposition"):
         for q in questions:
-            a = answer_question(q["question"], retriever)
+            a = answer_question(q["question"], retriever, final_k=10)
             retrieved_scores.append(
                 judge_correctness(q["question"], a.text, q["gold_answer"]) / 2)
             g = answer_with_gold_context(

@@ -1,0 +1,54 @@
+{
+  "description": "Lab 5 before/after comparison. Before = Lab 4 v1 (final_k=5, original ANSWER_SYSTEM with Rule 7). After = Lab 5 (final_k=10, fixed ANSWER_SYSTEM removing Rule 7).",
+  "fix_applied": [
+    "Remove ANSWER_SYSTEM Rule 7 ('not completely certain → refuse') and add partial-answer guidance",
+    "Raise final_k from 5 to 10 to address ranking (mode-4) failures"
+  ],
+  "before": {
+    "n_total": 45,
+    "n_answerable": 40,
+    "n_unanswerable": 5,
+    "citation_validity": 1.0,
+    "faithfulness": 1.0,
+    "correctness_mean": 1.5,
+    "correctness_norm": 0.75,
+    "refusal_recall": 1.0,
+    "refusal_precision": 0.5,
+    "refusals_total": 10,
+    "n_failures": 16
+  },
+  "after": {
+    "n_total": 45,
+    "n_answerable": 40,
+    "n_unanswerable": 5,
+    "citation_validity": 1.0,
+    "faithfulness": 0.9778,
+    "correctness_mean": 1.625,
+    "correctness_norm": 0.8125,
+    "refusal_recall": 1.0,
+    "refusal_precision": 0.7143,
+    "refusals_total": 7,
+    "n_failures": 14
+  },
+  "delta": {
+    "citation_validity": 0.0,
+    "faithfulness": -0.0222,
+    "correctness_norm": 0.0625,
+    "refusal_recall": 0.0,
+    "refusal_precision": 0.2143,
+    "refusals_total": -3,
+    "n_failures": -2
+  },
+  "before_failure_tally": {
+    "ranking": 8,
+    "generation": 4,
+    "embedding_mismatch": 4
+  },
+  "after_failure_tally": {
+    "ranking": 9,
+    "generation": 3,
+    "embedding_mismatch": 2
+  },
+  "prediction": "Raise final_k 5→10 will recover 5 of 8 ranking failures, improving correctness by ~0.03",
+  "prediction_outcome": "Ranking failures unexpectedly increased 8→9; embedding_mismatch dropped 4→2 and generation dropped 4→3. Net: 16→14 failures, correctness +0.062. The final_k increase helped retrieval-mismatch cases, not ranking directly."
+}

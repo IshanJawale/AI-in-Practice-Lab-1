@@ -1,0 +1,74 @@
+[
+  {
+    "id": "Q04",
+    "kind": "single_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "What is the waiting period for pre-existing diseases?",
+    "answer": "For standard retail plans, top-up/super top-up plans, and hospital cash benefits, the waiting period for pre-existing diseases is 36 months [5][7][9][10]. Under the Aurora Senior Care plan, the pre-existing disease waiting period is reduced to 24 months [5]. Additionally, waiting periods already ser"
+  },
+  {
+    "id": "Q11",
+    "kind": "single_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "How much ambulance cover is there?",
+    "answer": "Across all plans, road ambulance cover is ₹5,000 per hospitalisation [1][6][9]. Additionally, the Gold plan provides air ambulance cover of ₹2,50,000 per policy year within India, subject to prior authorisation [5]."
+  },
+  {
+    "id": "Q20",
+    "kind": "multi_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "My mother is 63 and I want to add her to my policy. Which plans allow it and what changes?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  },
+  {
+    "id": "Q23",
+    "kind": "multi_hop",
+    "mode": 3,
+    "mode_name": "embedding_mismatch",
+    "evidence": "gold doc not in top‑30 but found by keyword search (embedding mismatch)",
+    "question": "Can I get an out-patient physiotherapy session reimbursed on Bronze?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  },
+  {
+    "id": "Q26",
+    "kind": "multi_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "Is knee replacement covered immediately after I buy the policy?",
+    "answer": "No, knee joint replacement is not covered immediately, as it is subject to a 24-month waiting period unless it is required following an accident [1][5]. Claims resulting from accidental injuries are covered from day one [5]."
+  },
+  {
+    "id": "Q32",
+    "kind": "aggregation",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "Which plans have no co-payment?",
+    "answer": "Aurora Gold has no co-payment (nil) at all ages [1]. Aurora Silver requires no co-payment as long as the eldest insured member is below age 60 [2]. Additionally, two of the Aurora Group Health corporate plan variants feature nil co-payment [6]."
+  },
+  {
+    "id": "Q35",
+    "kind": "aggregation",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "List everything that is excluded relating to dental treatment.",
+    "answer": "Dental treatment and oral surgery are excluded from coverage unless necessitated by an accidental injury requiring hospitalisation [2]. Additionally, out-patient dental work is not covered by any plan [1]."
+  },
+  {
+    "id": "Q37",
+    "kind": "unanswerable",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "Does Aurora cover treatment in Singapore, and up to what limit?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  }
+]

@@ -15,8 +15,13 @@
 | 10–30 | §1 The boundary: what the model does and what your code does |
 | 30–50 | §2 The four resources: tokens, latency, money, reliability |
 | 50–70 | §3 The failure taxonomy — nine ways an LLM call goes wrong |
-| 70–85 | §4 Architecture of the thing you will actually build |
-| 85–90 | Lab 1 briefing |
+| 70–81 | §4 Architecture of the thing you will actually build |
+| 81–87 | §4.1 Operating it: the two caches, replay, SLOs, alerts |
+| 87–90 | Lab 1 briefing |
+
+§4.1 is new and is what Lab 7 assumes. If you are short of time it is the
+segment to cut, because the labs that need it are six weeks away — but cut it
+knowingly rather than by overrunning, and tell them it is in the notes.
 
 ---
 
@@ -324,6 +329,71 @@ Map this to the package you will use:
 | 3 | `aip.chunking`, `aip.retrieval`, `aip.rag` |
 | 2 | `aip.cache`, `aip.embed` |
 | 1 | `aip.tracing`, `aip.cost`, `aip.evals` |
+
+---
+
+### 4.1 Operating it
+
+Four things that live in layers 1 and 2, are invisible in a notebook, and are
+the whole of Lab 7.
+
+**Two caches, and only one of them is safe.**
+
+| Layer | Key | Hit rate | Can it be wrong? |
+|---|---|---|---|
+| Exact response cache | hash of the normalised request | 15–30% | **No.** A hit is the same request |
+| Semantic cache | embedding of the question, cosine ≥ threshold | +10–20% | **Yes** |
+
+The semantic cache is the feature most likely to break your system silently.
+
+```
+"What is the waiting period on Gold?"      cosine ~ 0.97
+"What is the waiting period on Silver?"  <- different answer
+```
+
+Below the safe threshold it returns a confident, well-cited, **fast** answer to
+a question nobody asked. Latency improves. Cost improves. Correctness quietly
+falls and nothing errors. **The threshold is the deliverable, not the feature** —
+sweep it, find where wrong hits begin, and report it. It is lower than people
+assume. Mitigations: raise it and accept fewer hits, or key on the question plus
+its filters so two plan names can never collide.
+
+**Offline replay.** `AIP_OFFLINE=1` makes every model call read from a committed
+cache and fail loudly rather than hit the network. It buys three things: CI needs
+no API key and costs nothing, so running the eval on every push is realistic
+rather than aspirational; the eval is deterministic, so a red build means your
+code changed and not that the model had an off day; and a grader can reproduce
+your numbers from a clean clone. The cost is that **the cache is part of the
+artefact** — commit it and keep it current. Note what it does *not* prove:
+that the provider still behaves that way. Different question, also worth asking.
+
+**Percentiles, and what an SLO is.** p50 is the median; **p95** is what 95% of
+requests come in under. Latency distributions are long-tailed — a repair retry,
+a rate-limit backoff, a cache miss — so a mean of 900 ms with a p95 of 6 s is a
+system that feels broken to one user in twenty, and the mean cannot see them.
+
+An **SLO** is a threshold you commit to on a percentile: *"p95 under 6 s,
+uncached"*. It is a promise, not a measurement, and it is what both an alert and
+a regression gate are defined against. Quote cached and uncached **separately** —
+they are different systems, and a blended figure lets a high hit rate hide a slow
+cold path.
+
+**Alerts, and the one worth having.** An alert with no action attached is
+ignored within a week. Three candidates:
+
+| Alert | Catches | Weakness |
+|---|---|---|
+| p95 above SLO for 5 min | Slow provider, bad deploy | The 5 minutes matter; one slow request is not an incident |
+| Cost per hour above budget | Runaway loops, retry storms | Lags — the damage is done |
+| **Refusal rate doubling** | **A broken or stale index** | Also fires on an odd traffic day |
+
+The third is the interesting one. A broken index throws no errors, raises no
+latency and costs no more. It quietly stops finding things — and a correctly
+built RAG system responds by **declining**. The refusal rate is where a silent
+data failure becomes visible, and watching it is free.
+
+> The general principle: the best alerts watch the **symptom a system produces
+> when it fails silently**, not the failures it already logs.
 
 ---
 

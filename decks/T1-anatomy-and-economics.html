@@ -537,8 +537,8 @@ const SLIDES = [
 /* 11 ----------------------------------------------------------------- */
 { t:"Cost calculator", cls:"tight", html:`
   <h2>Do this arithmetic in your head</h2>
-  <p class="sub">Move the sliders. This is the calculation that separates an engineer from a demo-builder.</p>
-  <div class="rule"></div>
+  <p class="sub" style="margin-bottom:6px">Move the sliders. This is the calculation that separates an engineer from a demo-builder.</p>
+  <div class="rule" style="margin-bottom:8px"></div>
   <div class="calc">
     <div>
       <div class="ctl"><label>Requests per day <b id="v_req">10,000</b></label>
@@ -739,6 +739,60 @@ const SLIDES = [
   the interesting layer. The wins are in 2 and 3.` },
 
 /* 20 ----------------------------------------------------------------- */
+{ t:"Two caches", cls:"tight", html:`
+  <h2>Two caches, and only one of them is safe</h2>
+  <p class="sub">Layer 2. Invisible in a notebook; the thing most likely to break Lab 7.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <table>
+    <tr><td><b>Exact response cache</b><br><span class="tiny">hash of the normalised request</span></td>
+        <td>15–30% hits</td><td><b>Cannot be wrong.</b><br>A hit is the same request</td></tr>
+    <tr><td><b>Semantic cache</b><br><span class="tiny">embedding, cosine ≥ threshold</span></td>
+        <td>+10–20%</td><td><b>Can be wrong</b>, and silently</td></tr>
+  </table>
+  <p class="mono small" style="margin:14px 0">"waiting period on <b>Gold</b>?"
+     &nbsp;vs&nbsp; "on <b>Silver</b>?" &nbsp;→&nbsp; cosine ~ 0.97, different answers</p>
+  <div class="pull"><p>Below the safe threshold it returns a confident, well-cited,
+    <b>fast</b> answer to a question nobody asked. Latency improves. Cost improves.
+    Correctness quietly falls, and nothing errors.</p></div>
+  <p class="small frag" style="margin-top:14px"><b>The threshold is the deliverable,
+     not the feature.</b> Sweep it, find where wrong hits begin, report it — it is
+     lower than people assume.</p>`,
+  notes:`<b>2 minutes, and do not skip this.</b> It is the most dangerous feature in
+  Lab 7, and the failure mode is one they now recognise: nothing errors, two metrics
+  <em>improve</em>, and the number that matters quietly falls. Same shape as the
+  cascade bug in Lab 2 and the truncated judge in Lab 4.
+  <br><br>The 0.95 in the Lab 7 starter is reasoned, not swept, and the comment in the
+  file says so. Sweeping it is their job.` },
+
+/* --------------------------------------------------------------------- */
+{ t:"Replay, SLOs, alerts", html:`
+  <h2>Three more things a notebook never makes you build</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="margin-top:14px">
+    <div class="card"><h4>Offline replay</h4>
+      <p class="small" style="margin:0">Committed cache, no network. CI needs no API
+      key and costs nothing; the eval is deterministic, so a red build means your
+      code changed; a grader reproduces you from a clean clone. <b>The cache is part
+      of the artefact.</b></p></div>
+    <div class="card"><h4>SLOs</h4>
+      <p class="small" style="margin:0">A promise on a percentile —
+      <span class="mono">p95 under 6 s, uncached</span>. Quote cached and uncached
+      <b>separately</b>, or a high hit rate hides a slow cold path.</p></div>
+  </div>
+  <p class="small frag" style="margin-top:16px"><b>The alert worth having: refusal
+     rate doubling.</b> A broken index throws no errors, adds no latency and costs no
+     more. It just quietly stops finding things — and a correctly built RAG system
+     responds by declining.</p>
+  <div class="pull frag" style="margin-top:14px"><p>The best alerts watch the
+    <b>symptom a system produces when it fails silently</b>, not the failures it
+    already logs.</p></div>`,
+  notes:`<b>2 minutes.</b> On the refusal alert, ask them directly: what does a broken
+  index look like in your monitoring? Errors? No. Latency? No. Cost? No. That is why
+  it earns a slide.
+  <br><br>Offline replay is what makes the Lab 7 CI gate realistic rather than
+  aspirational — and it is why the module commits its cache.` },
+
+/* --------------------------------------------------------------------- */
 { t:"Lab 1 briefing", cls:"tight", html:`
   <h2>Lab 1 — The Reliable Extractor</h2>
   <p class="sub">Next session · 3 hours · individual</p>

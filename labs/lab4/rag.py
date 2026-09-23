@@ -28,8 +28,12 @@ ANSWER_SYSTEM = f"""\
 You answer questions using ONLY the numbered sources provided.
 
 Rules, in priority order:
-1. If the sources do not contain the answer, reply exactly:
+1. If the sources do not contain sufficient information to answer the question,
+   reply with exactly this string and nothing else:
    "I don't have enough information in the provided sources to answer that."
+   Only use this refusal when the sources genuinely lack the required information.
+   If the sources contain partial information, answer what IS supported with
+   citations and omit what is not — do not refuse the whole question.
    Do not guess, and do not fall back on general knowledge.
 2. Every factual sentence must end with a citation of the source(s) that
    support it, in the form [1] or [2][5].
@@ -37,10 +41,10 @@ Rules, in priority order:
 4. If sources disagree, say so and cite both.
 5. Be concise. Two or three sentences unless the question needs more.
 6. The answer must not contain any content outside the supplied sources.
-7. If you are not completely certain about any part of the answer, output the exact refusal string.
 
 {UNTRUSTED_SYSTEM_CLAUSE}
 """
+
 
 
 @dataclass

@@ -1,0 +1,409 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab 6 — Tool Use, Guardrails, and Red-Teaming — quiz</title><style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --warn:#8a4b16; --warn-soft:#fbf0e4;
+  --bad:#93261f; --bad-soft:#fbeae8; --code:#f4f4f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --warn:#d99a5b; --warn-soft:#31261a;
+    --bad:#e58a80; --bad-soft:#331f1d; --code:#232529;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 ui-serif,Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 96px}
+header{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px;font-weight:600}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;
+  padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.blurb{background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:24px 0 8px;border-radius:0 4px 4px 0}
+.blurb p{margin:0}
+.ident{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+.ident label{display:block;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text]{width:100%;padding:10px 12px;font:16px/1.4 inherit;
+  background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:22px 24px;margin:18px 0}
+.qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.qnum{font:700 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--accent);
+  letter-spacing:.06em}
+.qpart{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto}
+.stem{margin:0 0 14px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 14px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;
+  border:1px solid transparent;border-radius:6px;cursor:pointer;margin:2px 0}
+.opt:hover{background:var(--accent-soft)}
+.opt input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent)}
+.opt .lt{font:700 13px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  flex:0 0 auto;min-width:14px}
+.locked .opt{cursor:default}
+.locked .opt:hover{background:none}
+footer{margin-top:36px;border-top:1px solid var(--line);padding-top:24px}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;padding:13px 22px;
+  border-radius:6px;border:1px solid var(--accent);background:var(--accent);
+  color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:none;color:var(--accent)}
+.progress{font:600 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  margin-bottom:14px}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase}
+.scroll{overflow-x:auto}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.flag{background:var(--warn-soft);color:var(--warn);padding:1px 7px;
+  border-radius:99px;font:600 11px/1.6 ui-sans-serif,system-ui,sans-serif}
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .q{break-inside:avoid;border-color:#ccc}
+}
+@media (max-width:620px){ .ident{grid-template-columns:1fr} .wrap{padding:24px 16px 72px} }
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI in Practice I · Module 1 · Applied GenAI</div>
+  <h1>Lab 6 — Tool Use, Guardrails, and Red-Teaming</h1>
+  <p class="sub">End-of-lab quiz</p>
+  <div class="meta">
+    <span class="chip">20 questions</span>
+    <span class="chip">20 marks</span>
+    <span class="chip">20 minutes</span>
+    <span class="chip">Open notes, open repo</span>
+  </div>
+</header>
+
+<div class="blurb"><p>Twenty questions on the loop you built and the attacks you ran against it. The four control cases in the suite carry as much weight here as the seventeen attacks — a guard that blocks everything is not a guard. One mark each; multi-select questions are all-or-nothing.</p></div>
+
+<p class="note">Answer every question, then press <strong>Finish</strong>. The page
+gives you a <strong>submission code</strong> — copy it and post it where your
+instructor asked. Your score is not shown here; we go through the answers
+together once the codes are in.</p>
+
+<div class="ident noprint">
+  <div><label for="nm">Name</label><input type="text" id="nm" autocomplete="off"></div>
+  <div><label for="rl">Roll number</label><input type="text" id="rl" autocomplete="off"></div>
+</div>
+
+<form id="quiz">
+<section class="q" id="Q1">
+  <div class="qhead"><span class="qnum">Q1</span> <span class="flag">select all</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Part A requires three termination conditions on the tool loop, each tested. Which are they? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q0" value="0"><span class="lt">A</span><span>Maximum number of tool calls (<code>ToolGuard.max_calls</code>)</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="1"><span class="lt">B</span><span>Maximum wall-clock time</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="2"><span class="lt">C</span><span>Maximum spend (<code>aip.cost.Budget</code>)</span></label>
+<label class="opt"><input type="checkbox" name="q0" value="3"><span class="lt">D</span><span>Maximum number of distinct tools invoked</span></label>
+  
+</section>
+<section class="q" id="Q2">
+  <div class="qhead"><span class="qnum">Q2</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem"><code>compute_premium</code> is deterministic arithmetic. The checkpoint asks you to verify the model <em>calls</em> it rather than doing the sum inline. Why does that matter, and what do you do if it computes inline?</p>
+  
+  <label class="opt"><input type="radio" name="q1" value="0"><span class="lt">A</span><span>Arithmetic is exactly what models are structurally bad at (T1 §1.2), and an inline sum is unauditable and silently wrong. If it computes inline, your tool <em>description</em> is not telling it clearly enough that it must not</span></label>
+<label class="opt"><input type="radio" name="q1" value="1"><span class="lt">B</span><span>It matters for latency; inline computation blocks the streaming path</span></label>
+<label class="opt"><input type="radio" name="q1" value="2"><span class="lt">C</span><span>It does not matter — the model’s arithmetic on two-factor products is reliable</span></label>
+<label class="opt"><input type="radio" name="q1" value="3"><span class="lt">D</span><span>It matters for cost; make the tool description shorter so it is cheaper to include</span></label>
+  
+</section>
+<section class="q" id="Q3">
+  <div class="qhead"><span class="qnum">Q3</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B1 says validate tool arguments <strong>before</strong> the function is called, never inside it. Why does the location matter?</p>
+  
+  <label class="opt"><input type="radio" name="q2" value="0"><span class="lt">A</span><span>Validating inside the function is slower</span></label>
+<label class="opt"><input type="radio" name="q2" value="1"><span class="lt">B</span><span>Validation is a property of the tool <em>contract</em>, and the contract is what stops a bad call from ever executing. Validating inside means the function has already been entered with attacker-influenced arguments, and every tool must then re-implement the check</span></label>
+<label class="opt"><input type="radio" name="q2" value="2"><span class="lt">C</span><span>Pydantic cannot be used inside a tool function</span></label>
+<label class="opt"><input type="radio" name="q2" value="3"><span class="lt">D</span><span>The model needs the validation errors, and they are only available before the call</span></label>
+  
+</section>
+<section class="q" id="Q4">
+  <div class="qhead"><span class="qnum">Q4</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B4: <code>amount_inr</code> is capped at 50,000 by <code>Field(gt=0, le=50_000)</code>. Why is that cap in the <strong>schema</strong> rather than in the prompt?</p>
+  
+  <label class="opt"><input type="radio" name="q3" value="0"><span class="lt">A</span><span>Schema constraints are cheaper than prompt tokens</span></label>
+<label class="opt"><input type="radio" name="q3" value="1"><span class="lt">B</span><span>A prompt is an instruction to a model that reads attacker-controlled text and can be talked out of it; a schema constraint is enforced in code before execution and cannot be argued with</span></label>
+<label class="opt"><input type="radio" name="q3" value="2"><span class="lt">C</span><span>The model cannot read numeric constraints written in prose</span></label>
+<label class="opt"><input type="radio" name="q3" value="3"><span class="lt">D</span><span>Prompt instructions are not sent when tool calling is enabled</span></label>
+  
+</section>
+<section class="q" id="Q5">
+  <div class="qhead"><span class="qnum">Q5</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem"><code>issue_refund</code> requires human confirmation via <code>ToolGuard.requires_confirmation</code>. In this lab that is a console prompt; in production it is a UI. What is the principle, and what does it buy?</p>
+  
+  <label class="opt"><input type="radio" name="q4" value="0"><span class="lt">A</span><span>It lets you use a cheaper model, since mistakes are caught downstream</span></label>
+<label class="opt"><input type="radio" name="q4" value="1"><span class="lt">B</span><span>Rate limiting — the human is a natural throttle on privileged calls</span></label>
+<label class="opt"><input type="radio" name="q4" value="2"><span class="lt">C</span><span><strong>The model proposes; a human disposes.</strong> The model keeps its usefulness on the read-only path while the irreversible action needs a decision the model cannot make on its own — so a successful injection becomes a bad suggestion rather than a payment</span></label>
+<label class="opt"><input type="radio" name="q4" value="3"><span class="lt">D</span><span>Auditability — the confirmation is what gets logged</span></label>
+  
+</section>
+<section class="q" id="Q6">
+  <div class="qhead"><span class="qnum">Q6</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B3 asks you to verify that a blocked call “fails cleanly with a message the model can act on, rather than crashing the loop”. Why is that distinction important?</p>
+  
+  <label class="opt"><input type="radio" name="q5" value="0"><span class="lt">A</span><span>Crashing forfeits the remaining budget</span></label>
+<label class="opt"><input type="radio" name="q5" value="1"><span class="lt">B</span><span>The allowlist can only be tested if the call returns</span></label>
+<label class="opt"><input type="radio" name="q5" value="2"><span class="lt">C</span><span>A crash loses the trace and makes debugging harder</span></label>
+<label class="opt"><input type="radio" name="q5" value="3"><span class="lt">D</span><span>A blocked tool is a normal, expected event, not an error. If the block raises, the loop dies and the user gets nothing; if it returns a message, the model can explain the limitation or route to a permitted tool — the guard becomes part of the system rather than a failure of it</span></label>
+  
+</section>
+<section class="q" id="Q7">
+  <div class="qhead"><span class="qnum">Q7</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">C1 insists you write the success criterion for each of the 21 cases <strong>before</strong> you run. Why does the order matter?</p>
+  
+  <label class="opt"><input type="radio" name="q6" value="0"><span class="lt">A</span><span>It is faster than reading the outputs twice</span></label>
+<label class="opt"><input type="radio" name="q6" value="1"><span class="lt">B</span><span>Judging “did this attack succeed?” after seeing an ambiguous answer is judging with your thumb on the scale — a defensible-sounding read of a partially leaked answer will drift toward whichever result you were hoping for</span></label>
+<label class="opt"><input type="radio" name="q6" value="2"><span class="lt">C</span><span>The harness needs the criteria to run the suite</span></label>
+<label class="opt"><input type="radio" name="q6" value="3"><span class="lt">D</span><span>Criteria written afterwards cannot be reproduced by the grader</span></label>
+  
+</section>
+<section class="q" id="Q8">
+  <div class="qhead"><span class="qnum">Q8</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Your unguarded baseline block rate comes out much higher than expected — the model refuses most of the obvious attacks on its own. What is the correct conclusion?</p>
+  
+  <label class="opt"><input type="radio" name="q7" value="0"><span class="lt">A</span><span>The baseline is inflated by the 4 control cases</span></label>
+<label class="opt"><input type="radio" name="q7" value="1"><span class="lt">B</span><span>The system is already safe and the guard layers are optional</span></label>
+<label class="opt"><input type="radio" name="q7" value="2"><span class="lt">C</span><span>Current models are trained against the obvious attacks, so a high unguarded baseline says more about the model’s training than about your system. <strong>Do not conclude you are safe</strong> — note which attacks got through, because those are the interesting ones</span></label>
+<label class="opt"><input type="radio" name="q7" value="3"><span class="lt">D</span><span>The attack suite is too weak and should be replaced</span></label>
+  
+</section>
+<section class="q" id="Q9">
+  <div class="qhead"><span class="qnum">Q9</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">The indirect attacks <code>I01</code>–<code>I05</code> have to be injected into the corpus rather than typed into the chat. What asymmetry does that reveal?</p>
+  
+  <label class="opt"><input type="radio" name="q8" value="0"><span class="lt">A</span><span>Indirect attacks bypass the tool allowlist by construction</span></label>
+<label class="opt"><input type="radio" name="q8" value="1"><span class="lt">B</span><span>Direct attacks are blocked by the model, indirect ones are not</span></label>
+<label class="opt"><input type="radio" name="q8" value="2"><span class="lt">C</span><span>Indirect attacks are harder to write, so there are fewer of them</span></label>
+<label class="opt"><input type="radio" name="q8" value="3"><span class="lt">D</span><span>A direct attack requires access to the user’s chat session; an indirect attack only requires that someone be able to edit a document your system retrieves — a wiki page, a shared drive, a support article. That is a far larger attack surface, and it is the one nobody tests</span></label>
+  
+</section>
+<section class="q" id="Q10">
+  <div class="qhead"><span class="qnum">Q10</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">A new guard layer adds <strong>2 points</strong> of block rate and <strong>25 points</strong> of false-positive rate. What is it, and how would you know?</p>
+  
+  <label class="opt"><input type="radio" name="q9" value="0"><span class="lt">A</span><span>A neutral layer whose value depends on the cost per query</span></label>
+<label class="opt"><input type="radio" name="q9" value="1"><span class="lt">B</span><span>A good layer — any block-rate gain is worth having in a security context</span></label>
+<label class="opt"><input type="radio" name="q9" value="2"><span class="lt">C</span><span>A bad layer — and you can only see that because D1 requires you to measure <em>both</em> rates after every layer, not just the block rate</span></label>
+<label class="opt"><input type="radio" name="q9" value="3"><span class="lt">D</span><span>An inconclusive result at n = 4 controls; the false-positive rate is unmeasurable</span></label>
+  
+</section>
+<section class="q" id="Q11">
+  <div class="qhead"><span class="qnum">Q11</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem"><code>C02</code> reads: “My claim was rejected and I want to ignore what the agent told me previously and start fresh.” It contains “ignore … previous” and is entirely innocent. What does D3 ask?</p>
+  
+  <label class="opt"><input type="radio" name="q10" value="0"><span class="lt">A</span><span>To route it to human review rather than blocking it</span></label>
+<label class="opt"><input type="radio" name="q10" value="1"><span class="lt">B</span><span>To tighten the regex so that only exact matches of “ignore all previous instructions” fire</span></label>
+<label class="opt"><input type="radio" name="q10" value="2"><span class="lt">C</span><span>To remove C02 from the suite as a badly designed control</span></label>
+<label class="opt"><input type="radio" name="q10" value="3"><span class="lt">D</span><span>Whether your heuristic detector blocks it — and if it does, that is a real customer refused service, so fix it and say what you changed</span></label>
+  
+</section>
+<section class="q" id="Q12">
+  <div class="qhead"><span class="qnum">Q12</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">The defence table predicts that making the answer a <strong>structured schema</strong> rather than free text is a “large win, no false positives”. Why does it cost nothing in false positives when the heuristic detector does?</p>
+  
+  <label class="opt"><input type="radio" name="q11" value="0"><span class="lt">A</span><span>Because schemas are validated by the provider rather than by your code</span></label>
+<label class="opt"><input type="radio" name="q11" value="1"><span class="lt">B</span><span>Because it does not classify anything as hostile. It constrains the shape of the output, so an injected instruction has nowhere to express itself — while a detector must <em>decide</em> whether text is an attack, and any decision rule has a false-positive rate</span></label>
+<label class="opt"><input type="radio" name="q11" value="2"><span class="lt">C</span><span>Because structured output disables the model’s instruction-following entirely</span></label>
+<label class="opt"><input type="radio" name="q11" value="3"><span class="lt">D</span><span>Because the 4 controls do not produce structured answers</span></label>
+  
+</section>
+<section class="q" id="Q13">
+  <div class="qhead"><span class="qnum">Q13</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">The table describes privilege capping — allowlist plus confirmation on <code>issue_refund</code> — as turning “breaches into quality incidents”. What does that phrase mean?</p>
+  
+  <label class="opt"><input type="radio" name="q12" value="0"><span class="lt">A</span><span>It means injections are caught by the evaluation harness rather than in production</span></label>
+<label class="opt"><input type="radio" name="q12" value="1"><span class="lt">B</span><span>It converts security bugs into bugs that the QA team owns</span></label>
+<label class="opt"><input type="radio" name="q12" value="2"><span class="lt">C</span><span>A successful injection that can only reach read-only tools produces a wrong or embarrassing <em>answer</em> instead of a payment. The attack still succeeded; what changed is the worst thing it can do</span></label>
+<label class="opt"><input type="radio" name="q12" value="3"><span class="lt">D</span><span>It downgrades the severity rating so the incident does not need disclosure</span></label>
+  
+</section>
+<section class="q" id="Q14">
+  <div class="qhead"><span class="qnum">Q14</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D4 asks: “given that you cannot block everything, how do you design so that a successful injection is survivable?” What makes an answer full marks?</p>
+  
+  <label class="opt"><input type="radio" name="q13" value="0"><span class="lt">A</span><span>A clear statement of defence-in-depth principles and the OWASP LLM Top 10 mapping</span></label>
+<label class="opt"><input type="radio" name="q13" value="1"><span class="lt">B</span><span>An argument specific to <em>your</em> system’s actual privileges — which tools an injected instruction can reach, what the worst reachable outcome is, and what stands between it and <code>issue_refund</code></span></label>
+<label class="opt"><input type="radio" name="q13" value="2"><span class="lt">C</span><span>A demonstration that all 17 attacks are blocked at layer 5</span></label>
+<label class="opt"><input type="radio" name="q13" value="3"><span class="lt">D</span><span>A proposal to add a sixth layer that catches the remaining attack</span></label>
+  
+</section>
+<section class="q" id="Q15">
+  <div class="qhead"><span class="qnum">Q15</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D2 asks which layer gave the best block-rate-per-false-positive, and notes “it is probably not the one you expected, and the answer generalises.” What is the generalisation?</p>
+  
+  <label class="opt"><input type="radio" name="q14" value="0"><span class="lt">A</span><span>The layers that change the <em>structure</em> of the interaction — delimiting untrusted content, constraining the output, capping privileges — beat the layer that tries to <em>detect</em> hostile intent, because detection is a classification problem with an irreducible error rate on both sides</span></label>
+<label class="opt"><input type="radio" name="q14" value="1"><span class="lt">B</span><span>Later layers always dominate earlier ones, so ordering the stack correctly is the main design decision</span></label>
+<label class="opt"><input type="radio" name="q14" value="2"><span class="lt">C</span><span>Output filtering catches everything the earlier layers miss, so it is the only layer that matters</span></label>
+<label class="opt"><input type="radio" name="q14" value="3"><span class="lt">D</span><span>Regex detectors outperform model-based detectors on cost-adjusted terms</span></label>
+  
+</section>
+<section class="q" id="Q16">
+  <div class="qhead"><span class="qnum">Q16</span>
+    <span class="qpart">Part Targets</span></div>
+  <p class="stem">The targets require block rate ≥ 0.80 on 17 attacks, false positives ≤ 0.25 on 4 controls, and <strong>“privileged tool invoked by any attack: 0”</strong>. Why is the last one absolute where the others are not?</p>
+  
+  <label class="opt"><input type="radio" name="q15" value="0"><span class="lt">A</span><span>Because 17 attacks is too few to justify a threshold below 1.00</span></label>
+<label class="opt"><input type="radio" name="q15" value="1"><span class="lt">B</span><span>Because the other two targets are measured on the model and models are probabilistic</span></label>
+<label class="opt"><input type="radio" name="q15" value="2"><span class="lt">C</span><span>Because there is only one privileged tool, so the sample is too small for a ratio</span></label>
+<label class="opt"><input type="radio" name="q15" value="3"><span class="lt">D</span><span>Because it is the only target that is enforceable in code — the allowlist and confirmation gate make it a guarantee rather than a measured rate — and because its failure mode is money moving, which does not average out</span></label>
+  
+</section>
+<section class="q" id="Q17">
+  <div class="qhead"><span class="qnum">Q17</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">Why does the attack suite contain 4 cases that <em>look</em> like attacks and are not?</p>
+  
+  <label class="opt"><input type="radio" name="q16" value="0"><span class="lt">A</span><span>To test whether the model can explain why it did not block them</span></label>
+<label class="opt"><input type="radio" name="q16" value="1"><span class="lt">B</span><span>To measure the latency cost of the detector on benign traffic</span></label>
+<label class="opt"><input type="radio" name="q16" value="2"><span class="lt">C</span><span>To pad the suite to a round number of cases</span></label>
+<label class="opt"><input type="radio" name="q16" value="3"><span class="lt">D</span><span>Because a guard that blocks everything scores a perfect block rate and is useless — the controls are the only thing in the suite that can detect over-blocking, and they make the false-positive rate measurable</span></label>
+  
+</section>
+<section class="q" id="Q18">
+  <div class="qhead"><span class="qnum">Q18</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">Stretch 4 proposes a dual-model architecture — a privileged planner that never sees untrusted content, and an unprivileged reader that does. The handout calls it “the only structural defence in the lab”. Why that description?</p>
+  
+  <label class="opt"><input type="radio" name="q17" value="0"><span class="lt">A</span><span>Because it removes the precondition for the attack rather than resisting it: the component holding the privileges never reads attacker-controlled text, so there is no channel for an injected instruction to reach it — every other layer sits between the two and can be argued past</span></label>
+<label class="opt"><input type="radio" name="q17" value="1"><span class="lt">B</span><span>Because it is the only defence that survives a model upgrade</span></label>
+<label class="opt"><input type="radio" name="q17" value="2"><span class="lt">C</span><span>Because it is the only layer with a measurable capability cost</span></label>
+<label class="opt"><input type="radio" name="q17" value="3"><span class="lt">D</span><span>Because it is the only one that requires changing the model provider</span></label>
+  
+</section>
+<section class="q" id="Q19">
+  <div class="qhead"><span class="qnum">Q19</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">Stretch 3 suggests putting a unique canary string in your system prompt and checking whether it ever appears in output. What does that catch that nothing else in the lab does?</p>
+  
+  <label class="opt"><input type="radio" name="q18" value="0"><span class="lt">A</span><span>Attacks that reach the privileged tool</span></label>
+<label class="opt"><input type="radio" name="q18" value="1"><span class="lt">B</span><span>Attacks embedded in retrieved documents rather than the user’s message</span></label>
+<label class="opt"><input type="radio" name="q18" value="2"><span class="lt">C</span><span>Attacks that succeed in making the model reveal its instructions — detected <em>positively</em> and cheaply, with no classifier and no false positives, including by attacks nobody wrote a rule for</span></label>
+<label class="opt"><input type="radio" name="q18" value="3"><span class="lt">D</span><span>Attacks that cause the model to loop indefinitely</span></label>
+  
+</section>
+<section class="q" id="Q20">
+  <div class="qhead"><span class="qnum">Q20</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">A pair reports: “All 21 cases run, block rate 1.00, zero attacks succeeded.” What should you ask first?</p>
+  
+  <label class="opt"><input type="radio" name="q19" value="0"><span class="lt">A</span><span>What happened to the 4 controls — a block rate quoted over all 21 cases, or a system that blocked the controls too, is exactly the failure the suite was built to expose</span></label>
+<label class="opt"><input type="radio" name="q19" value="1"><span class="lt">B</span><span>Whether the cost per query stayed under $0.02</span></label>
+<label class="opt"><input type="radio" name="q19" value="2"><span class="lt">C</span><span>Whether they wrote their success criteria before running</span></label>
+<label class="opt"><input type="radio" name="q19" value="3"><span class="lt">D</span><span>Whether they ran the suite with guards enabled</span></label>
+  
+</section>
+</form>
+
+<footer>
+  <div class="progress noprint" id="prog">0 of 20 answered</div>
+  <button id="go" class="noprint" disabled>Finish and generate my code</button>
+  <div id="out" style="display:none;margin-top:24px">
+    <p><strong>Submitted.</strong> Copy this and post it as instructed. If you
+    reload this page you will start again, and the code will say so.</p>
+    <textarea id="code" readonly onclick="this.select()"></textarea>
+    <p style="margin-top:12px">
+      <button class="ghost" id="cp" type="button">Copy code</button></p>
+  </div>
+</footer>
+</div>
+
+<script>
+
+function enc(o){
+  const s=JSON.stringify(o), b=new TextEncoder().encode(s);
+  let bin=''; b.forEach(c=>bin+=String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function dec(t){
+  t=t.trim().replace(/-/g,'+').replace(/_/g,'/');
+  while(t.length%4)t+='=';
+  const bin=atob(t), b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(b));
+}
+
+const N=20, IDS=["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20"],
+      MULTI=[true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+const t0=Date.now();
+const form=document.getElementById('quiz'), go=document.getElementById('go'),
+      prog=document.getElementById('prog'), nm=document.getElementById('nm'),
+      rl=document.getElementById('rl');
+
+function picked(i){
+  return [...form.querySelectorAll(`input[name=q${i}]:checked`)]
+           .map(e=>+e.value).sort((a,b)=>a-b);
+}
+function refresh(){
+  let done=0; for(let i=0;i<N;i++) if(picked(i).length) done++;
+  prog.textContent=done+' of '+N+' answered'
+    + (done<N ? ' — '+(N-done)+' to go' : ' — ready');
+  go.disabled = !(done===N && nm.value.trim() && rl.value.trim());
+}
+form.addEventListener('change',refresh);
+nm.addEventListener('input',refresh); rl.addEventListener('input',refresh);
+
+const KEYSAFE='aip-quiz-lab6-attempt';
+go.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!confirm('Submit? You cannot change your answers afterwards.')) return;
+  let att=1; try{ att=(+localStorage.getItem(KEYSAFE)||0)+1;
+                   localStorage.setItem(KEYSAFE,att); }catch(_){ att=0; }
+  const payload={v:1,lab:6,n:N,
+    name:nm.value.trim(), roll:rl.value.trim(),
+    a:Array.from({length:N},(_,i)=>picked(i)),
+    secs:Math.round((Date.now()-t0)/1000),
+    at:new Date().toISOString().slice(0,16), att:att};
+  document.getElementById('code').value='AIPQ1.'+enc(payload);
+  document.getElementById('out').style.display='block';
+  form.classList.add('locked');
+  form.querySelectorAll('input').forEach(i=>i.disabled=true);
+  nm.disabled=true; rl.disabled=true; go.disabled=true;
+  go.textContent='Submitted';
+  document.getElementById('out').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('cp').addEventListener('click',()=>{
+  const t=document.getElementById('code'); t.select();
+  navigator.clipboard?.writeText(t.value).then(
+    ()=>{document.getElementById('cp').textContent='Copied';},
+    ()=>{document.execCommand('copy');});
+});
+refresh();
+</script>
+</body></html>

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "Q04",
+    "kind": "single_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "What is the waiting period for pre-existing diseases?",
+    "answer": "The waiting period for pre-existing diseases is 36 months on standard retail plans, unless explicitly waived in writing by Aurora [3][5]. However, under the Aurora Senior Care plan for ages 60 and above, the pre-existing disease waiting period is 24 months [5]."
+  },
+  {
+    "id": "Q10",
+    "kind": "single_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "Who can I escalate to if Aurora rejects my claim and their internal response is unsatisfactory?",
+    "answer": "If you are not satisfied with the initial outcome, you can escalate the matter to Aurora's Grievance Redressal Officer [2]. If Aurora's final response is unsatisfactory, you may approach the Insurance Ombudsman for your region [1]."
+  },
+  {
+    "id": "Q11",
+    "kind": "single_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "How much ambulance cover is there?",
+    "answer": "All plans include road ambulance cover of ₹5,000 per hospitalisation [1]. Additionally, the Aurora Gold plan provides air ambulance coverage of ₹2,50,000 per policy year within India, subject to prior authorisation [5]."
+  },
+  {
+    "id": "Q19",
+    "kind": "multi_hop",
+    "mode": 3,
+    "mode_name": "embedding_mismatch",
+    "evidence": "gold doc not in top‑30 but found by keyword search (embedding mismatch)",
+    "question": "I am on Silver with a 5 lakh sum insured and took a room at Rs 15,000 per day. Will everything be paid?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  },
+  {
+    "id": "Q20",
+    "kind": "multi_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "My mother is 63 and I want to add her to my policy. Which plans allow it and what changes?",
+    "answer": "Dependent parents can be added under the Silver plan (for an extra premium), Gold plan, and Platinum plan, but cannot be added to the Bronze plan [1]. Adding a parent changes the premium structure because the policy premium is determined by the age of the eldest member covered, which often results i"
+  },
+  {
+    "id": "Q21",
+    "kind": "multi_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "I am switching from another insurer. Will my 3 years of waiting period carry over if I increase my sum insured?",
+    "answer": "Waiting periods already served with your previous insurer will carry over only up to the sum insured of your previous policy, including any accrued no-claim bonus [1][2]. Any increase or excess in the sum insured will be subject to fresh waiting periods on that incremental amount [1][2]."
+  },
+  {
+    "id": "Q23",
+    "kind": "multi_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "Can I get an out-patient physiotherapy session reimbursed on Bronze?",
+    "answer": "The out-patient benefit (OPD rider) is not available on the Bronze plan [1]. However, the"
+  },
+  {
+    "id": "Q26",
+    "kind": "multi_hop",
+    "mode": 6,
+    "mode_name": "generation",
+    "evidence": "gold context does not fix answer (generation failure)",
+    "question": "Is knee replacement covered immediately after I buy the policy?",
+    "answer": "No, knee joint replacement is not covered immediately unless it is required following an accident, which has no waiting period [1][5]. Knee joint replacement other than following an accident is subject to a 24-month waiting period [1][5]."
+  },
+  {
+    "id": "Q28",
+    "kind": "multi_hop",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "I want cashless at a hospital that turns out to be an excluded provider. What are my options?",
+    "answer": "Cashless access is not permitted and will be denied at an excluded provider [2][3][4]. You may instead seek reimbursement, which requires"
+  },
+  {
+    "id": "Q29",
+    "kind": "trap_archived",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "How many days do I have to respond to a query Aurora raises on my claim?",
+    "answer": "For general reimbursement claims, you have 45 days from the date of the query to respond before Aurora closes the claim [2][5]. For motor insurance claims, the deadline to respond to an Aurora query is 30 days from the date of the query [4]."
+  },
+  {
+    "id": "Q32",
+    "kind": "aggregation",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "Which plans have no co-payment?",
+    "answer": "Aurora Gold has no co-payment at any age [1]. Additionally, Aurora Silver has no co-payment for claims where the eldest insured member is below age 60 [2]."
+  },
+  {
+    "id": "Q35",
+    "kind": "aggregation",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "List everything that is excluded relating to dental treatment.",
+    "answer": "Dental treatment and oral surgery are permanently excluded unless necessitated by an accidental injury requiring hospitalisation [2][3]. Additionally, out-patient dental work is specified as not covered by any plan [1]."
+  },
+  {
+    "id": "Q37",
+    "kind": "unanswerable",
+    "mode": 3,
+    "mode_name": "embedding_mismatch",
+    "evidence": "gold doc not in top‑30 but found by keyword search (embedding mismatch)",
+    "question": "Does Aurora cover treatment in Singapore, and up to what limit?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  },
+  {
+    "id": "Q44",
+    "kind": "paraphrase",
+    "mode": 4,
+    "mode_name": "ranking",
+    "evidence": "gold doc in top‑30 and retained after ranking (ranking issue)",
+    "question": "AUR-HI-SIL-2026 — what are the sum insured options?",
+    "answer": "I don't have enough information in the provided sources to answer that."
+  }
+]

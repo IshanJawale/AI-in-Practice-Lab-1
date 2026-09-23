@@ -1,0 +1,409 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab 5 — RAG v2: Diagnose, Fix, Prove — quiz</title><style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --warn:#8a4b16; --warn-soft:#fbf0e4;
+  --bad:#93261f; --bad-soft:#fbeae8; --code:#f4f4f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --warn:#d99a5b; --warn-soft:#31261a;
+    --bad:#e58a80; --bad-soft:#331f1d; --code:#232529;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 ui-serif,Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 96px}
+header{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px;font-weight:600}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;
+  padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.blurb{background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:24px 0 8px;border-radius:0 4px 4px 0}
+.blurb p{margin:0}
+.ident{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+.ident label{display:block;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text]{width:100%;padding:10px 12px;font:16px/1.4 inherit;
+  background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:22px 24px;margin:18px 0}
+.qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.qnum{font:700 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--accent);
+  letter-spacing:.06em}
+.qpart{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto}
+.stem{margin:0 0 14px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 14px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;
+  border:1px solid transparent;border-radius:6px;cursor:pointer;margin:2px 0}
+.opt:hover{background:var(--accent-soft)}
+.opt input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent)}
+.opt .lt{font:700 13px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  flex:0 0 auto;min-width:14px}
+.locked .opt{cursor:default}
+.locked .opt:hover{background:none}
+footer{margin-top:36px;border-top:1px solid var(--line);padding-top:24px}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;padding:13px 22px;
+  border-radius:6px;border:1px solid var(--accent);background:var(--accent);
+  color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:none;color:var(--accent)}
+.progress{font:600 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  margin-bottom:14px}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase}
+.scroll{overflow-x:auto}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.flag{background:var(--warn-soft);color:var(--warn);padding:1px 7px;
+  border-radius:99px;font:600 11px/1.6 ui-sans-serif,system-ui,sans-serif}
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .q{break-inside:avoid;border-color:#ccc}
+}
+@media (max-width:620px){ .ident{grid-template-columns:1fr} .wrap{padding:24px 16px 72px} }
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI in Practice I · Module 1 · Applied GenAI</div>
+  <h1>Lab 5 — RAG v2: Diagnose, Fix, Prove</h1>
+  <p class="sub">End-of-lab quiz</p>
+  <div class="meta">
+    <span class="chip">20 questions</span>
+    <span class="chip">20 marks</span>
+    <span class="chip">20 minutes</span>
+    <span class="chip">Open notes, open repo</span>
+  </div>
+</header>
+
+<div class="blurb"><p>Twenty questions on the diagnosis you just performed. This lab is graded on process, not on the sign of your delta — and so is this quiz. Expect more than one question where the correct answer is “report that it got worse”. One mark each; multi-select questions are all-or-nothing.</p></div>
+
+<p class="note">Answer every question, then press <strong>Finish</strong>. The page
+gives you a <strong>submission code</strong> — copy it and post it where your
+instructor asked. Your score is not shown here; we go through the answers
+together once the codes are in.</p>
+
+<div class="ident noprint">
+  <div><label for="nm">Name</label><input type="text" id="nm" autocomplete="off"></div>
+  <div><label for="rl">Roll number</label><input type="text" id="rl" autocomplete="off"></div>
+</div>
+
+<form id="quiz">
+<section class="q" id="Q1">
+  <div class="qhead"><span class="qnum">Q1</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">The lab opens by naming the instinct it exists to replace: “bigger model, more chunks, a different embedding.” What is wrong with that approach?</p>
+  
+  <label class="opt"><input type="radio" name="q0" value="0"><span class="lt">A</span><span>It treats a wrong answer as one undifferentiated problem, when exactly one stage usually failed — so you are changing components at random with respect to the actual cause, which is how teams spend six weeks and gain two points</span></label>
+<label class="opt"><input type="radio" name="q0" value="1"><span class="lt">B</span><span>Those fixes only address modes 2 and 3</span></label>
+<label class="opt"><input type="radio" name="q0" value="2"><span class="lt">C</span><span>It violates the one-variable-at-a-time rule</span></label>
+<label class="opt"><input type="radio" name="q0" value="3"><span class="lt">D</span><span>Those changes are too expensive to justify</span></label>
+  
+</section>
+<section class="q" id="Q2">
+  <div class="qhead"><span class="qnum">Q2</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Which failure mode is confirmed by <strong>running the generator on gold context</strong>, and which way round is the test?</p>
+  
+  <label class="opt"><input type="radio" name="q1" value="0"><span class="lt">A</span><span>Mode 3 embedding mismatch — if gold context fixes it, the embedding was at fault</span></label>
+<label class="opt"><input type="radio" name="q1" value="1"><span class="lt">B</span><span>Mode 1 missing content — gold context is unavailable when the answer is not in the corpus</span></label>
+<label class="opt"><input type="radio" name="q1" value="2"><span class="lt">C</span><span>Mode 6 generation — if gold context <em>fixes</em> the answer, generation was at fault</span></label>
+<label class="opt"><input type="radio" name="q1" value="3"><span class="lt">D</span><span>Mode 6 generation — if gold context still gives the wrong answer, generation was at fault; if it fixes the answer, the problem was retrieval</span></label>
+  
+</section>
+<section class="q" id="Q3">
+  <div class="qhead"><span class="qnum">Q3</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">A failure is confirmed to be a retrieval problem. The gold chunk was <strong>not</strong> in the top 30. How do you separate mode 2 from mode 3?</p>
+  
+  <label class="opt"><input type="radio" name="q2" value="0"><span class="lt">A</span><span>Compare hit_rate@30 with hit_rate@5</span></label>
+<label class="opt"><input type="radio" name="q2" value="1"><span class="lt">B</span><span>Search for the gold chunk’s own text verbatim — if that retrieves it, the chunk is fine and the <em>query</em> is the problem (mode 3); if even its own text does not retrieve it cleanly, look at the chunk boundaries (mode 2)</span></label>
+<label class="opt"><input type="radio" name="q2" value="2"><span class="lt">C</span><span>Check whether the reranker dropped it</span></label>
+<label class="opt"><input type="radio" name="q2" value="3"><span class="lt">D</span><span>grep the corpus for the answer</span></label>
+  
+</section>
+<section class="q" id="Q4">
+  <div class="qhead"><span class="qnum">Q4</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Which check does <code>diagnose.py</code> explicitly <em>not</em> automate, and what must you do about it?</p>
+  
+  <label class="opt"><input type="radio" name="q3" value="0"><span class="lt">A</span><span>Whether the answer exists in the corpus — you must grep it yourself</span></label>
+<label class="opt"><input type="radio" name="q3" value="1"><span class="lt">B</span><span>Whether the answer straddles a chunk boundary (mode 2) — the script marks those cases <code>needs_human_check</code> and you open the chunks around the gold answer and record your judgement and your reason</span></label>
+<label class="opt"><input type="radio" name="q3" value="2"><span class="lt">C</span><span>Whether the citation is wrong (mode 7) — citations need human reading</span></label>
+<label class="opt"><input type="radio" name="q3" value="3"><span class="lt">D</span><span>Whether gold context fixes the answer — that costs a model call you must authorise</span></label>
+  
+</section>
+<section class="q" id="Q5">
+  <div class="qhead"><span class="qnum">Q5</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Your tally comes out roughly even across all seven modes. What does the checkpoint tell you?</p>
+  
+  <label class="opt"><input type="radio" name="q4" value="0"><span class="lt">A</span><span>That your pipeline is well balanced with no dominant weakness</span></label>
+<label class="opt"><input type="radio" name="q4" value="1"><span class="lt">B</span><span>That you have probably mis-classified — go back to the diagnostic tree, and check the mode-6 test in particular because it is the one people invert</span></label>
+<label class="opt"><input type="radio" name="q4" value="2"><span class="lt">C</span><span>That you need more failures before the distribution stabilises</span></label>
+<label class="opt"><input type="radio" name="q4" value="3"><span class="lt">D</span><span>That your retriever and generator are equally strong</span></label>
+  
+</section>
+<section class="q" id="Q6">
+  <div class="qhead"><span class="qnum">Q6</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">The reference tally was <strong>13 mode 6, 1 mode 4</strong> — and its Lab 4 gold-context decomposition independently gave generation-attributable loss 0.107 against retrieval-attributable 0.071. Why does that agreement matter?</p>
+  
+  <label class="opt"><input type="radio" name="q5" value="0"><span class="lt">A</span><span>It proves the mode-6 test is correctly implemented</span></label>
+<label class="opt"><input type="radio" name="q5" value="1"><span class="lt">B</span><span>It shows the retriever needs no further work at any scale</span></label>
+<label class="opt"><input type="radio" name="q5" value="2"><span class="lt">C</span><span>It means the classification can be skipped next time — the decomposition is enough</span></label>
+<label class="opt"><input type="radio" name="q5" value="3"><span class="lt">D</span><span>Two independent methods pointing the same way is corroboration: the per-case classification and the aggregate decomposition could easily have disagreed, and if they had, one of them would be wrong and worth finding out which</span></label>
+  
+</section>
+<section class="q" id="Q7">
+  <div class="qhead"><span class="qnum">Q7</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">Why does the reference tally concentrate so heavily in mode 6, and why does the handout warn that <em>your</em> tally may look completely different?</p>
+  
+  <label class="opt"><input type="radio" name="q6" value="0"><span class="lt">A</span><span>Because the corpus is small enough that retrieval rarely fails</span></label>
+<label class="opt"><input type="radio" name="q6" value="1"><span class="lt">B</span><span>Because generation is the hardest stage in every RAG system</span></label>
+<label class="opt"><input type="radio" name="q6" value="2"><span class="lt">C</span><span>Because it started from Lab 3’s <em>winning</em> retrieval configuration, so retrieval had already been optimised — a pair starting from a weaker retriever will find failures spread across modes 2–5, and that is exactly why you classify rather than copy</span></label>
+<label class="opt"><input type="radio" name="q6" value="3"><span class="lt">D</span><span>Because the judge is biased toward marking generation failures</span></label>
+  
+</section>
+<section class="q" id="Q8">
+  <div class="qhead"><span class="qnum">Q8</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">A failure is classified as <strong>mode 1, missing content</strong>. What is the fix?</p>
+  
+  <label class="opt"><input type="radio" name="q7" value="0"><span class="lt">A</span><span>There is no retrieval fix. Say so, and note what the corpus needs — the answer is simply not in the data</span></label>
+<label class="opt"><input type="radio" name="q7" value="1"><span class="lt">B</span><span>Raise final_k so more chunks reach the generator</span></label>
+<label class="opt"><input type="radio" name="q7" value="2"><span class="lt">C</span><span>Refuse the question and count it as a correct refusal</span></label>
+<label class="opt"><input type="radio" name="q7" value="3"><span class="lt">D</span><span>Hybrid retrieval, to catch the lexical form of the question</span></label>
+  
+</section>
+<section class="q" id="Q9">
+  <div class="qhead"><span class="qnum">Q9</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Part B ranks clusters by expected value. Why is the largest cluster not automatically the right target?</p>
+  
+  <label class="opt"><input type="radio" name="q8" value="0"><span class="lt">A</span><span>Large clusters usually contain misclassified cases</span></label>
+<label class="opt"><input type="radio" name="q8" value="1"><span class="lt">B</span><span>Expected value is recovery weighed against cost, latency and effort — a cluster of 9 whose fix costs 3× per query can lose to a cluster of 6 with a free fix</span></label>
+<label class="opt"><input type="radio" name="q8" value="2"><span class="lt">C</span><span>The largest cluster is usually mode 6, which cannot be fixed</span></label>
+<label class="opt"><input type="radio" name="q8" value="3"><span class="lt">D</span><span>Fixing the largest cluster tends to cause regressions elsewhere</span></label>
+  
+</section>
+<section class="q" id="Q10">
+  <div class="qhead"><span class="qnum">Q10</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">You must state a prediction — “I expect this to recover N of the M failures in this cluster” — <em>before</em> implementing. What is and is not penalised?</p>
+  
+  <label class="opt"><input type="radio" name="q9" value="0"><span class="lt">A</span><span>Only the direction matters, not the magnitude</span></label>
+<label class="opt"><input type="radio" name="q9" value="1"><span class="lt">B</span><span>The prediction is optional if the diagnosis is well evidenced</span></label>
+<label class="opt"><input type="radio" name="q9" value="2"><span class="lt">C</span><span>Being wrong is penalised; the prediction is a commitment</span></label>
+<label class="opt"><input type="radio" name="q9" value="3"><span class="lt">D</span><span>Being wrong is <strong>not</strong> penalised and is informative; <em>not predicting</em> is penalised</span></label>
+  
+</section>
+<section class="q" id="Q11">
+  <div class="qhead"><span class="qnum">Q11</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Your tally says 93% of failures are generation. Your instinct is to add an archived-document filter and widen <code>final_k</code>. What does the handout say?</p>
+  
+  <label class="opt"><input type="radio" name="q10" value="0"><span class="lt">A</span><span>Stop. Your fix and your tally disagree; either the tally wins or the tally was wrong, and you resolve that before implementing — otherwise you measure a change against a problem that is not there</span></label>
+<label class="opt"><input type="radio" name="q10" value="1"><span class="lt">B</span><span>Do it, but report it as a mode 4 fix</span></label>
+<label class="opt"><input type="radio" name="q10" value="2"><span class="lt">C</span><span>Widen final_k only, since the archived filter belongs to Lab 3</span></label>
+<label class="opt"><input type="radio" name="q10" value="3"><span class="lt">D</span><span>Do both — retrieval fixes are cheap and cannot hurt</span></label>
+  
+</section>
+<section class="q" id="Q12">
+  <div class="qhead"><span class="qnum">Q12</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Why does the lab insist on <strong>one fix at a time, measured each time</strong>?</p>
+  
+  <label class="opt"><input type="radio" name="q11" value="0"><span class="lt">A</span><span>Because the rubric awards marks per fix implemented</span></label>
+<label class="opt"><input type="radio" name="q11" value="1"><span class="lt">B</span><span>To keep the cost within the 2× budget</span></label>
+<label class="opt"><input type="radio" name="q11" value="2"><span class="lt">C</span><span>Because if you apply three fixes and the score moves you have learned nothing transferable — you cannot attribute the movement, and a fix that helped may be hiding one that hurt</span></label>
+<label class="opt"><input type="radio" name="q11" value="3"><span class="lt">D</span><span>Because the harness cannot evaluate combined changes</span></label>
+  
+</section>
+<section class="q" id="Q13">
+  <div class="qhead"><span class="qnum">Q13</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">The reference diagnosed 13 mode-6 failures clustering on multi_hop and aggregation, suspected the “at most three sentences” rule in <code>ANSWER_SYSTEM</code>, and relaxed it. What happened?</p>
+  
+  <label class="opt"><input type="radio" name="q12" value="0"><span class="lt">A</span><span>Correctness fell 0.050 and refusal precision fell 0.089 — licensing longer multi-part answers increased the surface area for unsupported claims and made the system readier to answer where it should have declined</span></label>
+<label class="opt"><input type="radio" name="q12" value="1"><span class="lt">B</span><span>Correctness was unchanged but cost rose 30%</span></label>
+<label class="opt"><input type="radio" name="q12" value="2"><span class="lt">C</span><span>Citation validity broke, falling to 0.93</span></label>
+<label class="opt"><input type="radio" name="q12" value="3"><span class="lt">D</span><span>Correctness rose 0.06, as predicted</span></label>
+  
+</section>
+<section class="q" id="Q14">
+  <div class="qhead"><span class="qnum">Q14</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Q29–Q31 are the archived-document trap. If they are still failing at Lab 5, what is the fix?</p>
+  
+  <label class="opt"><input type="radio" name="q13" value="0"><span class="lt">A</span><span>A cross-encoder reranker, which will prefer the current document</span></label>
+<label class="opt"><input type="radio" name="q13" value="1"><span class="lt">B</span><span>A larger model tier, since the answer conflict is a reasoning problem</span></label>
+<label class="opt"><input type="radio" name="q13" value="2"><span class="lt">C</span><span>Metadata filtering at query time — essentially free, and not a retriever change at all. If you already did it in Lab 3, say so</span></label>
+<label class="opt"><input type="radio" name="q13" value="3"><span class="lt">D</span><span>Delete the archived document from the corpus</span></label>
+  
+</section>
+<section class="q" id="Q15">
+  <div class="qhead"><span class="qnum">Q15</span> <span class="flag">select all</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D2 is the regression check. Which of these are specifically called out as things to look at? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q14" value="0"><span class="lt">A</span><span>Refusal precision — better retrieval often makes a system refuse <em>less</em>, so it starts answering unanswerable questions confidently</span></label>
+<label class="opt"><input type="checkbox" name="q14" value="1"><span class="lt">B</span><span>Cost and p95 — HyDE and multi-query each add a model call per query</span></label>
+<label class="opt"><input type="checkbox" name="q14" value="2"><span class="lt">C</span><span>The question kinds that were already passing</span></label>
+<label class="opt"><input type="checkbox" name="q14" value="3"><span class="lt">D</span><span>Cohen’s κ for the judge, which drifts as answers get longer</span></label>
+  
+</section>
+<section class="q" id="Q16">
+  <div class="qhead"><span class="qnum">Q16</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D1 requires the before/after table to cover <strong>every</strong> Lab 4 metric, not just the one you targeted. Why?</p>
+  
+  <label class="opt"><input type="radio" name="q15" value="0"><span class="lt">A</span><span>Because the harness computes them all anyway</span></label>
+<label class="opt"><input type="radio" name="q15" value="1"><span class="lt">B</span><span>Because the grader needs them to reproduce your run</span></label>
+<label class="opt"><input type="radio" name="q15" value="2"><span class="lt">C</span><span>To fill out the report to three pages</span></label>
+<label class="opt"><input type="radio" name="q15" value="3"><span class="lt">D</span><span>Because a fix that improves its target while degrading something else is a trade, not a win — and reporting only the metric you aimed at is how a regression ships</span></label>
+  
+</section>
+<section class="q" id="Q17">
+  <div class="qhead"><span class="qnum">Q17</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">After your fix you re-classify the remaining failures and find several have moved from mode 3 to mode 6. Is that a new problem?</p>
+  
+  <label class="opt"><input type="radio" name="q16" value="0"><span class="lt">A</span><span>Yes — you have broken generation while fixing retrieval</span></label>
+<label class="opt"><input type="radio" name="q16" value="1"><span class="lt">B</span><span>No — it has <em>revealed</em> one that was previously masked. A question failing at retrieval never got the chance to fail at generation; fixing retrieval exposes the next weakest stage, and that is progress. Say so</span></label>
+<label class="opt"><input type="radio" name="q16" value="2"><span class="lt">C</span><span>No — mode 3 and mode 6 are the same failure counted differently</span></label>
+<label class="opt"><input type="radio" name="q16" value="3"><span class="lt">D</span><span>It is uninterpretable without re-running the gold-context decomposition</span></label>
+  
+</section>
+<section class="q" id="Q18">
+  <div class="qhead"><span class="qnum">Q18</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">Two pairs present. Pair A raised correctness by 4 points and can show exactly which failure mode they eliminated. Pair B raised it by 12 points and cannot say why. Who scores higher, and why?</p>
+  
+  <label class="opt"><input type="radio" name="q17" value="0"><span class="lt">A</span><span>Pair B, provided they report a confidence interval on the 12 points</span></label>
+<label class="opt"><input type="radio" name="q17" value="1"><span class="lt">B</span><span>Pair B — the rubric rewards outcomes and 12 points is three times the improvement</span></label>
+<label class="opt"><input type="radio" name="q17" value="2"><span class="lt">C</span><span>Pair A — the lab grades the process: diagnosis, prediction, measurement and honesty. An unexplained 12 points is not reproducible, not transferable, and may not survive the test split</span></label>
+<label class="opt"><input type="radio" name="q17" value="3"><span class="lt">D</span><span>They score the same; the rubric weights process and outcome equally</span></label>
+  
+</section>
+<section class="q" id="Q19">
+  <div class="qhead"><span class="qnum">Q19</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">You diagnose carefully, predict 5 recoveries, implement one clean fix, and measure <strong>−0.05 correctness</strong>. What is the correct thing to do with three hours gone and the report due?</p>
+  
+  <label class="opt"><input type="radio" name="q18" value="0"><span class="lt">A</span><span>Try two more fixes quickly and report whichever lands positive</span></label>
+<label class="opt"><input type="radio" name="q18" value="1"><span class="lt">B</span><span>Report the fix as neutral, since −0.05 is within noise on 45 questions</span></label>
+<label class="opt"><input type="radio" name="q18" value="2"><span class="lt">C</span><span>Revert to v1 and report the Lab 4 numbers, since v2 is worse</span></label>
+<label class="opt"><input type="radio" name="q18" value="3"><span class="lt">D</span><span>Report it: the diagnosis, the prediction, the measured −0.05, the account of why, and the next fix you would make. That is a complete, full-marks Lab 5</span></label>
+  
+</section>
+<section class="q" id="Q20">
+  <div class="qhead"><span class="qnum">Q20</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">D4 asks for the next fix you would make. The reference names one: leave the length rule alone and instead decompose multi-part questions into sub-questions at retrieval time, so each clause gets its own evidence. Why is that a better attack on the same cluster?</p>
+  
+  <label class="opt"><input type="radio" name="q19" value="0"><span class="lt">A</span><span>It raises citation validity, which the length fix damaged</span></label>
+<label class="opt"><input type="radio" name="q19" value="1"><span class="lt">B</span><span>It is cheaper — decomposition removes a model call</span></label>
+<label class="opt"><input type="radio" name="q19" value="2"><span class="lt">C</span><span>It targets the same multi_hop/aggregation cluster without licensing longer prose, so it does not re-introduce the mechanism that made v2 worse</span></label>
+<label class="opt"><input type="radio" name="q19" value="3"><span class="lt">D</span><span>It converts mode 6 failures into mode 3 failures, which are easier to fix</span></label>
+  
+</section>
+</form>
+
+<footer>
+  <div class="progress noprint" id="prog">0 of 20 answered</div>
+  <button id="go" class="noprint" disabled>Finish and generate my code</button>
+  <div id="out" style="display:none;margin-top:24px">
+    <p><strong>Submitted.</strong> Copy this and post it as instructed. If you
+    reload this page you will start again, and the code will say so.</p>
+    <textarea id="code" readonly onclick="this.select()"></textarea>
+    <p style="margin-top:12px">
+      <button class="ghost" id="cp" type="button">Copy code</button></p>
+  </div>
+</footer>
+</div>
+
+<script>
+
+function enc(o){
+  const s=JSON.stringify(o), b=new TextEncoder().encode(s);
+  let bin=''; b.forEach(c=>bin+=String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function dec(t){
+  t=t.trim().replace(/-/g,'+').replace(/_/g,'/');
+  while(t.length%4)t+='=';
+  const bin=atob(t), b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(b));
+}
+
+const N=20, IDS=["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20"],
+      MULTI=[false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false];
+const t0=Date.now();
+const form=document.getElementById('quiz'), go=document.getElementById('go'),
+      prog=document.getElementById('prog'), nm=document.getElementById('nm'),
+      rl=document.getElementById('rl');
+
+function picked(i){
+  return [...form.querySelectorAll(`input[name=q${i}]:checked`)]
+           .map(e=>+e.value).sort((a,b)=>a-b);
+}
+function refresh(){
+  let done=0; for(let i=0;i<N;i++) if(picked(i).length) done++;
+  prog.textContent=done+' of '+N+' answered'
+    + (done<N ? ' — '+(N-done)+' to go' : ' — ready');
+  go.disabled = !(done===N && nm.value.trim() && rl.value.trim());
+}
+form.addEventListener('change',refresh);
+nm.addEventListener('input',refresh); rl.addEventListener('input',refresh);
+
+const KEYSAFE='aip-quiz-lab5-attempt';
+go.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!confirm('Submit? You cannot change your answers afterwards.')) return;
+  let att=1; try{ att=(+localStorage.getItem(KEYSAFE)||0)+1;
+                   localStorage.setItem(KEYSAFE,att); }catch(_){ att=0; }
+  const payload={v:1,lab:5,n:N,
+    name:nm.value.trim(), roll:rl.value.trim(),
+    a:Array.from({length:N},(_,i)=>picked(i)),
+    secs:Math.round((Date.now()-t0)/1000),
+    at:new Date().toISOString().slice(0,16), att:att};
+  document.getElementById('code').value='AIPQ1.'+enc(payload);
+  document.getElementById('out').style.display='block';
+  form.classList.add('locked');
+  form.querySelectorAll('input').forEach(i=>i.disabled=true);
+  nm.disabled=true; rl.disabled=true; go.disabled=true;
+  go.textContent='Submitted';
+  document.getElementById('out').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('cp').addEventListener('click',()=>{
+  const t=document.getElementById('code'); t.select();
+  navigator.clipboard?.writeText(t.value).then(
+    ()=>{document.getElementById('cp').textContent='Copied';},
+    ()=>{document.execCommand('copy');});
+});
+refresh();
+</script>
+</body></html>

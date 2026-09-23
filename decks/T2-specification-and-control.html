@@ -752,6 +752,70 @@ class WithCitation(BaseModel):
   sentence: <b>design so that the thing you cannot block is survivable.</b>` },
 
 /* 24 ----------------------------------------------------------------- */
+{ t:"The two layers we skipped", cls:"tight", html:`
+  <h2>Lab 6 layers five, not three</h2>
+  <p class="sub">The two above are the strongest. These two are what you will spend
+     your time tuning.</p>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="grid2">
+    <div class="card"><h4>4 · Heuristic detection</h4>
+      <p class="small" style="margin:0">Regex over <em>retrieved</em> content —
+      <span class="mono">ignore previous instructions</span>,
+      <span class="mono">you are now</span>. This is a <b>classifier</b>, so it has
+      two error rates, and this is where your false positives come from.</p></div>
+    <div class="card"><h4>5 · Output filtering</h4>
+      <p class="small" style="margin:0">Check the answer before it leaves: your system
+      prompt, a URL you did not supply, PII, a canary. The only layer that catches
+      <b>exfiltration</b> — where the attack succeeds silently.</p></div>
+  </div>
+  <p class="small" style="margin-top:14px">Ordinary English contains those words. A
+     customer writing <em>"I want to ignore what the agent told me previously and
+     start fresh"</em> is not attacking you — and a system that refuses them has
+     failed, differently but just as badly.</p>
+  <div class="pull" style="margin-top:14px"><p><b>Constraints have no false positives.
+    Classifiers do.</b> Layer 2 never decides whether anything is hostile — it says
+    "return these six fields", so an injected instruction has nowhere to go, and it
+    never refuses a real customer because it is not judging intent.</p></div>`,
+  notes:`<b>2 minutes.</b> The pull quote is the transferable line and it is worth
+  saying twice. It is Lab 1 Part C again — move the work out of the model's judgement
+  wherever the problem admits a mechanical answer — arriving in a security context.
+  <br><br>The innocent message is a real control case in Lab 6's suite (C02). They
+  will trip over it.` },
+
+/* --------------------------------------------------------------------- */
+{ t:"Both rates, always", html:`
+  <h2>You cannot measure a guard with one number</h2>
+  <div class="rule"></div>
+  <p>A guard that blocks everything scores a <b>perfect block rate</b> and is useless.</p>
+  <pre>block rate          = attacks blocked  / attacks     &lt;- want high
+false-positive rate = innocent blocked / innocent    &lt;- want low</pre>
+  <p class="small">Lab 6's suite is 21 cases: <b>17 attacks and 4 controls</b> —
+     innocent messages that look like attacks. The controls are the only thing that
+     can detect over-blocking. Measure both <b>after every layer</b>: one that adds
+     2 points of block rate and 25 points of false positives is a bad layer, and you
+     can only see that if you tracked both.</p>
+  <p class="small frag" style="margin-top:12px">Same shape as precision and recall,
+     quality and cost, dev and test. <b>One-sided measurement makes a broken system
+     look good.</b></p>
+  <div class="grid3 frag" style="margin-top:14px">
+    <div class="card"><h4>Canary token</h4>
+      <p class="tiny" style="margin:0">A unique string in the system prompt. Fires on
+      attacks nobody wrote a rule for, with essentially zero false positives.</p></div>
+    <div class="card"><h4>Dual-model</h4>
+      <p class="tiny" style="margin:0">Privileged planner that never reads untrusted
+      text. The only <em>structural</em> defence — and it costs capability.</p></div>
+    <div class="card"><h4>OWASP LLM Top 10</h4>
+      <p class="tiny" style="margin:0">The vocabulary a security team uses.
+      <span class="mono">aip/guards.py</span> maps its controls in the docstring.</p></div>
+  </div>`,
+  notes:`<b>2 minutes.</b> Land the one-sided-measurement point hard — it is the
+  fourth time in the module they have met it, and naming the repetition is what makes
+  it stick.
+  <br><br>Canary tokens are the crowd-pleaser: a detector with no false-positive rate,
+  because the string exists nowhere else. Same family as numbered citations in Lab 4 —
+  design so a class of failure becomes mechanically observable.` },
+
+/* --------------------------------------------------------------------- */
 { t:"Check yourself", html:`
   <h2>Check yourself</h2>
   <p class="sub">Six questions. If you can answer them, you can start Lab 1.</p>

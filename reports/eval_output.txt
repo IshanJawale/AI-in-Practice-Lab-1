@@ -1,0 +1,19 @@
+  embedded 64/235 (9772 ms/batch)  embedded 128/235 (2552 ms/batch)  embedded 192/235 (3054 ms/batch)  embedded 235/235 (1949 ms/batch)
+
+n = 45  (40 answerable, 5 unanswerable)
+citation validity   1.000   (target 1.000)
+faithfulness        1.000
+correctness (0-2)   1.775  normalised 0.887
+refusal recall      1.000   (5/5)
+refusal precision   0.833   (6 refusals total)
+
+[lab4-full] calls=180 (cache hits 0%) tokens=107139in/33901out cost=$0.2071 latency p50=2559ms p95=4794ms
+
+by question kind (mean correctness / 2):
+  aggregation      0.750  n=4
+  multi_hop        0.800  n=10
+  paraphrase       1.000  n=5
+  single_hop       0.917  n=18
+  trap_archived    1.000  n=3
+
+saved -> D:\Drive E\Ishan\Plaksha\AI in Practice\Lab 1\AI-in-Practice-Lab\aip-lab1\reports\lab5_before_after.json   (Lab 5 reads this file)
