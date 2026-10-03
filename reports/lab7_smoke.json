@@ -1,0 +1,180 @@
+{
+  "metrics": {
+    "correctness": 0.875,
+    "faithfulness": 1.0,
+    "citation_validity": 1.0,
+    "refusal_recall": 0.0,
+    "refusal_precision": 1.0,
+    "hit_rate_at_5": 1.0,
+    "cost_per_query_usd": 0.0019233375,
+    "p95_latency_ms": 3099.0001999677716
+  },
+  "run": {
+    "p50_latency_ms": 2938.9662000860644,
+    "n": 4,
+    "n_answerable": 4,
+    "n_unanswerable": 0,
+    "n_refusals": 0,
+    "final_k": 10,
+    "dropped_doc": null,
+    "wall_seconds": 17.0,
+    "offline": "0"
+  },
+  "rows": [
+    {
+      "id": "Q01",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "You must submit a standard reimbursement claim within 30 days of discharge [1][2]. However, for group corporate plans, the submission window is 60 days from discharge [5]. (An archived 2024 timeline previously specified 15 days from discharge [3].)",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-process",
+        "claims-timelines",
+        "claims-timelines-2024-ARCHIVED",
+        "claims-process",
+        "group-corporate-plans",
+        "claims-process",
+        "hospital-cash-benefit",
+        "claims-timelines-2024-ARCHIVED",
+        "claims-timelines",
+        "claims-process"
+      ],
+      "relevant": [
+        "claims-timelines",
+        "claims-process"
+      ],
+      "cost_usd": 0.00202545,
+      "latency_ms": 2691.8123999025674,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.77,
+        "retrieve": 2.18,
+        "rerank": 0.01,
+        "generate": 10934.07,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2687.7623999025673
+    },
+    {
+      "id": "Q02",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "The room rent limit on the Silver plan is 2% of the sum insured per day [3][4].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "topup-and-super-topup",
+        "plans-overview",
+        "plan-silver",
+        "plans-overview",
+        "plan-silver",
+        "plan-silver",
+        "plan-gold",
+        "plan-bronze",
+        "plan-silver",
+        "group-corporate-plans"
+      ],
+      "relevant": [
+        "plan-silver",
+        "plans-overview"
+      ],
+      "cost_usd": 0.00142455,
+      "latency_ms": 1945.9561999530345,
+      "stages_ms": {
+        "guard_in": 0.02,
+        "embed": 3.16,
+        "retrieve": 0.25,
+        "rerank": 0.01,
+        "generate": 10185.96,
+        "validate": 0.13
+      },
+      "llm_latency_ms": 1942.3861999530345
+    },
+    {
+      "id": "Q03",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "No, maternity is not covered on the Bronze plan at any sum insured [1][2].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "maternity-benefits",
+        "plan-bronze",
+        "maternity-benefits",
+        "health-faq-general",
+        "plans-overview",
+        "plan-bronze",
+        "maternity-benefits",
+        "dependents-and-family-floater",
+        "group-corporate-plans",
+        "maternity-benefits"
+      ],
+      "relevant": [
+        "maternity-benefits",
+        "plan-bronze"
+      ],
+      "cost_usd": 0.0019334999999999999,
+      "latency_ms": 3099.0001999677716,
+      "stages_ms": {
+        "guard_in": 0.02,
+        "embed": 4.25,
+        "retrieve": 0.16,
+        "rerank": 0.01,
+        "generate": 11337.06,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3094.5101999677718
+    },
+    {
+      "id": "Q04",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "For standard retail, Top-Up, Super Top-Up, and Hospital Cash Benefit plans, the waiting period for pre-existing diseases is 36 months [5][7][9][10]. Under the Aurora Senior Care plan for ages 60 and above, the waiting period is reduced to 24 months [5].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "pre-existing-conditions",
+        "exclusions",
+        "pre-existing-conditions",
+        "pre-existing-conditions",
+        "senior-citizen-plan",
+        "pre-existing-conditions",
+        "topup-and-super-topup",
+        "pre-existing-conditions",
+        "pre-existing-conditions",
+        "hospital-cash-benefit"
+      ],
+      "relevant": [
+        "pre-existing-conditions"
+      ],
+      "cost_usd": 0.00230985,
+      "latency_ms": 2938.9662000860644,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.68,
+        "retrieve": 0.21,
+        "rerank": 0.01,
+        "generate": 11175.83,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2936.9762000860646
+    }
+  ]
+}

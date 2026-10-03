@@ -1,0 +1,29 @@
+name: eval-gate
+
+# Runs the golden-set regression gate on every push.
+# AIP_OFFLINE=1 means it replays the committed response cache: no API key,
+# no cost, and deterministic results. Commit .aip_cache/calls.sqlite3.
+
+on: [push, pull_request]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Regression gate
+        env:
+          AIP_OFFLINE: "1"
+          AIP_PROFILE: gemini
+        run: python labs/lab7/gate.py --config labs/lab7/thresholds.yml
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: reports/

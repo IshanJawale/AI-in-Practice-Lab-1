@@ -2,6 +2,10 @@
 
 *Read this before `README.md`. It is the map; the README is the terrain.*
 
+> Keep [`CONCEPTS.md`](CONCEPTS.md) open beside your editor while you work —
+> every concept the lab uses, what it is, where it sits in the code, and
+> where it came from in the theory.
+
 ---
 
 ## The one-sentence version

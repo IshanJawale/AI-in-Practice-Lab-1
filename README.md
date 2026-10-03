@@ -113,3 +113,49 @@ the Word syllabus stay reviewable in a diff and cannot drift from the Markdown.
 
 Everything in `aip/` is under 250 lines per module and is meant to be read.
 There is no framework hiding the interesting parts.
+
+---
+
+## 🚀 Quick Start (Under 5 Minutes)
+
+Want to see the final deployed RAG service from **Lab 7**? You can spin up the entire system (Service, UI, Dashboard, and Regression Gate) in under 5 minutes on a clean machine.
+
+**1. Setup Environment**
+```bash
+make setup
+cp .env.example .env
+# Optional: Add your API keys to .env. If skipped, it will run in offline mode using the cache.
+make check
+```
+
+**2. Start the Backend Service**
+In a new terminal, launch the FastAPI RAG service:
+```bash
+cd labs/lab7
+fastapi dev service.py
+# The API will be available at http://127.0.0.1:8000
+```
+
+**3. Launch the User Interface**
+In a second terminal, start the Streamlit chat UI:
+```bash
+cd labs/lab7
+streamlit run ui.py
+# The UI will open in your browser at http://localhost:8501
+```
+
+**4. Launch the Observability Dashboard**
+In a third terminal, start the ops dashboard to monitor traces, costs, and cache hit rates:
+```bash
+cd labs/lab7
+streamlit run dashboard.py
+# The Dashboard will open in your browser at http://localhost:8502
+```
+
+**5. Run the CI Regression Gate**
+To prove the system meets its SLOs, run the golden set evaluation gate (using the offline cache for zero cost):
+```bash
+cd labs/lab7
+AIP_OFFLINE=1 python gate.py
+# This will evaluate 45 queries against thresholds.yml and exit non-zero if any metrics breach the limits.
+```

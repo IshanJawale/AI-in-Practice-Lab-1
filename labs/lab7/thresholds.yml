@@ -1,0 +1,24 @@
+# Lab 7 regression gate. Tune these to just below what you actually achieve --
+# a gate set at your current number fails on noise; a gate set far below it
+# never fires. Aim for roughly one standard error of headroom.
+#
+# Note that cost and latency have gates too. They regress silently otherwise.
+#
+# Baseline (reports/lab7_gate.json, final_k=10, n=45: 40 answerable, 5 not):
+#   correctness 0.8625  faithfulness 1.000  citation_validity 1.000
+#   refusal_recall 1.000 (5/5)  refusal_precision 0.625 (5 of 8 refusals)
+#   hit_rate_at_5 0.976  cost/query $0.0021  p95 5.06 s (replayed model time)
+#
+# Headroom choices:
+#   correctness      SE ~ 0.04 over 40 answerable   -> floor 0.80
+#   refusal_recall   5 questions: one miss = 0.20   -> floor 0.80 (tolerates one miss)
+#   refusal_precision 8 refusals: one extra wrong refusal = 0.556 -> floor 0.60
+#   cost             ~2x headroom; a MAIN->LARGE swap (~2.4x price) trips it
+correctness:        {min: 0.80}
+faithfulness:       {min: 0.95}
+citation_validity:  {min: 0.98}
+refusal_recall:     {min: 0.80}
+refusal_precision:  {min: 0.60}
+hit_rate_at_5:      {min: 0.90}
+cost_per_query_usd: {max: 0.004}
+p95_latency_ms:     {max: 6000}

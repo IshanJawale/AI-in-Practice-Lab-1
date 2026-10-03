@@ -43,7 +43,9 @@ venv.bak/
 !.env.template
 
 # Lab & Project Specific Caches / Traces / Databases
-.aip_cache/
+.aip_cache/*
+# Lab 7 D2: the call cache is part of the artefact. CI replays it with AIP_OFFLINE=1.
+!.aip_cache/calls.sqlite3
 .aip_traces/
 .chroma/
 

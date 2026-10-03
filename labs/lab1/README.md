@@ -6,6 +6,11 @@
 >
 > **This file is the reasoning** — why each step exists and what it is teaching.
 > Read it before the lab; keep the runsheet open during it.
+>
+> **New to the lab? Start with [`OVERVIEW.md`](OVERVIEW.md)** — the short orientation:
+> why this lab exists, how to approach it, and where each piece comes from in
+> T1 and T2. Keep [`CONCEPTS.md`](CONCEPTS.md) open while you work —
+> every concept, where it is in the code, and where it came from.
 
 ---
 

@@ -1,6 +1,11 @@
 # Lab 2 — The Prompt Lab: Build the Harness, Then Let It Choose
 **3 hours · Individual · Prepared by T3**
 
+> **Read [`OVERVIEW.md`](OVERVIEW.md) first** — why this lab exists, how to
+> approach the three hours, the hints, and the map back to the theory
+> sessions. Keep [`CONCEPTS.md`](CONCEPTS.md) open while you work.
+> This file is the detail.
+
 ---
 
 ## The problem

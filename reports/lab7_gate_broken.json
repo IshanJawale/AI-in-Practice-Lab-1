@@ -1,0 +1,1351 @@
+{
+  "metrics": {
+    "correctness": 0.625,
+    "faithfulness": 0.9777777777777777,
+    "citation_validity": 1.0,
+    "refusal_recall": 0.8,
+    "refusal_precision": 0.3333333333333333,
+    "hit_rate_at_5": 0.9761904761904762,
+    "cost_per_query_usd": 0.0013266566666666668,
+    "p95_latency_ms": 4879.658000083305
+  },
+  "run": {
+    "p50_latency_ms": 2886.2368000157176,
+    "n": 45,
+    "n_answerable": 40,
+    "n_unanswerable": 5,
+    "n_refusals": 12,
+    "final_k": 1,
+    "dropped_doc": null,
+    "wall_seconds": 108.9,
+    "offline": "0"
+  },
+  "rows": [
+    {
+      "id": "Q01",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "You must submit the reimbursement claim within 30 days of discharge [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-process"
+      ],
+      "relevant": [
+        "claims-timelines",
+        "claims-process"
+      ],
+      "cost_usd": 0.00055695,
+      "latency_ms": 3344.537699920535,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 3.36,
+        "retrieve": 0.34,
+        "rerank": 0.01,
+        "generate": 10676.37,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3340.727699920535
+    },
+    {
+      "id": "Q02",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "topup-and-super-topup"
+      ],
+      "relevant": [
+        "plan-silver",
+        "plans-overview"
+      ],
+      "cost_usd": 0.0013953,
+      "latency_ms": 3422.586000036411,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 3.04,
+        "retrieve": 0.16,
+        "rerank": 0.01,
+        "generate": 10753.93,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3419.296000036411
+    },
+    {
+      "id": "Q03",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "No, maternity cover is not available on the Bronze plan at any sum insured [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "maternity-benefits"
+      ],
+      "relevant": [
+        "maternity-benefits",
+        "plan-bronze"
+      ],
+      "cost_usd": 0.0010065,
+      "latency_ms": 3295.1873000707105,
+      "stages_ms": {
+        "guard_in": 0.02,
+        "embed": 3.14,
+        "retrieve": 0.13,
+        "rerank": 0.01,
+        "generate": 10627.07,
+        "validate": 0.14
+      },
+      "llm_latency_ms": 3291.7473000707105
+    },
+    {
+      "id": "Q04",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "pre-existing-conditions"
+      ],
+      "relevant": [
+        "pre-existing-conditions"
+      ],
+      "cost_usd": 0.0017248500000000002,
+      "latency_ms": 3347.668900015019,
+      "stages_ms": {
+        "guard_in": 0.02,
+        "embed": 3.33,
+        "retrieve": 0.15,
+        "rerank": 0.01,
+        "generate": 10678.93,
+        "validate": 0.04
+      },
+      "llm_latency_ms": 3344.118900015019
+    },
+    {
+      "id": "Q05",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "The grace period for an annual policy is 30 days from the renewal due date [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "policy-renewal-and-portability"
+      ],
+      "relevant": [
+        "policy-renewal-and-portability"
+      ],
+      "cost_usd": 0.0008367,
+      "latency_ms": 2519.2019999425484,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.12,
+        "retrieve": 0.28,
+        "rerank": 0.01,
+        "generate": 2525.15,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2517.7119999425486
+    },
+    {
+      "id": "Q06",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "As of 1 April 2026, the Aurora network covers 11,400 hospitals across 780 towns [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "network-hospitals"
+      ],
+      "relevant": [
+        "network-hospitals"
+      ],
+      "cost_usd": 0.0012423,
+      "latency_ms": 2855.459700097777,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 0.94,
+        "retrieve": 0.24,
+        "rerank": 0.01,
+        "generate": 2859.26,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2854.189700097777
+    },
+    {
+      "id": "Q07",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "The no-claim bonus on Aurora Gold is 25% of the base sum insured per claim-free year, which accumulates up to a maximum of 100% [1]. A claim does not reduce the accumulated bonus, but causes it to stop accumulating for that year only [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plan-gold"
+      ],
+      "relevant": [
+        "plan-gold",
+        "plans-overview"
+      ],
+      "cost_usd": 0.00142785,
+      "latency_ms": 2426.2918999834733,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.42,
+        "retrieve": 0.29,
+        "rerank": 0.02,
+        "generate": 2432.17,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2424.471899983473
+    },
+    {
+      "id": "Q08",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "No, you cannot claim for IVF treatment because it is listed as a permanent, treatment-related exclusion [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "exclusions"
+      ],
+      "relevant": [
+        "exclusions"
+      ],
+      "cost_usd": 0.0010617,
+      "latency_ms": 3185.6869000887127,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.0,
+        "retrieve": 0.24,
+        "rerank": 0.02,
+        "generate": 3190.18,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3184.3469000887126
+    },
+    {
+      "id": "Q09",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "Under the Aurora Gold plan, the sub-limit for cataract surgery is ₹75,000 per eye [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plan-gold"
+      ],
+      "relevant": [
+        "plan-gold"
+      ],
+      "cost_usd": 0.0006284999999999999,
+      "latency_ms": 2408.2533999958264,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.13,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2413.29,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2406.723399995826
+    },
+    {
+      "id": "Q10",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "If Aurora's final response is unsatisfactory, you may approach the Insurance Ombudsman for your region [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "grievance-redressal"
+      ],
+      "relevant": [
+        "grievance-redressal"
+      ],
+      "cost_usd": 0.00068685,
+      "latency_ms": 5383.161000007019,
+      "stages_ms": {
+        "guard_in": 0.06,
+        "embed": 1.42,
+        "retrieve": 0.24,
+        "rerank": 0.02,
+        "generate": 5390.55,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 5381.361000007018
+    },
+    {
+      "id": "Q11",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "There is an ambulance cover of ₹5,000 per hospitalisation, applicable to road ambulance only [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plans-overview"
+      ],
+      "relevant": [
+        "plans-overview",
+        "plan-silver",
+        "claims-process"
+      ],
+      "cost_usd": 0.00068835,
+      "latency_ms": 2360.861800086945,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.29,
+        "retrieve": 0.32,
+        "rerank": 0.02,
+        "generate": 2363.7,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2359.1418000869453
+    },
+    {
+      "id": "Q12",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "Yes, in-patient treatment for mental illness is covered on the same terms as physical illness as required by the Mental Healthcare Act 2017 [1]. The 30-day initial waiting period applies, but there is no separate waiting period [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "exclusions"
+      ],
+      "relevant": [
+        "exclusions"
+      ],
+      "cost_usd": 0.0014230500000000001,
+      "latency_ms": 2886.2368000157176,
+      "stages_ms": {
+        "guard_in": 0.02,
+        "embed": 1.11,
+        "retrieve": 0.25,
+        "rerank": 0.02,
+        "generate": 2888.43,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2884.7868000157177
+    },
+    {
+      "id": "Q13",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "The free-look period is 15 days from receipt, or 30 days for policies sold through distance marketing [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "life-insurance-grace-and-revival"
+      ],
+      "relevant": [
+        "policy-renewal-and-portability"
+      ],
+      "cost_usd": 0.0007227000000000001,
+      "latency_ms": 2561.0233000305293,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.08,
+        "retrieve": 0.26,
+        "rerank": 0.02,
+        "generate": 2564.83,
+        "validate": 0.07
+      },
+      "llm_latency_ms": 2559.5533000305295
+    },
+    {
+      "id": "Q14",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "You get 150 wellness points for completing an annual health check-up [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "outpatient-and-wellness"
+      ],
+      "relevant": [
+        "outpatient-and-wellness"
+      ],
+      "cost_usd": 0.00066735,
+      "latency_ms": 6977.232099986039,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.02,
+        "retrieve": 0.27,
+        "rerank": 0.01,
+        "generate": 6981.89,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 6975.842099986039
+    },
+    {
+      "id": "Q15",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plan-bronze"
+      ],
+      "relevant": [
+        "glossary"
+      ],
+      "cost_usd": 0.00111345,
+      "latency_ms": 2756.040499962382,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.15,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2763.56,
+        "validate": 0.04
+      },
+      "llm_latency_ms": 2754.520499962382
+    },
+    {
+      "id": "Q16",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "For an emergency admission under the cashless route, the hospital must notify Aurora within 24 hours of admission [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-process"
+      ],
+      "relevant": [
+        "claims-process",
+        "claims-timelines"
+      ],
+      "cost_usd": 0.00069195,
+      "latency_ms": 2100.678300108835,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.28,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2104.72,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2099.008300108835
+    },
+    {
+      "id": "Q17",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "No, Aurora administers its own claims and does not use a TPA [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "glossary"
+      ],
+      "relevant": [
+        "glossary"
+      ],
+      "cost_usd": 0.00108915,
+      "latency_ms": 3724.107799983658,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.45,
+        "retrieve": 0.36,
+        "rerank": 0.03,
+        "generate": 3727.73,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3722.187799983658
+    },
+    {
+      "id": "Q18",
+      "kind": "single_hop",
+      "unanswerable": false,
+      "answer": "To qualify as a hospital, a facility must have at least 10 in-patient beds in towns with a population below 10 lakh, or 15 in-patient beds elsewhere [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "network-hospitals"
+      ],
+      "relevant": [
+        "network-hospitals"
+      ],
+      "cost_usd": 0.00126735,
+      "latency_ms": 2979.437200061306,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.29,
+        "retrieve": 0.31,
+        "rerank": 0.02,
+        "generate": 2982.44,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2977.7172000613064
+    },
+    {
+      "id": "Q19",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "No, not everything will be paid in full because an insured on Silver with a ₹5,00,000 sum insured has a room-rent limit of 2%, or ₹10,000 per day [1]. Since a room at ₹15,000 per day exceeds this limit, proportionate deduction applies with an eligibility ratio of 0.667 (10,000 ÷ 15,000) [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-process"
+      ],
+      "relevant": [
+        "plan-silver",
+        "claims-process"
+      ],
+      "cost_usd": 0.0021871499999999997,
+      "latency_ms": 3598.910999992713,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.6,
+        "retrieve": 0.69,
+        "rerank": 0.02,
+        "generate": 3602.99,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3596.5009999927133
+    },
+    {
+      "id": "Q20",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "Dependent parents can be added under the Silver, Gold, and Platinum plans, but are not covered under the Bronze plan [1]. Under the Silver plan, adding a dependent parent is allowed at an extra premium [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "dependents-and-family-floater"
+      ],
+      "relevant": [
+        "dependents-and-family-floater",
+        "plan-silver",
+        "plan-bronze",
+        "plans-overview"
+      ],
+      "cost_usd": 0.0019587,
+      "latency_ms": 3465.431499965079,
+      "stages_ms": {
+        "guard_in": 0.4,
+        "embed": 1.42,
+        "retrieve": 0.3,
+        "rerank": 0.02,
+        "generate": 3466.99,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 3463.241499965079
+    },
+    {
+      "id": "Q21",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "Credit for waiting periods served carries over only up to the sum insured of your previous policy, including its accrued no-claim bonus [1]. Any increase in the sum insured is subject to fresh waiting periods on the incremental amount [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "policy-renewal-and-portability"
+      ],
+      "relevant": [
+        "policy-renewal-and-portability",
+        "pre-existing-conditions"
+      ],
+      "cost_usd": 0.00176595,
+      "latency_ms": 3095.4118999200314,
+      "stages_ms": {
+        "guard_in": 0.06,
+        "embed": 1.37,
+        "retrieve": 0.3,
+        "rerank": 0.02,
+        "generate": 3101.13,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3093.6018999200314
+    },
+    {
+      "id": "Q22",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "To continue cover beyond 90 days, you must inform Aurora and add the newborn to your policy as a dependent within 90 days of birth [1]. Adding the newborn within this 90-day window is guaranteed-issue without medical underwriting; otherwise, the child will be treated as a fresh applicant [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "maternity-benefits"
+      ],
+      "relevant": [
+        "maternity-benefits",
+        "dependents-and-family-floater"
+      ],
+      "cost_usd": 0.0018789,
+      "latency_ms": 3136.4199000173435,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.14,
+        "retrieve": 0.24,
+        "rerank": 0.01,
+        "generate": 3141.69,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3134.9399000173435
+    },
+    {
+      "id": "Q23",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "The out-patient benefit (OPD rider) is not available on the Bronze plan [1]. The provided sources do not contain specific information regarding physiotherapy sessions.",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "outpatient-and-wellness"
+      ],
+      "relevant": [
+        "outpatient-and-wellness",
+        "plan-bronze"
+      ],
+      "cost_usd": 0.00216105,
+      "latency_ms": 4072.7921000173687,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.19,
+        "retrieve": 0.25,
+        "rerank": 0.03,
+        "generate": 4077.36,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 4071.232100017369
+    },
+    {
+      "id": "Q24",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "A claim reduces your accumulated no-claim bonus by 10 percentage points, rather than resetting it to zero [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plan-silver"
+      ],
+      "relevant": [
+        "plan-silver",
+        "glossary"
+      ],
+      "cost_usd": 0.00135165,
+      "latency_ms": 2878.3155000424385,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.06,
+        "retrieve": 0.29,
+        "rerank": 0.01,
+        "generate": 2883.13,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2876.8555000424385
+    },
+    {
+      "id": "Q25",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "Under the Gold plan, the benefit limit for a Caesarean section is ₹1,00,000 per delivery [1]. If the hospital bills ₹1,60,000, the remaining out-of-pocket cost would be ₹60,000 [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 0,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "maternity-benefits"
+      ],
+      "relevant": [
+        "maternity-benefits",
+        "plan-gold"
+      ],
+      "cost_usd": 0.0016645499999999999,
+      "latency_ms": 2732.1913999890535,
+      "stages_ms": {
+        "guard_in": 0.06,
+        "embed": 1.25,
+        "retrieve": 0.25,
+        "rerank": 0.02,
+        "generate": 2739.01,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2730.5513999890536
+    },
+    {
+      "id": "Q26",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "No, knee joint replacement is not covered immediately and is subject to a 24-month waiting period, unless it is needed following an accident [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "pre-existing-conditions"
+      ],
+      "relevant": [
+        "pre-existing-conditions",
+        "plan-silver",
+        "plan-bronze"
+      ],
+      "cost_usd": 0.00145965,
+      "latency_ms": 3460.8658000098912,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.05,
+        "retrieve": 0.25,
+        "rerank": 0.02,
+        "generate": 3467.67,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3459.4558000098914
+    },
+    {
+      "id": "Q27",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "Total discounts are capped at 30% of the base premium [1]. However, the wellness discount is applied after the cap and is the only discount that may exceed that limit [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "premium-and-payments"
+      ],
+      "relevant": [
+        "premium-and-payments",
+        "outpatient-and-wellness"
+      ],
+      "cost_usd": 0.0015868500000000001,
+      "latency_ms": 2798.2854000081493,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 0.81,
+        "retrieve": 0.28,
+        "rerank": 0.01,
+        "generate": 2802.74,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2797.1054000081494
+    },
+    {
+      "id": "Q28",
+      "kind": "multi_hop",
+      "unanswerable": false,
+      "answer": "A claim from an excluded provider is payable on reimbursement only, and only if the admission was a genuine emergency and no alternative facility was reachable [1]. Cashless access is not available at these facilities [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "network-hospitals"
+      ],
+      "relevant": [
+        "network-hospitals",
+        "claims-process"
+      ],
+      "cost_usd": 0.0019191000000000002,
+      "latency_ms": 3469.1079999900235,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.28,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 3473.8,
+        "validate": 0.09
+      },
+      "llm_latency_ms": 3467.3879999900237
+    },
+    {
+      "id": "Q29",
+      "kind": "trap_archived",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-timelines"
+      ],
+      "relevant": [
+        "claims-timelines"
+      ],
+      "cost_usd": 0.00114045,
+      "latency_ms": 2629.8032000199705,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 4.36,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2632.76,
+        "validate": 0.07
+      },
+      "llm_latency_ms": 2625.0332000199705
+    },
+    {
+      "id": "Q30",
+      "kind": "trap_archived",
+      "unanswerable": false,
+      "answer": "A planned cashless admission must be notified 48 hours before admission [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-timelines-2024-ARCHIVED"
+      ],
+      "relevant": [
+        "claims-process",
+        "claims-timelines"
+      ],
+      "cost_usd": 0.0005763000000000001,
+      "latency_ms": 2429.24750009913,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 2.29,
+        "retrieve": 0.23,
+        "rerank": 0.01,
+        "generate": 2433.74,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2426.62750009913
+    },
+    {
+      "id": "Q31",
+      "kind": "trap_archived",
+      "unanswerable": false,
+      "answer": "Aurora settles or rejects a complete reimbursement claim within 15 working days of receiving the last required document [1]. If Aurora raises a query, the timeline restarts once the requested document is supplied [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "claims-process"
+      ],
+      "relevant": [
+        "claims-timelines",
+        "claims-process"
+      ],
+      "cost_usd": 0.00089775,
+      "latency_ms": 2370.732299902402,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.44,
+        "retrieve": 0.24,
+        "rerank": 0.02,
+        "generate": 2374.95,
+        "validate": 0.08
+      },
+      "llm_latency_ms": 2368.902299902402
+    },
+    {
+      "id": "Q32",
+      "kind": "aggregation",
+      "unanswerable": false,
+      "answer": "The Aurora Gold plan has no co-payment at all ages [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plan-gold"
+      ],
+      "relevant": [
+        "plans-overview",
+        "plan-gold"
+      ],
+      "cost_usd": 0.0009147000000000001,
+      "latency_ms": 2677.5871999914943,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.45,
+        "retrieve": 0.25,
+        "rerank": 0.02,
+        "generate": 2682.17,
+        "validate": 0.07
+      },
+      "llm_latency_ms": 2675.7571999914944
+    },
+    {
+      "id": "Q33",
+      "kind": "aggregation",
+      "unanswerable": false,
+      "answer": "Across the four plans, pre-hospitalisation cover ranges from 30 days in the first plan, 45 days in the second, 60 days in the third, to 90 days in the fourth plan [1]. Post-hospitalisation cover correspondingly increases from 60 days in the first plan, to 90 days in the second, 120 days in the third, and 180 days in the fourth plan [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plans-overview"
+      ],
+      "relevant": [
+        "plans-overview"
+      ],
+      "cost_usd": 0.0013647,
+      "latency_ms": 2804.785499996692,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.86,
+        "retrieve": 0.3,
+        "rerank": 0.02,
+        "generate": 2809.18,
+        "validate": 0.07
+      },
+      "llm_latency_ms": 2802.485499996692
+    },
+    {
+      "id": "Q34",
+      "kind": "aggregation",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [],
+      "relevant": [
+        "plans-overview",
+        "plan-gold",
+        "dependents-and-family-floater"
+      ],
+      "cost_usd": 0.0025932,
+      "latency_ms": 3828.9187000546976,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.79,
+        "retrieve": 0.29,
+        "rerank": 0.02,
+        "generate": 3836.81,
+        "validate": 0.42
+      },
+      "llm_latency_ms": 3826.3587000546977
+    },
+    {
+      "id": "Q35",
+      "kind": "aggregation",
+      "unanswerable": false,
+      "answer": "The provided source notes that out-patient dental work is excluded from coverage by all plans [1]. A complete list of exclusions is referenced under `exclusions` [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "plans-overview"
+      ],
+      "relevant": [
+        "exclusions",
+        "outpatient-and-wellness"
+      ],
+      "cost_usd": 0.00133665,
+      "latency_ms": 2879.822299966179,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 3.56,
+        "retrieve": 0.3,
+        "rerank": 0.01,
+        "generate": 2883.17,
+        "validate": 0.04
+      },
+      "llm_latency_ms": 2875.882299966179
+    },
+    {
+      "id": "Q36",
+      "kind": "unanswerable",
+      "unanswerable": true,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": null,
+      "retrieved": [
+        "plan-gold"
+      ],
+      "relevant": [],
+      "cost_usd": 0.0013881000000000002,
+      "latency_ms": 2719.354699950293,
+      "stages_ms": {
+        "guard_in": 0.07,
+        "embed": 1.99,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2723.19,
+        "validate": 0.04
+      },
+      "llm_latency_ms": 2716.9546999502927
+    },
+    {
+      "id": "Q37",
+      "kind": "unanswerable",
+      "unanswerable": true,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 0.0,
+      "retrieved": [
+        "topup-and-super-topup"
+      ],
+      "relevant": [
+        "exclusions",
+        "plans-overview"
+      ],
+      "cost_usd": 0.0011034,
+      "latency_ms": 2712.614100022465,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.64,
+        "retrieve": 0.26,
+        "rerank": 0.02,
+        "generate": 2715.86,
+        "validate": 0.05
+      },
+      "llm_latency_ms": 2710.604100022465
+    },
+    {
+      "id": "Q38",
+      "kind": "unanswerable",
+      "unanswerable": true,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": null,
+      "retrieved": [
+        "regulatory-disclosures"
+      ],
+      "relevant": [],
+      "cost_usd": 0.00097305,
+      "latency_ms": 2648.3232999375464,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.53,
+        "retrieve": 1.21,
+        "rerank": 0.05,
+        "generate": 2653.52,
+        "validate": 0.03
+      },
+      "llm_latency_ms": 2645.4632999375463
+    },
+    {
+      "id": "Q39",
+      "kind": "unanswerable",
+      "unanswerable": true,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": null,
+      "retrieved": [
+        "claims-process"
+      ],
+      "relevant": [],
+      "cost_usd": 0.0011184,
+      "latency_ms": 2694.1795000120624,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 3.77,
+        "retrieve": 0.25,
+        "rerank": 0.01,
+        "generate": 2696.99,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2690.0395000120625
+    },
+    {
+      "id": "Q40",
+      "kind": "unanswerable",
+      "unanswerable": true,
+      "answer": "The helpline number is located on your policy schedule [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "wellness-app-guide"
+      ],
+      "relevant": [
+        "grievance-redressal"
+      ],
+      "cost_usd": 0.0018537,
+      "latency_ms": 3287.5845999401436,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.29,
+        "retrieve": 0.29,
+        "rerank": 0.02,
+        "generate": 3292.34,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3285.8745999401435
+    },
+    {
+      "id": "Q41",
+      "kind": "paraphrase",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "policy-renewal-and-portability"
+      ],
+      "relevant": [
+        "policy-renewal-and-portability"
+      ],
+      "cost_usd": 0.0025236,
+      "latency_ms": 3852.471899909079,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.0,
+        "retrieve": 0.27,
+        "rerank": 0.01,
+        "generate": 3857.31,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3851.091899909079
+    },
+    {
+      "id": "Q42",
+      "kind": "paraphrase",
+      "unanswerable": false,
+      "answer": "No, a denial of cashless is not a rejection of the claim [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 1,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "network-hospitals"
+      ],
+      "relevant": [
+        "network-hospitals",
+        "claims-process"
+      ],
+      "cost_usd": 0.0014661000000000001,
+      "latency_ms": 2904.9016000212728,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.45,
+        "retrieve": 0.31,
+        "rerank": 0.02,
+        "generate": 2910.78,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 2903.011600021273
+    },
+    {
+      "id": "Q43",
+      "kind": "paraphrase",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "dependents-and-family-floater"
+      ],
+      "relevant": [
+        "outpatient-and-wellness",
+        "premium-and-payments"
+      ],
+      "cost_usd": 0.00105765,
+      "latency_ms": 4879.658000083305,
+      "stages_ms": {
+        "guard_in": 0.04,
+        "embed": 1.0,
+        "retrieve": 0.26,
+        "rerank": 0.02,
+        "generate": 4885.03,
+        "validate": 0.04
+      },
+      "llm_latency_ms": 4878.298000083305
+    },
+    {
+      "id": "Q44",
+      "kind": "paraphrase",
+      "unanswerable": false,
+      "answer": "I don't have enough information in the provided sources to answer that.",
+      "refused": true,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 0,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "topup-and-super-topup"
+      ],
+      "relevant": [
+        "plan-silver"
+      ],
+      "cost_usd": 0.0017314499999999998,
+      "latency_ms": 3148.8123000110313,
+      "stages_ms": {
+        "guard_in": 0.05,
+        "embed": 1.12,
+        "retrieve": 0.27,
+        "rerank": 0.02,
+        "generate": 3155.32,
+        "validate": 0.06
+      },
+      "llm_latency_ms": 3147.2923000110313
+    },
+    {
+      "id": "Q45",
+      "kind": "paraphrase",
+      "unanswerable": false,
+      "answer": "No, refractive error correction for an error of less than 7.5 dioptres is listed as a permanent exclusion [1]. Therefore, a 6 dioptre correction is not covered [1].",
+      "refused": false,
+      "citations_valid": true,
+      "invalid_citations": [],
+      "faithfulness": 1,
+      "correctness": 2,
+      "hit_rate_at_5": 1.0,
+      "retrieved": [
+        "exclusions"
+      ],
+      "relevant": [
+        "exclusions"
+      ],
+      "cost_usd": 0.00149595,
+      "latency_ms": 2739.4105999493227,
+      "stages_ms": {
+        "guard_in": 0.03,
+        "embed": 1.08,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 2746.15,
+        "validate": 0.07
+      },
+      "llm_latency_ms": 2737.9305999493226
+    }
+  ]
+}

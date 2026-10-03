@@ -1,0 +1,409 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab 7 — Ship It — quiz</title><style>
+:root{
+  --bg:#fbfbf9; --fg:#1a1a18; --muted:#6b6b64; --line:#e2e1db; --card:#ffffff;
+  --accent:#1f5f4f; --accent-soft:#e8f2ee; --warn:#8a4b16; --warn-soft:#fbf0e4;
+  --bad:#93261f; --bad-soft:#fbeae8; --code:#f4f4f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --fg:#e8e8e4; --muted:#9a9a92; --line:#2e3035; --card:#1d1f23;
+    --accent:#6fc0a8; --accent-soft:#1b2f2a; --warn:#d99a5b; --warn-soft:#31261a;
+    --bad:#e58a80; --bad-soft:#331f1d; --code:#232529;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 ui-serif,Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 96px}
+header{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px;font-weight:600}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;
+  padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.blurb{background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:24px 0 8px;border-radius:0 4px 4px 0}
+.blurb p{margin:0}
+.ident{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+.ident label{display:block;font:600 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text]{width:100%;padding:10px 12px;font:16px/1.4 inherit;
+  background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:22px 24px;margin:18px 0}
+.qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.qnum{font:700 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--accent);
+  letter-spacing:.06em}
+.qpart{font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto}
+.stem{margin:0 0 14px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;
+  padding:14px 16px;overflow-x:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 14px}
+code{background:var(--code);padding:1px 5px;border-radius:4px;
+  font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;
+  border:1px solid transparent;border-radius:6px;cursor:pointer;margin:2px 0}
+.opt:hover{background:var(--accent-soft)}
+.opt input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent)}
+.opt .lt{font:700 13px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  flex:0 0 auto;min-width:14px}
+.locked .opt{cursor:default}
+.locked .opt:hover{background:none}
+footer{margin-top:36px;border-top:1px solid var(--line);padding-top:24px}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;padding:13px 22px;
+  border-radius:6px;border:1px solid var(--accent);background:var(--accent);
+  color:#fff;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:none;color:var(--accent)}
+.progress{font:600 13px/1 ui-sans-serif,system-ui,sans-serif;color:var(--muted);
+  margin-bottom:14px}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.note{font-size:14px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase}
+.scroll{overflow-x:auto}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.flag{background:var(--warn-soft);color:var(--warn);padding:1px 7px;
+  border-radius:99px;font:600 11px/1.6 ui-sans-serif,system-ui,sans-serif}
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .q{break-inside:avoid;border-color:#ccc}
+}
+@media (max-width:620px){ .ident{grid-template-columns:1fr} .wrap{padding:24px 16px 72px} }
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI in Practice I · Module 1 · Applied GenAI</div>
+  <h1>Lab 7 — Ship It</h1>
+  <p class="sub">End-of-module quiz</p>
+  <div class="meta">
+    <span class="chip">20 questions</span>
+    <span class="chip">20 marks</span>
+    <span class="chip">20 minutes</span>
+    <span class="chip">Open notes, open repo</span>
+  </div>
+</header>
+
+<div class="blurb"><p>Twenty questions on the service you shipped — the API contract, the two cache layers, streaming, observability, the regression gate, and the evaluation report. A few questions reach back across the module, because that is what the capstone does. One mark each; multi-select questions are all-or-nothing.</p></div>
+
+<p class="note">Answer every question, then press <strong>Finish</strong>. The page
+gives you a <strong>submission code</strong> — copy it and post it where your
+instructor asked. Your score is not shown here; we go through the answers
+together once the codes are in.</p>
+
+<div class="ident noprint">
+  <div><label for="nm">Name</label><input type="text" id="nm" autocomplete="off"></div>
+  <div><label for="rl">Roll number</label><input type="text" id="rl" autocomplete="off"></div>
+</div>
+
+<form id="quiz">
+<section class="q" id="Q1">
+  <div class="qhead"><span class="qnum">Q1</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem"><code>POST /ask</code> is required to return <code>cost_usd</code> and <code>trace_id</code> in the response body. The handout says this is “not padding”. Why?</p>
+  
+  <label class="opt"><input type="radio" name="q0" value="0"><span class="lt">A</span><span>They are needed to compute the p95 latency</span></label>
+<label class="opt"><input type="radio" name="q0" value="1"><span class="lt">B</span><span>The trace id is how anyone debugging in production finds the trace for a specific bad answer, and the cost is how the person paying for the system sees what a query costs — both are operational requirements, not diagnostics for you</span></label>
+<label class="opt"><input type="radio" name="q0" value="2"><span class="lt">C</span><span>The regression gate reads them from the response</span></label>
+<label class="opt"><input type="radio" name="q0" value="3"><span class="lt">D</span><span>They are required for the response to be cacheable</span></label>
+  
+</section>
+<section class="q" id="Q2">
+  <div class="qhead"><span class="qnum">Q2</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">A3 specifies three error responses. Match them: a malformed request, a model outage, and budget exhaustion.</p>
+  
+  <label class="opt"><input type="radio" name="q1" value="0"><span class="lt">A</span><span>422, 500 with the stack trace for debugging, 503</span></label>
+<label class="opt"><input type="radio" name="q1" value="1"><span class="lt">B</span><span>400, 503, 500</span></label>
+<label class="opt"><input type="radio" name="q1" value="2"><span class="lt">C</span><span>400, 500, 402</span></label>
+<label class="opt"><input type="radio" name="q1" value="3"><span class="lt">D</span><span>422, 503 with a <code>Retry-After</code> header, 429</span></label>
+  
+</section>
+<section class="q" id="Q3">
+  <div class="qhead"><span class="qnum">Q3</span>
+    <span class="qpart">Part A</span></div>
+  <p class="stem">A2 requires you to wire in both your best Labs 3–5 pipeline <strong>and</strong> your Lab 6 guards. The handout says “this is where marks are lost”. Why is it easy to lose them here?</p>
+  
+  <label class="opt"><input type="radio" name="q2" value="0"><span class="lt">A</span><span>The guards are invisible when everything goes right, so under time pressure the pipeline gets wired up and the guards get skipped — and a service with no guards is not shippable regardless of how good its answers are</span></label>
+<label class="opt"><input type="radio" name="q2" value="1"><span class="lt">B</span><span>The guards add latency that breaks the p95 target</span></label>
+<label class="opt"><input type="radio" name="q2" value="2"><span class="lt">C</span><span>Lab 6 and Lab 3 use incompatible retriever interfaces</span></label>
+<label class="opt"><input type="radio" name="q2" value="3"><span class="lt">D</span><span>The guards conflict with the streaming path and are often removed to make the demo work</span></label>
+  
+</section>
+<section class="q" id="Q4">
+  <div class="qhead"><span class="qnum">Q4</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Two cache layers, keyed differently. What does each key on, and what is the risk profile of each?</p>
+  
+  <label class="opt"><input type="radio" name="q3" value="0"><span class="lt">A</span><span>The exact cache is per-user; the semantic cache is global</span></label>
+<label class="opt"><input type="radio" name="q3" value="1"><span class="lt">B</span><span>Both key on the question text; the semantic cache simply has a longer TTL</span></label>
+<label class="opt"><input type="radio" name="q3" value="2"><span class="lt">C</span><span>Exact cache keys on a hash of the normalised question and is always safe — a hit is the same question. The semantic cache keys on the question’s embedding above a cosine threshold and can return an answer to a <em>different</em> question</span></label>
+<label class="opt"><input type="radio" name="q3" value="3"><span class="lt">D</span><span>Exact cache keys on the answer; semantic cache keys on the retrieved chunks</span></label>
+  
+</section>
+<section class="q" id="Q5">
+  <div class="qhead"><span class="qnum">Q5</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B1 asks you to find the cosine threshold at which the semantic cache <em>starts returning wrong answers</em>, and says it is “the interesting number, and it is lower than people assume.” What does that mean in practice, and what is the status of the 0.95 in the starter code?</p>
+  
+  <label class="opt"><input type="radio" name="q4" value="0"><span class="lt">A</span><span>The threshold must be swept and reported rather than assumed — the 0.95 in the starter is <strong>reasoned, not swept</strong>, and the file says so</span></label>
+<label class="opt"><input type="radio" name="q4" value="1"><span class="lt">B</span><span>0.95 is a hard floor imposed by the embedding model’s calibration</span></label>
+<label class="opt"><input type="radio" name="q4" value="2"><span class="lt">C</span><span>The threshold only matters for questions shorter than ten words</span></label>
+<label class="opt"><input type="radio" name="q4" value="3"><span class="lt">D</span><span>0.95 is the measured optimum for this corpus and should be used as-is</span></label>
+  
+</section>
+<section class="q" id="Q6">
+  <div class="qhead"><span class="qnum">Q6</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">B3: streaming creates a problem — you cannot validate citations until the answer is complete, but you have already sent it. Which is <strong>not</strong> one of the three options you are asked to choose between and defend?</p>
+  
+  <label class="opt"><input type="radio" name="q5" value="0"><span class="lt">A</span><span>Validate each sentence as it completes and retract invalid ones mid-stream</span></label>
+<label class="opt"><input type="radio" name="q5" value="1"><span class="lt">B</span><span>Buffer the answer, validate, then stream — losing the TTFT benefit</span></label>
+<label class="opt"><input type="radio" name="q5" value="2"><span class="lt">C</span><span>Stream, then send a validation event the UI acts on</span></label>
+<label class="opt"><input type="radio" name="q5" value="3"><span class="lt">D</span><span>Stream the prose and hold the citations to the end</span></label>
+  
+</section>
+<section class="q" id="Q7">
+  <div class="qhead"><span class="qnum">Q7</span>
+    <span class="qpart">Part B</span></div>
+  <p class="stem">Your p95 stage breakdown reads: embed 40 ms, retrieve 15 ms, rerank 0 ms, <strong>generate 5,200 ms</strong>, validate 5 ms. Which stage do you optimise, and what is the honest first move?</p>
+  
+  <label class="opt"><input type="radio" name="q6" value="0"><span class="lt">A</span><span>Embedding, since it runs before everything else and blocks the pipeline</span></label>
+<label class="opt"><input type="radio" name="q6" value="1"><span class="lt">B</span><span>None — the total is under the 6,000 ms uncached target, so the budget is met</span></label>
+<label class="opt"><input type="radio" name="q6" value="2"><span class="lt">C</span><span>Retrieval — 15 ms is measurable and easy to halve</span></label>
+<label class="opt"><input type="radio" name="q6" value="3"><span class="lt">D</span><span>Generation, which is 98% of the budget — and the first move is on output length and tier, since output tokens are generated serially and dominate the wait</span></label>
+  
+</section>
+<section class="q" id="Q8">
+  <div class="qhead"><span class="qnum">Q8</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">C1 sets a specific bar for your tracing: you must be able to answer, <em>from traces alone</em>, “why did request X take 9 seconds?”. What does that require your traces to contain?</p>
+  
+  <label class="opt"><input type="radio" name="q7" value="0"><span class="lt">A</span><span>The full prompt and completion for every call</span></label>
+<label class="opt"><input type="radio" name="q7" value="1"><span class="lt">B</span><span>Per-stage timings within a single request, correlated by run id — so you can see whether the 9 seconds was embedding, retrieval, a repair loop, a rate-limit backoff, or generation</span></label>
+<label class="opt"><input type="radio" name="q7" value="2"><span class="lt">C</span><span>A log line at the start and end of each request</span></label>
+<label class="opt"><input type="radio" name="q7" value="3"><span class="lt">D</span><span>The cost of every call, since cost and latency are proportional</span></label>
+  
+</section>
+<section class="q" id="Q9">
+  <div class="qhead"><span class="qnum">Q9</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">C4 asks for one alert condition. It suggests: p95 above SLO for five minutes, cost per hour above budget, or <strong>refusal rate doubling</strong>. Why is the third one on the list?</p>
+  
+  <label class="opt"><input type="radio" name="q8" value="0"><span class="lt">A</span><span>Because refusals are more expensive than answers</span></label>
+<label class="opt"><input type="radio" name="q8" value="1"><span class="lt">B</span><span>Because it detects prompt injection attempts</span></label>
+<label class="opt"><input type="radio" name="q8" value="2"><span class="lt">C</span><span>Because a rising refusal rate indicates users are asking harder questions</span></label>
+<label class="opt"><input type="radio" name="q8" value="3"><span class="lt">D</span><span>Because it is a cheap proxy for a broken index — if retrieval returns nothing useful, a correctly built system refuses, so the refusal rate moves before anyone notices the answers got worse</span></label>
+  
+</section>
+<section class="q" id="Q10">
+  <div class="qhead"><span class="qnum">Q10</span> <span class="flag">select all</span>
+    <span class="qpart">Part C</span></div>
+  <p class="stem">Which of these must <code>GET /metrics</code> expose? <strong>Select all that apply.</strong></p>
+  
+  <label class="opt"><input type="checkbox" name="q9" value="0"><span class="lt">A</span><span>Error rate broken down by type, and tool-call counts</span></label>
+<label class="opt"><input type="checkbox" name="q9" value="1"><span class="lt">B</span><span>Total cost today and cost per query</span></label>
+<label class="opt"><input type="checkbox" name="q9" value="2"><span class="lt">C</span><span>Cache hit rate</span></label>
+<label class="opt"><input type="checkbox" name="q9" value="3"><span class="lt">D</span><span>Latency p50/p95/p99</span></label>
+  
+</section>
+<section class="q" id="Q11">
+  <div class="qhead"><span class="qnum">Q11</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">D3 requires you to deliberately break something — drop <code>final_k</code> to 1, or delete a corpus document — push, and show the red build. Why is that a graded step rather than an optional flourish?</p>
+  
+  <label class="opt"><input type="radio" name="q10" value="0"><span class="lt">A</span><span>It demonstrates the CI pipeline is connected to the repository</span></label>
+<label class="opt"><input type="radio" name="q10" value="1"><span class="lt">B</span><span>Because “a gate you have not seen fail is a gate you do not have” — an untested gate is indistinguishable from one whose thresholds are unreachable, whose eval never runs, or whose exit code is swallowed</span></label>
+<label class="opt"><input type="radio" name="q10" value="2"><span class="lt">C</span><span>It measures how far a metric can drop before the gate fires</span></label>
+<label class="opt"><input type="radio" name="q10" value="3"><span class="lt">D</span><span>It provides the before/after pair the evaluation report needs</span></label>
+  
+</section>
+<section class="q" id="Q12">
+  <div class="qhead"><span class="qnum">Q12</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">The gate runs in GitHub Actions with <code>AIP_OFFLINE=1</code> against your committed cache. What does that buy, and what does it require of you?</p>
+  
+  <label class="opt"><input type="radio" name="q11" value="0"><span class="lt">A</span><span>It skips the model calls entirely and grades on retrieval metrics only</span></label>
+<label class="opt"><input type="radio" name="q11" value="1"><span class="lt">B</span><span>It runs faster; it requires the cache to be under 50 MB</span></label>
+<label class="opt"><input type="radio" name="q11" value="2"><span class="lt">C</span><span>CI needs no API key and costs nothing, and the eval is deterministic run to run — which requires you to commit the cache and keep it current with your pipeline</span></label>
+<label class="opt"><input type="radio" name="q11" value="3"><span class="lt">D</span><span>It avoids rate limits; it requires a separate key for CI</span></label>
+  
+</section>
+<section class="q" id="Q13">
+  <div class="qhead"><span class="qnum">Q13</span>
+    <span class="qpart">Part D</span></div>
+  <p class="stem">Your gate thresholds include <code>correctness: min 0.75</code> and <code>cost_per_query_usd: max 0.010</code>. Why does a regression gate carry a cost threshold at all?</p>
+  
+  <label class="opt"><input type="radio" name="q12" value="0"><span class="lt">A</span><span>Because a quality improvement bought with a 3× cost increase is a regression on the axis the business feels, and a gate that only guards quality will happily let it through</span></label>
+<label class="opt"><input type="radio" name="q12" value="1"><span class="lt">B</span><span>Because cost is the most reliably measured metric</span></label>
+<label class="opt"><input type="radio" name="q12" value="2"><span class="lt">C</span><span>Because the cost threshold is what makes the offline run deterministic</span></label>
+<label class="opt"><input type="radio" name="q12" value="3"><span class="lt">D</span><span>To stop the CI bill from growing</span></label>
+  
+</section>
+<section class="q" id="Q14">
+  <div class="qhead"><span class="qnum">Q14</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Section 6 of the evaluation report is “what it is not safe for”. The handout calls it the section that distinguishes a professional report. What makes a good one?</p>
+  
+  <label class="opt"><input type="radio" name="q13" value="0"><span class="lt">A</span><span>A list of the model’s known limitations as published by the provider</span></label>
+<label class="opt"><input type="radio" name="q13" value="1"><span class="lt">B</span><span>The confidence intervals on every metric in section 2</span></label>
+<label class="opt"><input type="radio" name="q13" value="2"><span class="lt">C</span><span>A disclaimer that the system is a prototype and comes with no warranty</span></label>
+<label class="opt"><input type="radio" name="q13" value="3"><span class="lt">D</span><span>A concrete boundary of safe use with the reason attached — e.g. “not to be relied on for a coverage decision without human review”, and precisely why: the measured correctness, what the residual failures look like, and who is harmed when one lands</span></label>
+  
+</section>
+<section class="q" id="Q15">
+  <div class="qhead"><span class="qnum">Q15</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Section 7 asks for three next steps, <strong>ranked, with expected value</strong>. Why ranked with expected value rather than simply listed?</p>
+  
+  <label class="opt"><input type="radio" name="q14" value="0"><span class="lt">A</span><span>Because the grader will implement the top item</span></label>
+<label class="opt"><input type="radio" name="q14" value="1"><span class="lt">B</span><span>Because expected value is required to compute the annual cost in section 4</span></label>
+<label class="opt"><input type="radio" name="q14" value="2"><span class="lt">C</span><span>Because the rubric allocates marks per ranked item</span></label>
+<label class="opt"><input type="radio" name="q14" value="3"><span class="lt">D</span><span>Because an unranked list is a wish, while a ranking forces you to compare the size of each opportunity against its cost — the same Lab 5 Part B discipline, now applied to your own roadmap</span></label>
+  
+</section>
+<section class="q" id="Q16">
+  <div class="qhead"><span class="qnum">Q16</span>
+    <span class="qpart">Part E</span></div>
+  <p class="stem">Section 1 must be “one paragraph, no jargon — a non-engineer must understand it”. Why does that requirement carry marks in an engineering module?</p>
+  
+  <label class="opt"><input type="radio" name="q15" value="0"><span class="lt">A</span><span>It is a writing exercise unrelated to the system</span></label>
+<label class="opt"><input type="radio" name="q15" value="1"><span class="lt">B</span><span>Because the report’s audience includes the people who decide whether the system is deployed, and a system whose behaviour cannot be explained to them does not get deployed — the same reason the economic argument appears in Lab 1 and the recommendation paragraph in Lab 2</span></label>
+<label class="opt"><input type="radio" name="q15" value="2"><span class="lt">C</span><span>Because it is the section reused in the demo-day script</span></label>
+<label class="opt"><input type="radio" name="q15" value="3"><span class="lt">D</span><span>Because plain language reduces the risk of overstating the metrics</span></label>
+  
+</section>
+<section class="q" id="Q17">
+  <div class="qhead"><span class="qnum">Q17</span>
+    <span class="qpart">Part Demo</span></div>
+  <p class="stem">Demo item 5 is “show your worst remaining failure and say what you would do about it”, and the handout says a pair claiming not to have one “has not looked”. Why is that item graded at all?</p>
+  
+  <label class="opt"><input type="radio" name="q16" value="0"><span class="lt">A</span><span>Because the remaining failure determines the limitations section</span></label>
+<label class="opt"><input type="radio" name="q16" value="1"><span class="lt">B</span><span>To ensure every pair has tested their system before the demo</span></label>
+<label class="opt"><input type="radio" name="q16" value="2"><span class="lt">C</span><span>Because knowing your system’s worst failure is the difference between having measured it and having demonstrated it — and it is the one claim in the demo that cannot be prepared by making the system look good</span></label>
+<label class="opt"><input type="radio" name="q16" value="3"><span class="lt">D</span><span>Because the grading sheet requires a negative result in every deliverable</span></label>
+  
+</section>
+<section class="q" id="Q18">
+  <div class="qhead"><span class="qnum">Q18</span>
+    <span class="qpart">Part Targets</span></div>
+  <p class="stem">The latency targets are p95 ≤ <strong>800 ms cached</strong> and ≤ <strong>6,000 ms uncached</strong>. Why two numbers rather than one?</p>
+  
+  <label class="opt"><input type="radio" name="q17" value="0"><span class="lt">A</span><span>Cached responses are exempt from the citation validation step</span></label>
+<label class="opt"><input type="radio" name="q17" value="1"><span class="lt">B</span><span>The cached path is measured on a different endpoint</span></label>
+<label class="opt"><input type="radio" name="q17" value="2"><span class="lt">C</span><span>They are different systems from a performance standpoint — a cache hit skips retrieval and generation entirely — and quoting a single blended p95 would let a high hit rate hide a slow uncached path</span></label>
+<label class="opt"><input type="radio" name="q17" value="3"><span class="lt">D</span><span>The 800 ms figure is the streaming TTFT target under another name</span></label>
+  
+</section>
+<section class="q" id="Q19">
+  <div class="qhead"><span class="qnum">Q19</span>
+    <span class="qpart">Part Method</span></div>
+  <p class="stem">Deliverable 3 is a root README explaining how to run the system in under five minutes on a clean machine — and the handout says to test it on <em>your partner’s</em> laptop, not yours. Why that instruction specifically?</p>
+  
+  <label class="opt"><input type="radio" name="q18" value="0"><span class="lt">A</span><span>Because your machine has the accumulated state that makes the instructions look complete — the venv, the keys, the warm cache, the file you created and forgot to commit. A different machine is the only honest test of reproducibility</span></label>
+<label class="opt"><input type="radio" name="q18" value="1"><span class="lt">B</span><span>Because the demo will be run from your partner’s machine</span></label>
+<label class="opt"><input type="radio" name="q18" value="2"><span class="lt">C</span><span>Because the grader uses a Windows machine and yours is macOS</span></label>
+<label class="opt"><input type="radio" name="q18" value="3"><span class="lt">D</span><span>Because your partner will be graded on it too</span></label>
+  
+</section>
+<section class="q" id="Q20">
+  <div class="qhead"><span class="qnum">Q20</span>
+    <span class="qpart">Part Rubric</span></div>
+  <p class="stem">The handout claims that a RAG service with a p95 SLO and a CI gate on eval regression is what distinguishes your portfolio, because “every candidate has a RAG notebook”. Which pairing of artefacts best supports that claim?</p>
+  
+  <label class="opt"><input type="radio" name="q19" value="0"><span class="lt">A</span><span>The streaming endpoint and the trace ids — they show production engineering</span></label>
+<label class="opt"><input type="radio" name="q19" value="1"><span class="lt">B</span><span>The Streamlit UI and the dashboard — they make the system visible</span></label>
+<label class="opt"><input type="radio" name="q19" value="2"><span class="lt">C</span><span>The regression gate demonstrated failing, and the evaluation report’s limitations section — one proves the system’s behaviour is defended automatically, the other proves you know where it stops working</span></label>
+<label class="opt"><input type="radio" name="q19" value="3"><span class="lt">D</span><span>The metrics endpoint and the semantic cache — they show operational maturity</span></label>
+  
+</section>
+</form>
+
+<footer>
+  <div class="progress noprint" id="prog">0 of 20 answered</div>
+  <button id="go" class="noprint" disabled>Finish and generate my code</button>
+  <div id="out" style="display:none;margin-top:24px">
+    <p><strong>Submitted.</strong> Copy this and post it as instructed. If you
+    reload this page you will start again, and the code will say so.</p>
+    <textarea id="code" readonly onclick="this.select()"></textarea>
+    <p style="margin-top:12px">
+      <button class="ghost" id="cp" type="button">Copy code</button></p>
+  </div>
+</footer>
+</div>
+
+<script>
+
+function enc(o){
+  const s=JSON.stringify(o), b=new TextEncoder().encode(s);
+  let bin=''; b.forEach(c=>bin+=String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function dec(t){
+  t=t.trim().replace(/-/g,'+').replace(/_/g,'/');
+  while(t.length%4)t+='=';
+  const bin=atob(t), b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(b));
+}
+
+const N=20, IDS=["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20"],
+      MULTI=[false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false];
+const t0=Date.now();
+const form=document.getElementById('quiz'), go=document.getElementById('go'),
+      prog=document.getElementById('prog'), nm=document.getElementById('nm'),
+      rl=document.getElementById('rl');
+
+function picked(i){
+  return [...form.querySelectorAll(`input[name=q${i}]:checked`)]
+           .map(e=>+e.value).sort((a,b)=>a-b);
+}
+function refresh(){
+  let done=0; for(let i=0;i<N;i++) if(picked(i).length) done++;
+  prog.textContent=done+' of '+N+' answered'
+    + (done<N ? ' — '+(N-done)+' to go' : ' — ready');
+  go.disabled = !(done===N && nm.value.trim() && rl.value.trim());
+}
+form.addEventListener('change',refresh);
+nm.addEventListener('input',refresh); rl.addEventListener('input',refresh);
+
+const KEYSAFE='aip-quiz-lab7-attempt';
+go.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!confirm('Submit? You cannot change your answers afterwards.')) return;
+  let att=1; try{ att=(+localStorage.getItem(KEYSAFE)||0)+1;
+                   localStorage.setItem(KEYSAFE,att); }catch(_){ att=0; }
+  const payload={v:1,lab:7,n:N,
+    name:nm.value.trim(), roll:rl.value.trim(),
+    a:Array.from({length:N},(_,i)=>picked(i)),
+    secs:Math.round((Date.now()-t0)/1000),
+    at:new Date().toISOString().slice(0,16), att:att};
+  document.getElementById('code').value='AIPQ1.'+enc(payload);
+  document.getElementById('out').style.display='block';
+  form.classList.add('locked');
+  form.querySelectorAll('input').forEach(i=>i.disabled=true);
+  nm.disabled=true; rl.disabled=true; go.disabled=true;
+  go.textContent='Submitted';
+  document.getElementById('out').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('cp').addEventListener('click',()=>{
+  const t=document.getElementById('code'); t.select();
+  navigator.clipboard?.writeText(t.value).then(
+    ()=>{document.getElementById('cp').textContent='Copied';},
+    ()=>{document.execCommand('copy');});
+});
+refresh();
+</script>
+</body></html>
