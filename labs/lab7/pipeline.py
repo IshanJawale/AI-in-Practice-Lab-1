@@ -70,7 +70,7 @@ FINAL_K = 10              # Lab 5 fix: pass 10 chunks, not 5
 EXACT_CACHE_SIZE = 2048
 SEMANTIC_CACHE_SIZE = 2048
 # Measured, not reasoned: see reports/lab7_semantic_cache.json and the report.
-SEMANTIC_THRESHOLD = float(os.getenv("AIP_SEMANTIC_THRESHOLD", "0.93"))
+SEMANTIC_THRESHOLD = float(os.getenv("AIP_SEMANTIC_THRESHOLD", "0.99"))
 DAILY_BUDGET_USD = float(os.getenv("AIP_SERVICE_BUDGET_USD", "1.00"))
 
 BLOCKED_MESSAGE = ("I can't help with that request. It looks like it contains "

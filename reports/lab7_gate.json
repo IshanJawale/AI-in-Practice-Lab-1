@@ -7,10 +7,10 @@
     "refusal_precision": 0.625,
     "hit_rate_at_5": 0.9761904761904762,
     "cost_per_query_usd": 0.0020848733333333333,
-    "p95_latency_ms": 5055.345800001807
+    "p95_latency_ms": 5055.445800001808
   },
   "run": {
-    "p50_latency_ms": 2859.2171000419557,
+    "p50_latency_ms": 2857.4371000419555,
     "n": 45,
     "n_answerable": 40,
     "n_unanswerable": 5,
@@ -49,14 +49,14 @@
         "claims-process"
       ],
       "cost_usd": 0.00202545,
-      "latency_ms": 2690.402399902567,
+      "latency_ms": 2690.752399902567,
       "stages_ms": {
         "guard_in": 0.04,
-        "embed": 2.18,
-        "retrieve": 0.3,
-        "rerank": 0.01,
-        "generate": 1.42,
-        "validate": 0.11
+        "embed": 2.55,
+        "retrieve": 0.28,
+        "rerank": 0.02,
+        "generate": 1.69,
+        "validate": 0.1
       },
       "llm_latency_ms": 2687.7623999025673
     },
@@ -88,13 +88,13 @@
         "plans-overview"
       ],
       "cost_usd": 0.00142455,
-      "latency_ms": 1944.8561999530345,
+      "latency_ms": 1944.7361999530344,
       "stages_ms": {
-        "guard_in": 0.03,
-        "embed": 2.22,
+        "guard_in": 0.02,
+        "embed": 2.11,
         "retrieve": 0.18,
         "rerank": 0.01,
-        "generate": 1.4,
+        "generate": 1.19,
         "validate": 0.03
       },
       "llm_latency_ms": 1942.3861999530345
@@ -127,14 +127,14 @@
         "plan-bronze"
       ],
       "cost_usd": 0.0019334999999999999,
-      "latency_ms": 3097.1701999677716,
+      "latency_ms": 3096.490199967772,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 2.44,
-        "retrieve": 0.16,
+        "embed": 1.78,
+        "retrieve": 0.15,
         "rerank": 0.01,
-        "generate": 1.45,
-        "validate": 0.03
+        "generate": 1.36,
+        "validate": 0.02
       },
       "llm_latency_ms": 3094.5101999677718
     },
@@ -165,13 +165,13 @@
         "pre-existing-conditions"
       ],
       "cost_usd": 0.00230985,
-      "latency_ms": 2939.9362000860647,
+      "latency_ms": 2939.3462000860645,
       "stages_ms": {
-        "guard_in": 0.02,
-        "embed": 2.74,
-        "retrieve": 0.16,
-        "rerank": 0.01,
-        "generate": 1.35,
+        "guard_in": 0.05,
+        "embed": 2.12,
+        "retrieve": 0.15,
+        "rerank": 0.02,
+        "generate": 1.15,
         "validate": 0.03
       },
       "llm_latency_ms": 2936.9762000860646
@@ -203,13 +203,13 @@
         "policy-renewal-and-portability"
       ],
       "cost_usd": 0.0014037,
-      "latency_ms": 2924.538000082821,
+      "latency_ms": 2924.6980000828207,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.82,
-        "retrieve": 0.13,
+        "embed": 1.91,
+        "retrieve": 0.2,
         "rerank": 0.01,
-        "generate": 1.56,
+        "generate": 1.45,
         "validate": 0.03
       },
       "llm_latency_ms": 2922.5280000828207
@@ -241,13 +241,13 @@
         "network-hospitals"
       ],
       "cost_usd": 0.0011972999999999999,
-      "latency_ms": 2044.8166999467462,
+      "latency_ms": 2044.2666999467463,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 2.29,
-        "retrieve": 0.17,
+        "embed": 1.7,
+        "retrieve": 0.21,
         "rerank": 0.01,
-        "generate": 1.35,
+        "generate": 1.28,
         "validate": 0.03
       },
       "llm_latency_ms": 2042.2966999467462
@@ -280,13 +280,13 @@
         "plans-overview"
       ],
       "cost_usd": 0.0017571,
-      "latency_ms": 2446.966000086777,
+      "latency_ms": 2446.426000086777,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 2.34,
-        "retrieve": 0.19,
+        "embed": 1.83,
+        "retrieve": 0.16,
         "rerank": 0.01,
-        "generate": 1.23,
+        "generate": 1.13,
         "validate": 0.03
       },
       "llm_latency_ms": 2444.376000086777
@@ -318,14 +318,14 @@
         "exclusions"
       ],
       "cost_usd": 0.0016872,
-      "latency_ms": 2311.9173999423533,
+      "latency_ms": 2312.1473999423533,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.62,
-        "retrieve": 0.13,
+        "embed": 1.77,
+        "retrieve": 0.22,
         "rerank": 0.01,
-        "generate": 1.09,
-        "validate": 0.03
+        "generate": 1.03,
+        "validate": 0.02
       },
       "llm_latency_ms": 2310.1073999423534
     },
@@ -356,13 +356,13 @@
         "plan-gold"
       ],
       "cost_usd": 0.0013395,
-      "latency_ms": 3518.3987999965993,
+      "latency_ms": 3518.8287999965996,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.26,
-        "retrieve": 0.17,
+        "embed": 1.64,
+        "retrieve": 0.22,
         "rerank": 0.01,
-        "generate": 2.13,
+        "generate": 1.46,
         "validate": 0.03
       },
       "llm_latency_ms": 3516.9087999965996
@@ -394,14 +394,14 @@
         "grievance-redressal"
       ],
       "cost_usd": 0.0021081,
-      "latency_ms": 5055.345800001807,
+      "latency_ms": 5055.445800001808,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.58,
-        "retrieve": 0.16,
+        "embed": 1.67,
+        "retrieve": 0.18,
         "rerank": 0.01,
-        "generate": 1.43,
-        "validate": 0.04
+        "generate": 1.26,
+        "validate": 0.03
       },
       "llm_latency_ms": 5053.5258000018075
     },
@@ -434,13 +434,13 @@
         "claims-process"
       ],
       "cost_usd": 0.0022475999999999998,
-      "latency_ms": 2489.424500036873,
+      "latency_ms": 2489.964500036873,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.37,
-        "retrieve": 0.19,
+        "embed": 1.97,
+        "retrieve": 0.13,
         "rerank": 0.01,
-        "generate": 1.13,
+        "generate": 1.19,
         "validate": 0.03
       },
       "llm_latency_ms": 2487.804500036873
@@ -472,14 +472,14 @@
         "exclusions"
       ],
       "cost_usd": 0.00134655,
-      "latency_ms": 2213.4545000686126,
+      "latency_ms": 2213.3145000686122,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.56,
-        "retrieve": 0.19,
+        "embed": 1.44,
+        "retrieve": 0.18,
         "rerank": 0.01,
-        "generate": 1.24,
-        "validate": 0.04
+        "generate": 1.12,
+        "validate": 0.03
       },
       "llm_latency_ms": 2211.6345000686124
     },
@@ -510,13 +510,13 @@
         "policy-renewal-and-portability"
       ],
       "cost_usd": 0.0020899499999999997,
-      "latency_ms": 4126.363000011928,
+      "latency_ms": 4126.173000011929,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.67,
-        "retrieve": 0.34,
+        "embed": 1.62,
+        "retrieve": 0.2,
         "rerank": 0.01,
-        "generate": 3.0,
+        "generate": 2.79,
         "validate": 0.04
       },
       "llm_latency_ms": 4124.283000011928
@@ -548,13 +548,13 @@
         "outpatient-and-wellness"
       ],
       "cost_usd": 0.0013671,
-      "latency_ms": 1682.8351000592857,
+      "latency_ms": 1682.7051000592858,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 2.33,
-        "retrieve": 0.23,
+        "embed": 2.26,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.95,
+        "generate": 1.36,
         "validate": 0.03
       },
       "llm_latency_ms": 1680.2151000592858
@@ -586,14 +586,14 @@
         "glossary"
       ],
       "cost_usd": 0.0015987,
-      "latency_ms": 2130.5131999333203,
+      "latency_ms": 2129.6631999333204,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 2.54,
-        "retrieve": 0.15,
+        "embed": 1.68,
+        "retrieve": 0.17,
         "rerank": 0.02,
-        "generate": 2.12,
-        "validate": 0.04
+        "generate": 1.17,
+        "validate": 0.03
       },
       "llm_latency_ms": 2127.7431999333203
     },
@@ -625,13 +625,13 @@
         "claims-timelines"
       ],
       "cost_usd": 0.0014742,
-      "latency_ms": 2132.3089000233635,
+      "latency_ms": 2131.7989000233633,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.97,
-        "retrieve": 0.2,
+        "embed": 1.49,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 2.14,
+        "generate": 1.02,
         "validate": 0.02
       },
       "llm_latency_ms": 2130.0789000233635
@@ -663,14 +663,14 @@
         "glossary"
       ],
       "cost_usd": 0.0015744,
-      "latency_ms": 2949.049099979773,
+      "latency_ms": 2948.889099979773,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.38,
-        "retrieve": 0.22,
-        "rerank": 0.02,
-        "generate": 1.68,
-        "validate": 0.02
+        "embed": 1.25,
+        "retrieve": 0.19,
+        "rerank": 0.01,
+        "generate": 1.52,
+        "validate": 0.03
       },
       "llm_latency_ms": 2947.389099979773
     },
@@ -701,13 +701,13 @@
         "network-hospitals"
       ],
       "cost_usd": 0.0021591,
-      "latency_ms": 2588.792199939787,
+      "latency_ms": 2589.0121999397875,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.7,
-        "retrieve": 0.17,
-        "rerank": 0.01,
-        "generate": 1.5,
+        "embed": 1.92,
+        "retrieve": 0.16,
+        "rerank": 0.02,
+        "generate": 1.27,
         "validate": 0.03
       },
       "llm_latency_ms": 2586.8621999397874
@@ -740,13 +740,13 @@
         "claims-process"
       ],
       "cost_usd": 0.0031576499999999997,
-      "latency_ms": 2829.3838999895006,
+      "latency_ms": 2829.0938999895006,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.72,
-        "retrieve": 0.24,
+        "embed": 1.55,
+        "retrieve": 0.12,
         "rerank": 0.01,
-        "generate": 1.33,
+        "generate": 1.12,
         "validate": 0.04
       },
       "llm_latency_ms": 2827.3438999895006
@@ -770,14 +770,14 @@
         "plans-overview"
       ],
       "cost_usd": 0.0031107,
-      "latency_ms": 3814.1405000185596,
+      "latency_ms": 3814.560500018559,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.73,
-        "retrieve": 0.24,
+        "embed": 1.66,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.04,
-        "validate": 0.79
+        "generate": 1.01,
+        "validate": 1.33
       },
       "llm_latency_ms": 3811.3405000185594
     },
@@ -809,13 +809,13 @@
         "pre-existing-conditions"
       ],
       "cost_usd": 0.00188295,
-      "latency_ms": 2131.204599929936,
+      "latency_ms": 2130.804599929936,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.72,
-        "retrieve": 0.25,
+        "embed": 1.37,
+        "retrieve": 0.2,
         "rerank": 0.01,
-        "generate": 1.34,
+        "generate": 1.0,
         "validate": 0.03
       },
       "llm_latency_ms": 2129.1645999299362
@@ -848,13 +848,13 @@
         "dependents-and-family-floater"
       ],
       "cost_usd": 0.0024654,
-      "latency_ms": 3181.6042000195384,
+      "latency_ms": 3181.5442000195385,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.69,
-        "retrieve": 0.2,
+        "embed": 1.67,
+        "retrieve": 0.16,
         "rerank": 0.01,
-        "generate": 1.28,
+        "generate": 1.17,
         "validate": 0.04
       },
       "llm_latency_ms": 3179.6442000195384
@@ -887,13 +887,13 @@
         "plan-bronze"
       ],
       "cost_usd": 0.0030708,
-      "latency_ms": 4309.211100012511,
+      "latency_ms": 4308.951100012511,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.57,
-        "retrieve": 0.15,
+        "embed": 1.32,
+        "retrieve": 0.14,
         "rerank": 0.01,
-        "generate": 1.73,
+        "generate": 1.5,
         "validate": 0.02
       },
       "llm_latency_ms": 4307.441100012511
@@ -926,14 +926,14 @@
         "glossary"
       ],
       "cost_usd": 0.0019839,
-      "latency_ms": 2280.0151000537353,
+      "latency_ms": 2280.355100053735,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.3,
-        "retrieve": 0.16,
+        "embed": 1.6,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.29,
-        "validate": 0.02
+        "generate": 1.26,
+        "validate": 0.03
       },
       "llm_latency_ms": 2278.505100053735
     },
@@ -965,13 +965,13 @@
         "plan-gold"
       ],
       "cost_usd": 0.0025758,
-      "latency_ms": 2896.6204000436514,
+      "latency_ms": 2896.2404000436513,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.5,
-        "retrieve": 0.2,
+        "embed": 1.13,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.16,
+        "generate": 1.2,
         "validate": 0.03
       },
       "llm_latency_ms": 2894.8504000436515
@@ -1005,13 +1005,13 @@
         "plan-bronze"
       ],
       "cost_usd": 0.00187965,
-      "latency_ms": 8644.568799985536,
+      "latency_ms": 8644.608799985535,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.55,
-        "retrieve": 0.18,
+        "embed": 1.62,
+        "retrieve": 0.15,
         "rerank": 0.01,
-        "generate": 1.25,
+        "generate": 1.45,
         "validate": 0.03
       },
       "llm_latency_ms": 8642.778799985535
@@ -1044,13 +1044,13 @@
         "outpatient-and-wellness"
       ],
       "cost_usd": 0.0020308500000000003,
-      "latency_ms": 2884.9210000566395,
+      "latency_ms": 2884.6710000566395,
       "stages_ms": {
-        "guard_in": 0.02,
-        "embed": 1.53,
-        "retrieve": 0.19,
+        "guard_in": 0.03,
+        "embed": 1.3,
+        "retrieve": 0.16,
         "rerank": 0.01,
-        "generate": 1.26,
+        "generate": 1.25,
         "validate": 0.03
       },
       "llm_latency_ms": 2883.1410000566393
@@ -1083,14 +1083,14 @@
         "claims-process"
       ],
       "cost_usd": 0.0016836000000000002,
-      "latency_ms": 2796.415400081612,
+      "latency_ms": 2796.195400081612,
       "stages_ms": {
-        "guard_in": 0.03,
-        "embed": 1.69,
+        "guard_in": 0.02,
+        "embed": 1.47,
         "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.02,
-        "validate": 0.03
+        "generate": 1.37,
+        "validate": 0.04
       },
       "llm_latency_ms": 2794.485400081612
     },
@@ -1121,13 +1121,13 @@
         "claims-timelines"
       ],
       "cost_usd": 0.00223995,
-      "latency_ms": 2876.6639999989793,
+      "latency_ms": 2876.593999998979,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.45,
-        "retrieve": 0.18,
+        "embed": 1.36,
+        "retrieve": 0.2,
         "rerank": 0.01,
-        "generate": 1.0,
+        "generate": 1.13,
         "validate": 0.04
       },
       "llm_latency_ms": 2874.9539999989793
@@ -1160,13 +1160,13 @@
         "claims-timelines"
       ],
       "cost_usd": 0.0027723,
-      "latency_ms": 2954.5570000226053,
+      "latency_ms": 2954.247000022605,
       "stages_ms": {
-        "guard_in": 0.03,
-        "embed": 1.77,
+        "guard_in": 0.02,
+        "embed": 1.47,
         "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.04,
+        "generate": 1.44,
         "validate": 0.03
       },
       "llm_latency_ms": 2952.547000022605
@@ -1199,13 +1199,13 @@
         "claims-process"
       ],
       "cost_usd": 0.0021060000000000002,
-      "latency_ms": 2924.5713999966906,
+      "latency_ms": 2924.3213999966906,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.83,
-        "retrieve": 0.18,
+        "embed": 1.57,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.28,
+        "generate": 1.33,
         "validate": 0.03
       },
       "llm_latency_ms": 2922.5013999966905
@@ -1238,13 +1238,13 @@
         "plan-gold"
       ],
       "cost_usd": 0.00209445,
-      "latency_ms": 2527.8706999509036,
+      "latency_ms": 2527.8006999509034,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.59,
-        "retrieve": 0.16,
+        "embed": 1.55,
+        "retrieve": 0.13,
         "rerank": 0.01,
-        "generate": 1.12,
+        "generate": 1.36,
         "validate": 0.03
       },
       "llm_latency_ms": 2526.0606999509037
@@ -1276,13 +1276,13 @@
         "plans-overview"
       ],
       "cost_usd": 0.00272895,
-      "latency_ms": 3111.9709000420944,
+      "latency_ms": 3110.2209000420944,
       "stages_ms": {
-        "guard_in": 0.02,
-        "embed": 3.38,
-        "retrieve": 0.19,
+        "guard_in": 0.03,
+        "embed": 1.61,
+        "retrieve": 0.2,
         "rerank": 0.01,
-        "generate": 1.17,
+        "generate": 1.46,
         "validate": 0.03
       },
       "llm_latency_ms": 3108.3409000420943
@@ -1316,13 +1316,13 @@
         "dependents-and-family-floater"
       ],
       "cost_usd": 0.0030049499999999997,
-      "latency_ms": 2859.2171000419557,
+      "latency_ms": 2857.4371000419555,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 3.15,
-        "retrieve": 0.24,
+        "embed": 1.43,
+        "retrieve": 0.18,
         "rerank": 0.01,
-        "generate": 1.38,
+        "generate": 1.19,
         "validate": 0.03
       },
       "llm_latency_ms": 2855.7571000419557
@@ -1355,13 +1355,13 @@
         "outpatient-and-wellness"
       ],
       "cost_usd": 0.00162765,
-      "latency_ms": 2515.2577999307214,
+      "latency_ms": 2515.3177999307213,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.43,
-        "retrieve": 0.17,
+        "embed": 1.48,
+        "retrieve": 0.18,
         "rerank": 0.01,
-        "generate": 1.24,
+        "generate": 1.11,
         "validate": 0.03
       },
       "llm_latency_ms": 2513.5977999307215
@@ -1391,11 +1391,11 @@
       ],
       "relevant": [],
       "cost_usd": 0.0017106,
-      "latency_ms": 2319.8459000114353,
+      "latency_ms": 2320.165900011435,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.32,
-        "retrieve": 0.17,
+        "embed": 1.67,
+        "retrieve": 0.14,
         "rerank": 0.01,
         "generate": 1.1,
         "validate": 0.02
@@ -1430,14 +1430,14 @@
         "plans-overview"
       ],
       "cost_usd": 0.0023754,
-      "latency_ms": 2565.2373000898956,
+      "latency_ms": 2565.0873000898955,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.41,
-        "retrieve": 0.18,
+        "embed": 1.24,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.46,
-        "validate": 0.02
+        "generate": 1.71,
+        "validate": 0.03
       },
       "llm_latency_ms": 2563.5973000898957
     },
@@ -1466,13 +1466,13 @@
       ],
       "relevant": [],
       "cost_usd": 0.0015813000000000001,
-      "latency_ms": 2688.324800035134,
+      "latency_ms": 2688.734800035134,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.11,
-        "retrieve": 0.18,
+        "embed": 1.51,
+        "retrieve": 0.19,
         "rerank": 0.01,
-        "generate": 1.34,
+        "generate": 1.44,
         "validate": 0.02
       },
       "llm_latency_ms": 2686.984800035134
@@ -1502,13 +1502,13 @@
       ],
       "relevant": [],
       "cost_usd": 0.00166515,
-      "latency_ms": 2752.879399950616,
+      "latency_ms": 2753.479399950616,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.02,
-        "retrieve": 0.18,
+        "embed": 1.55,
+        "retrieve": 0.25,
         "rerank": 0.01,
-        "generate": 1.27,
+        "generate": 1.38,
         "validate": 0.02
       },
       "llm_latency_ms": 2751.629399950616
@@ -1529,14 +1529,14 @@
         "grievance-redressal"
       ],
       "cost_usd": 0.00299445,
-      "latency_ms": 3517.419399960339,
+      "latency_ms": 3518.249399960339,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.18,
-        "retrieve": 0.14,
+        "embed": 1.6,
+        "retrieve": 0.16,
         "rerank": 0.01,
-        "generate": 1.08,
-        "validate": 1.0
+        "generate": 1.0,
+        "validate": 1.39
       },
       "llm_latency_ms": 3515.069399960339
     },
@@ -1567,14 +1567,14 @@
         "policy-renewal-and-portability"
       ],
       "cost_usd": 0.00231735,
-      "latency_ms": 12326.782100019902,
+      "latency_ms": 12326.912100019901,
       "stages_ms": {
-        "guard_in": 0.02,
-        "embed": 1.09,
-        "retrieve": 0.18,
+        "guard_in": 0.03,
+        "embed": 1.17,
+        "retrieve": 0.21,
         "rerank": 0.01,
-        "generate": 1.09,
-        "validate": 0.03
+        "generate": 1.34,
+        "validate": 0.04
       },
       "llm_latency_ms": 12325.452100019902
     },
@@ -1595,14 +1595,14 @@
         "claims-process"
       ],
       "cost_usd": 0.00297885,
-      "latency_ms": 4690.846000033207,
+      "latency_ms": 4690.596000033207,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.71,
-        "retrieve": 0.16,
+        "embed": 1.52,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.18,
-        "validate": 1.09
+        "generate": 1.03,
+        "validate": 1.02
       },
       "llm_latency_ms": 4687.856000033207
     },
@@ -1634,14 +1634,14 @@
         "premium-and-payments"
       ],
       "cost_usd": 0.0029131499999999998,
-      "latency_ms": 3050.672700033523,
+      "latency_ms": 3050.7827000335233,
       "stages_ms": {
-        "guard_in": 0.03,
-        "embed": 1.29,
-        "retrieve": 0.14,
+        "guard_in": 0.02,
+        "embed": 1.39,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.4,
-        "validate": 0.03
+        "generate": 1.46,
+        "validate": 0.02
       },
       "llm_latency_ms": 3049.172700033523
     },
@@ -1672,13 +1672,13 @@
         "plan-silver"
       ],
       "cost_usd": 0.00157695,
-      "latency_ms": 2337.378200031705,
+      "latency_ms": 2337.3482000317053,
       "stages_ms": {
         "guard_in": 0.03,
-        "embed": 1.34,
-        "retrieve": 0.21,
+        "embed": 1.35,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 1.17,
+        "generate": 1.38,
         "validate": 0.03
       },
       "llm_latency_ms": 2335.758200031705
@@ -1710,14 +1710,14 @@
         "exclusions"
       ],
       "cost_usd": 0.0022467,
-      "latency_ms": 2981.5599000970274,
+      "latency_ms": 2981.4299000970273,
       "stages_ms": {
         "guard_in": 0.02,
-        "embed": 1.36,
-        "retrieve": 0.15,
+        "embed": 1.2,
+        "retrieve": 0.17,
         "rerank": 0.01,
-        "generate": 0.61,
-        "validate": 0.02
+        "generate": 0.57,
+        "validate": 0.03
       },
       "llm_latency_ms": 2979.9999000970274
     }

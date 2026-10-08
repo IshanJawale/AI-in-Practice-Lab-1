@@ -1,0 +1,271 @@
+{
+  "embedding_model": "gemini",
+  "paraphrase": [
+    {
+      "a": "How many days do I have to submit a reimbursement claim after discharge?",
+      "b": "What is the deadline for filing a reimbursement claim after leaving hospital?",
+      "cosine": 0.9303500652313232
+    },
+    {
+      "a": "What is the room rent limit on the Silver plan?",
+      "b": "How much room rent does the Silver plan allow per day?",
+      "cosine": 0.955155074596405
+    },
+    {
+      "a": "Is maternity covered under the Gold plan?",
+      "b": "Does the Gold plan include maternity benefits?",
+      "cosine": 0.9810974597930908
+    },
+    {
+      "a": "How do I file a complaint about a rejected claim?",
+      "b": "What is the process to raise a grievance over a claim rejection?",
+      "cosine": 0.8518243432044983
+    },
+    {
+      "a": "Can I port my policy to Aurora from another insurer?",
+      "b": "How does policy portability from a different insurer work?",
+      "cosine": 0.8105153441429138
+    },
+    {
+      "a": "What is the waiting period for pre-existing conditions?",
+      "b": "How long must I wait before pre-existing conditions are covered?",
+      "cosine": 0.9624818563461304
+    },
+    {
+      "a": "Does Aurora have cashless treatment at network hospitals?",
+      "b": "Can I get cashless hospitalisation at a network hospital?",
+      "cosine": 0.8138222694396973
+    },
+    {
+      "a": "What is the grace period for paying my life insurance premium?",
+      "b": "How long is the grace period on a life insurance premium payment?",
+      "cosine": 0.9622108340263367
+    },
+    {
+      "a": "Which documents are required to submit a claim?",
+      "b": "What paperwork do I need for filing a claim?",
+      "cosine": 0.857320249080658
+    },
+    {
+      "a": "Are dependent parents covered on the family floater?",
+      "b": "Can I add my parents to a family floater plan?",
+      "cosine": 0.9138119220733643
+    },
+    {
+      "a": "What is excluded from travel insurance?",
+      "b": "What does the travel insurance policy not cover?",
+      "cosine": 0.8614076375961304
+    },
+    {
+      "a": "How do I renew my policy?",
+      "b": "What are the steps for policy renewal?",
+      "cosine": 0.8771027326583862
+    }
+  ],
+  "near_miss": [
+    {
+      "a": "What is the room rent limit on the Silver plan?",
+      "b": "What is the room rent limit on the Gold plan?",
+      "cosine": 0.878188967704773,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the room rent limit on the Silver plan?",
+      "b": "What is the room rent limit on the Bronze plan?",
+      "cosine": 0.8901264667510986,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "Is maternity covered under the Gold plan?",
+      "b": "Is maternity covered under the Silver plan?",
+      "cosine": 0.8649474382400513,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the waiting period on the Gold plan?",
+      "b": "What is the waiting period on the Silver plan?",
+      "cosine": 0.8525591492652893,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "How many days do I have to submit a reimbursement claim after discharge?",
+      "b": "How many days do I have to submit a reimbursement claim before admission?",
+      "cosine": 0.8946324586868286,
+      "entity_guard_blocks": false
+    },
+    {
+      "a": "What is the sum insured on the Platinum plan?",
+      "b": "What is the sum insured on the Bronze plan?",
+      "cosine": 0.8314285278320312,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the claim deadline for health insurance?",
+      "b": "What is the claim deadline for motor insurance?",
+      "cosine": 0.8357532620429993,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the grace period for a monthly premium?",
+      "b": "What is the grace period for an annual premium?",
+      "cosine": 0.8750705122947693,
+      "entity_guard_blocks": false
+    },
+    {
+      "a": "What is the co-payment for senior citizens above 60?",
+      "b": "What is the co-payment for senior citizens above 75?",
+      "cosine": 0.9017540216445923,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "Does the Silver plan cover dental treatment?",
+      "b": "Does the Silver plan exclude dental treatment?",
+      "cosine": 0.9841305613517761,
+      "entity_guard_blocks": false
+    },
+    {
+      "a": "Is a pre-authorisation required for planned hospitalisation?",
+      "b": "Is a pre-authorisation required for emergency hospitalisation?",
+      "cosine": 0.8939392566680908,
+      "entity_guard_blocks": false
+    },
+    {
+      "a": "What is the maximum cashless limit for a 2-member family?",
+      "b": "What is the maximum cashless limit for a 5-member family?",
+      "cosine": 0.9424094557762146,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "Are pre-existing conditions covered after 2 years?",
+      "b": "Are pre-existing conditions covered after 4 years?",
+      "cosine": 0.9081894159317017,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the ombudsman office for Mumbai?",
+      "b": "What is the ombudsman office for Chennai?",
+      "cosine": 0.8465136885643005,
+      "entity_guard_blocks": false
+    },
+    {
+      "a": "Is the critical illness rider available on the Gold plan?",
+      "b": "Is the critical illness rider available on the Bronze plan?",
+      "cosine": 0.885925829410553,
+      "entity_guard_blocks": true
+    },
+    {
+      "a": "What is the premium for a 35 year old on the Silver plan?",
+      "b": "What is the premium for a 55 year old on the Silver plan?",
+      "cosine": 0.9030998945236206,
+      "entity_guard_blocks": true
+    }
+  ],
+  "sweep": [
+    {
+      "threshold": 0.99,
+      "paraphrase_hits": 0,
+      "n_paraphrase": 12,
+      "wrong_hits": 0,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 0
+    },
+    {
+      "threshold": 0.98,
+      "paraphrase_hits": 1,
+      "n_paraphrase": 12,
+      "wrong_hits": 1,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.97,
+      "paraphrase_hits": 1,
+      "n_paraphrase": 12,
+      "wrong_hits": 1,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.96,
+      "paraphrase_hits": 3,
+      "n_paraphrase": 12,
+      "wrong_hits": 1,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.95,
+      "paraphrase_hits": 4,
+      "n_paraphrase": 12,
+      "wrong_hits": 1,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.94,
+      "paraphrase_hits": 4,
+      "n_paraphrase": 12,
+      "wrong_hits": 2,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.93,
+      "paraphrase_hits": 5,
+      "n_paraphrase": 12,
+      "wrong_hits": 2,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.92,
+      "paraphrase_hits": 5,
+      "n_paraphrase": 12,
+      "wrong_hits": 2,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.91,
+      "paraphrase_hits": 6,
+      "n_paraphrase": 12,
+      "wrong_hits": 2,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.9,
+      "paraphrase_hits": 6,
+      "n_paraphrase": 12,
+      "wrong_hits": 5,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 1
+    },
+    {
+      "threshold": 0.88,
+      "paraphrase_hits": 6,
+      "n_paraphrase": 12,
+      "wrong_hits": 9,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 3
+    },
+    {
+      "threshold": 0.85,
+      "paraphrase_hits": 10,
+      "n_paraphrase": 12,
+      "wrong_hits": 13,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 4
+    },
+    {
+      "threshold": 0.8,
+      "paraphrase_hits": 12,
+      "n_paraphrase": 12,
+      "wrong_hits": 16,
+      "n_near_miss": 16,
+      "wrong_hits_with_entity_guard": 5
+    }
+  ],
+  "first_wrong_hit_cosine": 0.9841305613517761,
+  "lowest_zero_wrong_threshold": 0.99
+}
